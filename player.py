@@ -62,6 +62,7 @@ class Player(Being):
 
     def update(self, up, down, left, right, running):
         #a lot of this could be moved to a supeclass
+        self.xvel = 0
         if down:
             pass
         if left and not right:
