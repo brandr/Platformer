@@ -1,5 +1,5 @@
-import entity
-from entity import *
+import being
+from being import *
 import lantern
 from lantern import *
 import exitblock
@@ -7,12 +7,14 @@ from exitblock import *
 import platform
 from platform import *
 
-class Player(Entity):
+class Player(Being):
     def __init__(self,player_animations,start_level):
         #not sure if I'm still using player sprites, could probably make the arg an animationset instead
-        Entity.__init__(self,player_animations,)#,Rect(0,0,32,64),-1)
-        self.direction_set = self.animation_set.set_in_direction("right") #could extend this to gameImage/Entity (or some other class between player and gameimage)
-        self.animation = self.direction_set["idle"]
+        Being.__init__(self,player_animations)#,Rect(0,0,32,64),-1)
+        #self.changeDirection('right') #could extend this to gameImage/Entity (or some other class between player and gameimage)
+        #self.animation = self.direction_set["idle"]
+        self.changeAnimation('idle','right')
+        self.direction_id = 'right'
 
         self.animated = True
         self.default_image = self.animation.images[0]
@@ -64,15 +66,17 @@ class Player(Entity):
             pass
         if left and not right:
             self.xvel = -4
-            self.changeDirection('left')
+            self.direction_id = 'left'
+            #self.changeDirection('left')
         if right and not left:
             self.xvel = 4
-            self.changeDirection('right')
+            self.direction_id = 'right'
+            #self.changeDirection('right')
         if up:
             # only jump if on the ground
             if self.onGround:  
                 self.yvel -= 9
-                self.changeAnimation('jumping')
+                self.changeAnimation('jumping',self.direction_id)
                 self.animation.iter()
                 self.onGround = False
         if not self.onGround:
@@ -87,14 +91,17 @@ class Player(Entity):
         if(self.running):
             self.xvel *= 1.67
             if(self.onGround):
-                self.changeAnimation('running')
+                self.changeAnimation('running',self.direction_id)
         else:
             if(self.onGround):
-                self.changeAnimation('walking')
-        if not(left != right):
-            self.xvel = 0
-            if(self.onGround):
-                self.changeAnimation('idle')
+                if(left != right):
+                    self.changeAnimation('walking',self.direction_id)
+                else:
+                    self.xvel = 0
+                    self.changeAnimation('idle',self.direction_id)
+            else: 
+                if(left == right):
+                    self.xvel = 0
         # increment in x direction
         self.rect.left += self.xvel
         # do x-axis collisions

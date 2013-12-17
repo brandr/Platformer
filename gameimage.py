@@ -16,6 +16,8 @@ class GameImage(pygame.sprite.Sprite):
 
         self.animation_set = animations
         self.animation = self.animation_set.default_animation()
+        
+        self.direction_id = 'default'
         self.animation_id = ('default','default')
 
         self.default_image = copy.copy(self.animation.images[0]) #this might be an inefficient/awkward place to use copy in the long run.
@@ -48,13 +50,13 @@ class GameImage(pygame.sprite.Sprite):
         still_animation = SpriteStripAnimator(still_image,rect, 1, colorkey, False, 1)
         return AnimationSet(still_animation)
 
-    def changeAnimation(self, ID='default',direction = None):
-        #if(ID == 'running'): print ID + ", " + str(self.animation_id)
+    def changeAnimation(self, ID,direction):
         if(self.animation_id[0] == (ID)):
             if(direction == None or self.animation_id[1] == direction):
                return
         if(direction != None):
-            self.changeDirection(direction) 
+            self.changeDirection(direction)
+            #self.direction_id = direction 
         self.animation = self.direction_set[ID]
         self.animation.iter()
         self.animation_id = (ID,direction)
