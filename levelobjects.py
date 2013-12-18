@@ -1,10 +1,11 @@
 #all entities in a level (including player, )
 
 class LevelObjects(object):
-	def __init__(self,level,tiles,entities,platforms,lanterns):
+	def __init__(self,level,tiles,entities,platforms,monsters,lanterns):
 		self.tiles = tiles
 		self.entities = entities
 		self.platforms = platforms
+		self.monsters = monsters
 		self.lanterns = lanterns
 
 		self.player = None

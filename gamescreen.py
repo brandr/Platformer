@@ -33,7 +33,7 @@ class GameScreen:
 
         up = down = left = right = running = False
         while 1:
-            timer.tick(120)
+            timer.tick(150)
             for e in pygame.event.get():
                 if e.type == QUIT: raise SystemExit, "QUIT"
                 if e.type == KEYDOWN and e.key == K_ESCAPE:
@@ -60,7 +60,8 @@ class GameScreen:
                     right = False
                 if e.type == KEYUP and e.key == K_LCTRL:
                     running = False
-                
+                if e.type == USEREVENT + 1: #NOTE: this is not very extensible. it is a quick fix only
+                   player.mobilize()
         # draw background
             for y in range(32):
                 for x in range(32):

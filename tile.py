@@ -29,8 +29,7 @@ class Tile(GameImage):
         self.image.convert()
         self.block = None
 
-    def updateimage(self, visible, lightvalue = 0):
-        #print lightvalue
+    def updateimage(self, lightvalue = 0):
         if(self.block != None): 
             self.image = Surface((32,32))
             self.block.updateimage(lightvalue)
@@ -47,7 +46,7 @@ class Tile(GameImage):
     	if otherlights != None:
     	    for o in otherlights:
     		    o.update_light(tiles)
-        self.updateimage(True,256)
+        self.updateimage(256)
         directions = ((-1,0),(1,0),(0,-1),(0,1))
         for d in directions:
             nexttile = self.relativetile((d[0],d[1]),tiles)
@@ -65,7 +64,7 @@ class Tile(GameImage):
                 if o.withindist(self, o.light_distance()):
                     checkbrightness = o.calculate_brightness(self.coordinates(),tiles)
                     maxbrightness = max(checkbrightness,brightness)
-        self.updateimage(True,maxbrightness)  #update the current image based on light level
+        self.updateimage(maxbrightness)  #update the current image based on light level
         if dist <= 0:
             return               #once the light reaches its max distance, stop
         if self.block!= None:
@@ -97,24 +96,16 @@ class Tile(GameImage):
 
     def castShadow(self, tiles, brightness):
         pass
-        #self.darkenTo(brightness)
-        #if(brightness >= 256 or self.block != None):return
-        #down_tile = self.relativetile((0,1),tiles)
-        #right_tile = self.relativetile((1,0),tiles)
-        #if not (down_tile == None):
-        #    down_tile.castShadow(tiles,brightness*1.06)
-        #if not (right_tile == None):
-        #    right_tile.castShadow(tiles,brightness*1.06)
  
     def relativetile(self,coords,tiles):
         startcoords = self.coordinates()
         tilecoords = (startcoords[0] + coords[0], startcoords[1] + coords[1])
         if Tile.validcoords(tilecoords,tiles): #this check might not be necessary here
-        	return Tile.tileat((tilecoords[0],tilecoords[1]),tiles)
+            return Tile.tileat((tilecoords[0],tilecoords[1]),tiles)
         return None
 
     def coordinates(self):
-    	return (self.rect.centerx/32,self.rect.centery/32)
+        return (self.rect.centerx/32,self.rect.centery/32)
 
     def map(self):
         self.mapped = True 
@@ -124,12 +115,12 @@ class Tile(GameImage):
     @staticmethod
     def validcoords(coords,tiles): #checks if a set of tile coords correspond to an actual tile on the level.
         if(coords == None or coords[0] == None or coords[1] == None):
-        	return False
-    	minuscheck = coords[0] >= 0 and coords[1] >= 0
+            return False
+        minuscheck = coords[0] >= 0 and coords[1] >= 0
         ymax = len(tiles)
         xmax = len(tiles[0])
-    	pluscheck = coords[0] < xmax and coords[1] < ymax
-    	return minuscheck and pluscheck
+        pluscheck = coords[0] < xmax and coords[1] < ymax
+        return minuscheck and pluscheck
 
     @staticmethod
     def tileat(coords,tiles):	#the tile on the level at a set of coords

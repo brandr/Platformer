@@ -16,15 +16,12 @@ class Lantern(Entity):	#lantern which can help the player see
         lantern_images = GameImage.load_animation('test_lantern_1.bmp',lantern_rect,2, -1)
         #could probably store this data even more generally, and make a "load animation set" method that takes args like these.
         animation_set = AnimationSet(lantern_images)
-        #animation_set.insertAnimation(player_idle_right,'right','idle')
-        
         return animation_set
 
-    def update(self, player): 
-        pass
+    def update(self, player):
+        self.updateAnimation() 
 
     def update_light(self,tiles):
-        GameImage.updateimage(self,256) 
         self.emit_light(self.lightvalue, tiles)
 
     def calculate_brightness(self,coords,tiles):

@@ -1,9 +1,26 @@
 import gamescreen
 from gamescreen import *
 
+    #IMMEDIATE STUFF
+
+#sort out player collisions with hostile monsters.
+    #TODO: fix the glitch where the player can be pushed really far up by repeated monster collisions 
+        #(might already be impossible. Need someone to test.)
+        #IDEA: make the player "invincible" (not knocked back by monster collisions) for a little longer than the actual knockback duration
+       
+
+#build the enemies extensibly. Make temporary classes/methods if necessary, but plan to replace them later
+    #Later, have the bat start hanging from the ceiling and maybe give it "dropping"
+        #animation followed by the flying animation
+    #change the bat's attack patterns so that it periodically flaps around the player before diving, bounces off, 
+        #moves away, and then dives again.
+        #(some randomness may make this pattern look more natural)
+    #focus on visual aspects of collisions with player before HP-related stuff, and figure out/test which
+        #event will affect HP (if HP is even a thing in this game)
+
     #SPRITE STUFF
 
-#TODO: organize sprite system
+#TODO: organize sprite system better
     #IDEA: make a data structure involving double arrays which allows:
         #1. loading the level
         #2. loading the level editor
@@ -16,10 +33,10 @@ from gamescreen import *
         #related to tilefactory)
 
         #ENEMY/AI STUFF
-#IDEA: before making the first enemy, add an extra layer of inheritance separating
-       #player from entity (representing a moving entity that cannot be treated like a block.)
-#TODO: implement enemies.
+#TODO: implement more enemies.
 #TODO: when adding AI, try to be creative and extensible, as though this were a roguelike.
+#IDEA: could give some monsters strong knockback by increasing the bounce they deliver.
+#NOTE: enemies remain in the exact same state they were left in when the player leaves a level. should decide if this is good or bad.
 
        #LEVEL STUFF
 #IDEA: consider an intermediary, constant-sized square area between tile and level. (ala super metroid)
@@ -64,7 +81,7 @@ def main():
         "PPP                                                                   PPP",
         "PPP                                                                   PPP",
         "PPP                                                                   PPP",
-        "PPP                                                                PPPPPP",
+        "PPP                                                         B       PPPPPP",
         "PPP                                                                PPPPPP",
         "PPP                                                                     N",
         "PPP                                                                     N",
@@ -91,8 +108,8 @@ def main():
         "PP     PPPPPPPPPPPPPPPPPPPPPPPPPPPPP PPPPPPPPPPPPP  PPPPPPPPPPPPPP PPPPPP",
         "PP     PPPPPPPPPPPPPPPP  PPPPP PPPP  PPPPPPPPPPPP    PP  PPPP  PP  PPPPPP",
         "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-        "PP                                                                     PP",
-        "N               S                                                       N",
+        "PP      B                                                              PP",
+        "N                          S                                             N",
         "N                                L                                      N",
         "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
         "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",

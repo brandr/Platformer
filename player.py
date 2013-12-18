@@ -9,22 +9,14 @@ from platform import *
 
 class Player(Being):
     def __init__(self,player_animations,start_level):
-        #not sure if I'm still using player sprites, could probably make the arg an animationset instead
-        Being.__init__(self,player_animations)#,Rect(0,0,32,64),-1)
-        #self.changeDirection('right') #could extend this to gameImage/Entity (or some other class between player and gameimage)
-        #self.animation = self.direction_set["idle"]
+        Being.__init__(self,player_animations)
         self.changeAnimation('idle','right')
         self.direction_id = 'right'
-
         self.animated = True
         self.default_image = self.animation.images[0]
-  
-        self.xvel = 0
-        self.yvel = 0
-        self.onGround = False
-        self.running = False
-        self.sightdist = 3
         self.current_level = start_level
+        self.sightdist = 3
+        
 
     @staticmethod
     def load_player_animation_set():
@@ -61,27 +53,28 @@ class Player(Being):
         return animation_set
 
     def update(self, up, down, left, right, running):
-        #a lot of this could be moved to a supeclass
+        #TODO: move some or all of this stuff to "being", and break it up to be more extensible.
+        #print self.bounce_count
+        #this stuff can happen repeatedly after bouncing, but other stuff cannot
+        if(self.bounce_count > 0):
+            self.bounce()
+            return
         self.xvel = 0
         if down:
             pass
         if left and not right:
             self.xvel = -4
             self.direction_id = 'left'
-            #self.changeDirection('left')
         if right and not left:
             self.xvel = 4
             self.direction_id = 'right'
-            #self.changeDirection('right')
-        if up:
-            # only jump if on the ground
+        if up:            # only jump if on the ground
             if self.onGround:  
                 self.yvel -= 9
                 self.changeAnimation('jumping',self.direction_id)
                 self.animation.iter()
                 self.onGround = False
-        if not self.onGround:
-            # only accelerate with gravity if in the air
+        if not self.onGround:    # only accelerate with gravity if in the air
             self.yvel += 0.3
             #TODO: falling animation starts once self.yvel >=0 (or maybe slightly lower/higher)
             # max falling speed
@@ -90,7 +83,7 @@ class Player(Being):
         else:
             self.running = running
         if(self.running):
-            self.xvel *= 1.67
+            self.xvel *= 1.6
             if(self.onGround):
                 self.changeAnimation('running',self.direction_id)
         else:
@@ -103,29 +96,27 @@ class Player(Being):
             else: 
                 if(left == right):
                     self.xvel = 0
-        # increment in x direction
-        self.rect.left += self.xvel
-        # do x-axis collisions
-        self.collide(self.xvel, 0)
-        # increment in y direction
-        self.rect.top += self.yvel
-        # assuming we're in the air
-        self.onGround = False;
-        # do y-axis collisions
-        self.collide(0, self.yvel)
+
+        Being.updatePosition(self)
         self.updateView()
-        
+     
     def updateView(self): #note: this is only to be used in "cave" settings. for areas that are outdoors, use something else.
         level = self.current_level
         tiles = level.getTiles()
+        entities = level.getEntities()
+        monsters = level.getMonsters()
         lanterns = level.getLanterns()
         
-        GameImage.updateimage(self,256) 
-        if(self.current_level.outdoors):return
+        GameImage.updateAnimation(self,256) 
+        for e in entities:
+            if(e != self):
+               e.update(self)
+        if(self.current_level.outdoors):
+            return
         for row in tiles:    #IDEA: if the program becomes very slow, could limit tiles/lanterns to only the ones on camera. 
             for t in row:    #(might need to add 1 to each border though)
                 if t.mapped:
-                    t.updateimage(False)
+                    t.updateimage()
         nearby_light_sources = []
         far_light_sources = []
         for l in lanterns:
@@ -160,31 +151,49 @@ class Player(Being):
         yrectcheck = p[1] >= c1[1] and p[1] <= c2[1] 
         return xrectcheck and yrectcheck
 
-    def collide(self, xvel, yvel): 
+    def collide(self, xvel, yvel):
+
         level = self.current_level
-        tiles = level.getTiles()
-        entities = level.getEntities()
         platforms = level.getPlatforms()
-        lanterns = level.getLanterns()
 
         for p in platforms:
             if pygame.sprite.collide_rect(self, p):
-                if isinstance(p, Lantern): #TODO: break this off into its own method as the program grows
+                if isinstance(p, Lantern): #TODO: break this off into its own method as the program grows (could be an abstract method in the object we collide with)
                     p.delete()
                     self.sightdist += p.lightvalue
                 if isinstance(p, ExitBlock):
                     self.exitLevel(p)
                     return
-                if xvel > 0:
-                    self.rect.right = p.rect.left
-                if xvel < 0:
-                    self.rect.left = p.rect.right
-                if yvel > 0:
-                    self.rect.bottom = p.rect.top
-                    self.onGround = True
-                    self.yvel = 0
-                if yvel < 0:
-                    self.rect.top = p.rect.bottom
+                Being.collideWith(self, xvel,yvel,p)
+        if(self.bounce_count <= 0):
+            self.collideMonsters(xvel,yvel)
+
+    def collideMonsters(self,xvel,yvel):
+        x_direction_sign = 1
+        y_direction_sign = 1
+        level = self.current_level
+        monsters = level.getMonsters()
+        #print self.bounce_count
+        for m in monsters:
+            if pygame.sprite.collide_rect(self, m):
+                if(self.rect.left < m.rect.left):
+                    x_direction_sign = -1
+                if(self.rect.top < m.rect.top):
+                    y_direction_sign = -1
+                new_xvel = 4*x_direction_sign
+                new_yvel = y_direction_sign
+                self.xvel = new_xvel
+                self.yvel = new_yvel 
+                self.bounce_count = 15
+                m.bounceAgainst(self)
+                break #makes sure the player can only collide with one monster per cycle
+
+    def bounce(self):
+        if(self.bounce_count <= 0): return
+        self.collide(self.xvel,self.yvel)
+        self.updatePosition()
+        self.updateView()
+        self.bounce_count -= 1
 
     def light_distance(self):
     	return self.sightdist

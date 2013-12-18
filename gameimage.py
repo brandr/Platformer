@@ -23,7 +23,7 @@ class GameImage(pygame.sprite.Sprite):
         self.default_image = copy.copy(self.animation.images[0]) #this might be an inefficient/awkward place to use copy in the long run.
         self.image = self.default_image
         self.image.convert()
-        self.rect = self.image.get_rect()
+        self.rect = self.image.get_bounding_rect()
 
     @staticmethod
     def loadImageFile(name,colorkey = None):
@@ -65,9 +65,7 @@ class GameImage(pygame.sprite.Sprite):
         self.direction_set = self.animation_set.set_in_direction(direction) 
 
     def updateimage(self, lightvalue = 0):
-        if(self.animated):
-            self.animate()
-            return
+        
         if(lightvalue != 0): 
             if(self.default_image != None):
                 self.image = self.default_image
@@ -77,10 +75,25 @@ class GameImage(pygame.sprite.Sprite):
                 self.fully_darken()
                 return
             self.image = Surface((32, 32))
-            self.image.fill(BACKGROUND_COLOR)  #TODO: eventually split into cases for "mapped" and "not mapped" (plan ahead)
+            self.image.fill(BACKGROUND_COLOR) 
+
+    def updateAnimation(self, lightvalue = 0):
+        if(self.animated):
+            self.animate()
+            #not sure how best  to process lightvalue at this point.
+            #GameImage.setLightLevel(self.image,lightvalue)
+            #self.image.set_alpha(lightvalue)
+            return
+        self.updateimage(lightvalue)
+
+    @staticmethod
+    def setLightLevel(image,light_value):
+        light_value = 255
+        dark = pygame.Surface(image.get_size(), 32)
+        dark.set_alpha(light_value, pygame.RLEACCEL)
+        image.blit(dark, (0, 0))
 
     def animate(self):
-        #self.animation.iter()
         self.image = self.animation.next()
 
     def darkenTo(self, lightvalue):
@@ -88,7 +101,10 @@ class GameImage(pygame.sprite.Sprite):
         self.image.set_alpha(min(current_lightvalue, lightvalue))
 
     def check_brightness(self):
-        return self.image.get_alpha()
+        brightness = self.image.get_alpha()
+        if(brightness == None):
+            return 0
+        return brightness
 
     def fully_darken(self):
         self.image = Surface((32, 32))

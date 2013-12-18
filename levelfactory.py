@@ -8,6 +8,8 @@ import lantern
 from lantern import *
 import exitblock
 from exitblock import *
+import monster
+from monster import *
 
 class LevelFactory(object):
 
@@ -16,6 +18,7 @@ class LevelFactory(object):
 			tiles = []
 			platforms = []
 			lanterns = []
+			monsters = []
 
 			entities = pygame.sprite.Group()
 
@@ -42,6 +45,8 @@ class LevelFactory(object):
 
 			default_lantern = Lantern.load_lantern_animation_set()
 
+			default_bat = Monster.load_bat_animation_set() #TEMPORARY
+
 			if(self.outdoors(global_coords[1],level_map[0])):
 				default_tile = default_sky_tile
 
@@ -66,12 +71,18 @@ class LevelFactory(object):
 						t.block = e
 					if col == "S":
 						start_coords = (True,x,y)
+					#TEMPORARY
+					if col == "B":
+						b = Monster(default_bat,"bat",x,y)
+						monsters.append(b)
+						entities.add(b)
+					#TEMPORARY
 					tiles[y/32].append(t)
 					x += 32 
 				y += 32
 				x = 0
 
-			return Level(tiles,entities,platforms,lanterns,dungeon,global_coords,start_coords) 
+			return Level(tiles,entities,platforms,monsters,lanterns,dungeon,global_coords,start_coords) 
 
 	def outdoors(self,depth,level_top):
 		if(depth > 0): return False

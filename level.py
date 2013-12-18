@@ -8,11 +8,12 @@ import gameimage
 from gameimage import *
 
 class Level(object):
-	def __init__(self, tiles,entities,platforms,lanterns,dungeon,global_coords,start_coords):#,outdoors = True):
+	#NOTE: this is a lot of args. May want to put them in levelObjects before creating the level, not after.
+	def __init__(self, tiles,entities,platforms,monsters,lanterns,dungeon,global_coords,start_coords):#,outdoors = True):
 		total_level_width  = len(tiles[0])*32
 		total_level_height = len(tiles)*32
 		self.level_camera = Camera(total_level_width, total_level_height)	
-		self.level_objects = LevelObjects(self,tiles,entities,platforms,lanterns)
+		self.level_objects = LevelObjects(self,tiles,entities,platforms,monsters,lanterns)
 		self.global_coords = global_coords
 		self.start_coords = None
 		self.setStartCoords(start_coords)
@@ -32,7 +33,6 @@ class Level(object):
 		for t in tiles[0]:
 			if (t.block != None): #should really be transparency check
 				blocked += 1
-	
 		return blocked < width/1.5
 
 	def	calibrateLighting(self):
@@ -41,12 +41,12 @@ class Level(object):
 			for row in tiles:
 				for t in row:
 					t.changeImage()
-					t.updateimage(True,256)
+					t.updateimage(256)
 			return
 		tiles = self.getTiles()
 		for row in tiles:
 			for t in row:
-				t.updateimage(False)
+				t.updateimage()
 
 	def direction_of(self,exit_block):
 		dimensions = self.get_dimensions()
@@ -129,6 +129,9 @@ class Level(object):
 	def getPlatforms(self):
 		return self.level_objects.platforms
 		
+	def getMonsters(self):
+		return self.level_objects.monsters
+
 	def getLanterns(self):
 		return self.level_objects.lanterns
 		
