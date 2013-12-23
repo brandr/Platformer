@@ -98,6 +98,7 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode(DISPLAY, FLAGS, DEPTH)
 
+    #NOTE: dungeon map must have all columns the same size and all rows the same size (so perfectly rectangular)
     dungeon_map = [
         "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",#1
         "PPPP           PPPPPPPPPPPPPPPPPP                             PPP                              PP                              P",
