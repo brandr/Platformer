@@ -1,12 +1,19 @@
 import gamescreen
 from gamescreen import *
-
+import leveleditorscreen
+from leveleditorscreen import *
 #PLATFORMEXAMPLE (name will probably change):
     #this is currently the only class with a main method, so you can run the game from it.
     #currently the data for building the dungeon is read in from here, though that is likely to change as
         #the data gets more complicated.
 
-def main():
+def loadMapEditor():
+    pygame.init()
+    screen = pygame.display.set_mode(DISPLAY, FLAGS, DEPTH) #might want to change these args
+    level_editor_screen = LevelEditorScreen()
+    level_editor_screen.openEditor(screen) #add more args if necessary
+
+def runGame():
     pygame.init()
     screen = pygame.display.set_mode(DISPLAY, FLAGS, DEPTH)
 
@@ -235,4 +242,5 @@ def main():
         "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",]
     
 if __name__ == "__main__":
-    main()
+    loadMapEditor()
+    #runGame()
