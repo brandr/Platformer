@@ -11,8 +11,6 @@ from gamescreen import *
 
     #IMMEDIATE STUFF
  
-#with new level system, experiment with different level configurations
-#separate Room building from LevelFactory into a new RoomFactory class (ROBERT)
 #expand levelData into its own class which might include sprite/tile sets, indoors/outdoors, and other data 
     #not necessarily found in Room
     #MOST IMPORTANTLY, consider how levelData might be derived from input
@@ -100,7 +98,6 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode(DISPLAY, FLAGS, DEPTH)
 
-    #TODO: try reading in the whole dungeon from one map instead
     dungeon_map = [
         "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",#1
         "PPPP           PPPPPPPPPPPPPPPPPP                             PPP                              PP                              P",
