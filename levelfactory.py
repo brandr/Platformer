@@ -1,6 +1,9 @@
 import roomfactory
 from roomfactory import *
 
+#The LevelFactory calls methods from RoomFactory (along with some additional methods)
+	#to create the dungeon levels based on a set of input.
+
 class LevelFactory(object):
 
 	def __init__(self):

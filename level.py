@@ -2,14 +2,15 @@ import room
 from room import *
 
 class Level(object):
-	#TODO: make level take in room arg, along with maybe leveldata
-	#def __init__(self, tiles,entities,platforms,monsters,lanterns,dungeon,global_coords,start_coords):
+	#a level is built from a rectangular set of rooms.
+	#it copies all objects from the rooms into itself, and processes these objects as the game is running.
+	#only the player's current level should be active at any given time
 	def __init__(self, dungeon, level_ID,origin,rooms):
-		self.dungeon = dungeon #could probably get dungeon from rooms instead, if that would work better
-		self.level_ID = level_ID
-		self.origin = origin
-		self.level_objects = LevelObjects(self)
-		self.start_coords = None
+		self.dungeon = dungeon #the LevelGroup that the level is part of
+		self.level_ID = level_ID #a currently unused int which identifies the level uniquely
+		self.origin = origin#upper-left corner of the level (in terms of global coords, so each coordinate pair corresponds to a room)
+		self.level_objects = LevelObjects(self) #all objects in the level (tiles and entities)
+		self.start_coords = None #coords where the player appears upon entering the level (set by addRooms)
 		self.addRooms(rooms)
 		tiles = self.getTiles()
 		total_level_width = len(tiles[0])*32
@@ -17,7 +18,6 @@ class Level(object):
 		self.level_camera = Camera(total_level_width, total_level_height) #might not be the best way to make the camera
 		self.outdoors = False #TODO: take this as an arg from the factory (could also be in levelData)
 		self.calibrateLighting()
-		#self.calibrateExits()
 
 		#toString test methods
 	def to_string(self): #will only be used for testing, I  think
