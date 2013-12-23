@@ -88,35 +88,47 @@ class Level(object):
 			for t in row:
 				t.fullyDarken()
 	
+		#if any exits to the level don't lead anywhere, add blocks barring the player from leaving.
 	def calibrateExits(self):
 		tiles = self.getTiles()
 		x_tiles = len(tiles[0])-1
 		y_tiles = len(tiles)-1
 		exit_tiles = []
+		#global_coords = (0,0)
 		for t in tiles[0]: #ceiling
 			if(t.passable()):
-				exit_tiles.append(t)
+				exit_tiles.append((t,(0,-1)))
 		for t in tiles[y_tiles]: #floor
 			if(t.passable()):
-				exit_tiles.append(t)
+				exit_tiles.append((t,(0,1)))
 		for row in tiles: #walls
 			if(row[0].passable()): #left wall
-				exit_tiles.append(row[0])
+				exit_tiles.append((row[0],(-1,0)))
 			if(row[x_tiles].passable()): #right wall
-				exit_tiles.append(row[x_tiles])
-
+				exit_tiles.append((row[x_tiles],(1,0)))
 		for e in exit_tiles:
-			default_platform_image = GameImage.loadImageFile('exitblock1.bmp') #TEMPORARY
-			default_platform = GameImage.still_animation_set(default_platform_image) #TEMPORARY
-			x = e.rect_coords()[0]
-			y = e.rect_coords()[1]
-			self.level_objects.addBlock(ExitBlock(default_platform,x,y),t)
-		#TODO
+			tile = e[0]
+			direction = e[1]
+			x = tile.coordinates()[0]
+			y = tile.coordinates()[1]
+			if self.next_level_exists(self.global_coords((x,y)),direction): #this is the sort of area whre we want to get rid of these 32s
+				continue
+			exit_platform_image = GameImage.loadImageFile('exitblock1.bmp') #TEMPORARY
+			exit_platform = GameImage.still_animation_set(exit_platform_image) #TEMPORARY
+			block_x = 32*(x+direction[0])
+			block_y = 32*(y+direction[1])
+			self.level_objects.addBlock(Platform(exit_platform,block_x,block_y),t)
 
 		#directonal/movement methods
+
+	def level_in_direction(self,global_x,global_y,direction): #doesn't really need anything from this level in particular, but this method works here for now
+		x_coord = global_x + direction[0]
+		y_coord = global_y + direction[1]
+		return self.dungeon.level_at(x_coord,y_coord)
+
+		#find the direction of the level a tile is in, assuming that it is outside this level's borders.
 	def direction_of(self,coords):
 		dimensions = self.get_dimensions()
-		#exit_tile = exit_block.currenttile()
 		if(coords[0] <= 1): return (-1,0)
 		if(coords[0] >= dimensions[0] - 1): return (1,0)
 		if(coords[1] <= 1): return (0,-1)
@@ -143,12 +155,20 @@ class Level(object):
 			return (local_coords[0],2)
 		#TODO: error case (no possible edge detected for exitblock)
 
+	def next_level_exists(self,global_coords,direction):
+		next_level = self.level_in_direction(global_coords[0],global_coords[1],direction)
+		return next_level != None
+
 	def movePlayer(self,coords):
 		player = self.getPlayer()
 		direction = self.direction_of(coords)
 		adjusted_coords = (coords[0]-direction[0],coords[1]-direction[1])
 		self.removePlayer()
-		self.dungeon.movePlayer(player,self.global_coords(adjusted_coords),adjusted_coords,direction)
+		global_coords = self.global_coords(adjusted_coords)
+		if(self.next_level_exists(global_coords,direction)):
+			next_level = self.level_in_direction(global_coords[0],global_coords[1],direction)
+			self.dungeon.movePlayer(player,next_level,global_coords,adjusted_coords)
+		#TODO: error case
 
 	def addPlayer(self,player,coords = None):
 		player.current_level = self

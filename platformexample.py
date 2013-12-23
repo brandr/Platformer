@@ -1,28 +1,48 @@
 import gamescreen
 from gamescreen import *
 
-    #IMMEDIATE STUFF
+    #KNOWN BUGS
 
-#Make levels more extensible and built from rooms. (mostly done)
-    #experiment with different level configurations, like T-shaped.
-        #don't need to worry about weird configurations (like awkward diagonals) because 
-        #level configurations are not set by the end user.
-    #expand levelData into its own class which may include sprite/tile sets, indoors/outdoors, and other data 
-        #not necessarily found in Room
-    #fix movement/rect related stuff, and put all relevant methods in gameImage, to be called by subclasses.
-        #there seems to be some inconsistency about which parts of rects are moved (left,top,centerx,centery,etc)
-    #fix imports
+#player can end up in a "None" level (and crash game) when leaving a level
+    #this can occur with certain combinations of sprinting/jumping while leaving the level.
+    #so far it seems to only happen when leaving the level horizontally while jumping and
+        #sprinting through a gap of the same height as the player.
+    #it's possible that other bugs may occur if the player does this combination of actions, even when not leaving the level.
+
+    #IMMEDIATE STUFF
+ 
+#with new level system, experiment with different level configurations
+#separate Room building from LevelFactory into a new RoomFactory class (ROBERT)
+#expand levelData into its own class which might include sprite/tile sets, indoors/outdoors, and other data 
+    #not necessarily found in Room
+    #MOST IMPORTANTLY, consider how levelData might be derived from input
+        #in the long run, this input may come from the level editor.
+        #consider a set of "level tags" for the editor, as well as
+            #different "layers" that can be toggled (i.e.,background layer, platforms layer, and (at dungeon zoom level)
+                #a layer which shows which levels contain which rooms)
+    #Conisder determining origin from the list of room coords (we want the one with both the lowest x *and* the lowest y)
+#fix movement/rect related stuff, and put all relevant methods in gameImage, to be called by subclasses.
+    #there seems to be some inconsistency about which parts of rects are moved (left,top,centerx,centery,etc)
+#fix imports
+#reintroduce outdoor levels (data should be part of levelData)
+#consider how background tiles, platform tiles, etc might be reorganized
+    #EXAMPLE: could have a tileset 
+#consider removing level_ID, but first try to think of possible uses for it.
 
     #LESS IMMEDIATE STUFF
 
+#rename this class to something besides "platformexample"
+#store/organize sprites a little better.
+    #keep in mind that we need an extensible way to load sprites, so if they are in different directories
+        #we need to plan out how we'll access them.
 #build the enemies extensibly. Make temporary classes/methods if necessary, but plan to replace them later
-    #Later, have the bat start hanging from the ceiling and maybe give it "dropping"
+    #have the bat start hanging from the ceiling and maybe give it "dropping"
         #animation followed by the flying animation
-    #make lighting less laggy for large amounts of light
-        #one way might be to only udpate tiles within rectangular areas around light sources.
     #change the bat's attack patterns so that it periodically flaps around the player before diving, bounces off, 
         #moves away, and then dives again.
         #(some randomness may make this pattern look more natural)
+    #make lighting less laggy for large amounts of light
+        #one way might be to only udpate tiles within rectangular areas around light sources.
     #consider possible combat systems (damage, HP, etc)
 
     #SPRITE STUFF
@@ -82,49 +102,65 @@ def main():
 
     #TODO: try reading in the whole dungeon from one map instead
     dungeon_map = [
-        "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",#1
-        "PPPP           PPPPPPPPPPPPPPPPPP                             PPP                              P",
-        "PPPP           PPPPPPPPPPPPPPPPPP                             PPP                              P",
-        "PPPP           P            PPPPP                             PPP                              P",
-        "PPPP           P            PPPPP                             PPP                              P",#5
-        "P              P            PPPPP                             PPP                              P",
-        "P              P            PPPPP                             PPP                              P",
-        "P              P            PPPPP                             PPP                              P",
-        "P              P            PPPPP                             PPP                              P",
-        "P                           PPPPP                             PPP                              P",#10
-        "P                              PP                             PPP                              P",
-        "P                    PPPP      PP                             PPP                              P",
-        "P                              PP                             PPP                              P",
-        "P                              PP                             PPP                              P",
-        "P                              PP                              PP                              P",#15
-        "P                              PP                              PP       PPPPP                  P",
-        "P             PPP              PP                                                 PPPP         P",
-        "PP      S                                                                                      P",
-        "PP                  L                     L                                                    P",
-        "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",#20
-        "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-        "PPPP                        PPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-        "PPPP                        PPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-        "PPPP                        PPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-        "PPPP         PPP            PPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-        "PPPP                        PPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-        "PPPP                  PPP   PPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-        "PPPP                        PPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-        "PPPP                        PPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-        "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-        "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-        "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",#1
+        "PPPP           PPPPPPPPPPPPPPPPPP                             PPP                              PP                              P",
+        "PPPP           PPPPPPPPPPPPPPPPPP                             PPP                              PP                              P",
+        "PPPP           P            PPPPP                             PPP                              PP                              P",
+        "PPPP           P            PPPPP                             PPP                              PP                              P",#5
+        "P              P            PPPPP                             PPP                              PP                              P",
+        "P              P            PPPPP                             PPP                              PP                              P",
+        "P              P            PPPPP                             PPP                              PP                              P",
+        "P              P            PPPPP                             PPP                              PP                              P",
+        "P                           PPPPP                             PPP                              PP                              P",#10
+        "P                              PP                             PPP                              PP                              P",
+        "P                    PPPP      PP                             PPP                              PP                              P",
+        "P                              PP                             PPP                              PP                              P",
+        "P                              PP                             PPP                              PP                              P",
+        "P                              PP                              PP                              PP                              P",#15
+        "P                              PP                              PP       PPPPP                  PP                              P",
+        "                       PPPPPPPP         PPPPPPPPPPPPPPPPPP                        PPPP                                         P",
+        "        S                                                                                                                      P",
+        "                                          L                                                                  L                 P",
+        "PPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP    PPPPPPPPPPPP   PPPPPPPPPP",#20
+        "PPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",#21
+        "PPPP           PPPPPPPPPPPPPPPPPP                             PPP                              PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "PPPP           PPPPPPPPPPPPPPPPPP                             PPP                              PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "PPPP        PPPP            PPPPP                             PPP                              PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "PPPP           P            PPPPP                             PPP                              PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",#25
+        "P              P            PPPPP                             PPP                              PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "P              P            PPPPP                             PPP                              PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "P              P            PPPPP                             PPP                              PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "P              P            PPPPP                             PPP                              PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "P                           PPPPP                             PPP                              PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",#30
+        "P                              PP                             PPP                              PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "P                    PPPP      PP                             PPP                              PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "P                              PP                             PPP                              PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "P                              PP                             PPP                              PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "P                              PP                              PP                              PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",#35
+        "P                              PP                              PP       PPPPP                  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "P             PPP              PP                                                 PPPP         PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "PP                                                                                             PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "PP                  L                     PPPP                                                 PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",#40
     ]  # 1   5    10   15   20   25   30  
 
     level_1_rooms = [(0,0)]
     level_1_origin = (0,0)
-    level_1_data = [0,level_1_origin,level_1_rooms]
+    level_1_data = [1,level_1_origin,level_1_rooms]
 
-    level_2_rooms = [(1,0),(2,0)]
+    level_2_rooms = [(1,0),(2,0),(3,0)]
     level_2_origin = (1,0)
-    level_2_data = [1,level_2_origin,level_2_rooms]
+    level_2_data = [2,level_2_origin,level_2_rooms]
 
-    level_data = [level_1_data,level_2_data]
+    level_3_rooms = [(0,1),(1,1)]
+    level_3_origin = (0,1)
+    level_3_data = [3,level_3_origin,level_3_rooms]
+
+    level_4_rooms = [(2,1)]
+    level_4_origin = (2,1)
+    level_4_data = [4,level_4_origin,level_4_rooms]
+
+    level_data = [level_1_data,level_2_data,level_3_data,level_4_data]
 
     dungeon = LevelGroup(dungeon_map,level_data)
     mainScreen = GameScreen()

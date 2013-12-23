@@ -55,7 +55,7 @@ class Player(Being):
     def update(self, up, down, left, right, running):
         #TODO: move some or all of this stuff to "being", and break it up to be more extensible.
             #could also make a Movement class, held as a data type by player or being.
-        self.exitLevelCheck()
+        if(self.exitLevelCheck()): return
         if(self.bounce_count > 0):
             self.bounce()
             return
@@ -134,10 +134,6 @@ class Player(Being):
             return True
         else:
             return False 
-
-    def exitLevelCheck(self):
-        if(self.currenttile() == None):
-            self.exitLevel(self.coordinates())
 
             #this could probably be moved up in inheritance
     def getpoint(self,start,end,slope,x):
@@ -224,6 +220,13 @@ class Player(Being):
 
     def light_distance(self):
     	return self.sightdist
+
+    def exitLevelCheck(self):
+        if(self.currenttile() == None):
+            #a bug can sometimes occur here.
+            self.exitLevel(self.coordinates())
+            return True
+        return False
 
     def exitLevel(self, coords):
         self.current_level.movePlayer(coords)
