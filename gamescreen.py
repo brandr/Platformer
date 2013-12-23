@@ -33,7 +33,7 @@ class GameScreen:
 
         up = down = left = right = running = False
         while 1:
-            timer.tick(150)
+            timer.tick(100)
             for e in pygame.event.get():
                 if e.type == QUIT: raise SystemExit, "QUIT"
                 if e.type == KEYDOWN and e.key == K_ESCAPE:
@@ -66,4 +66,5 @@ class GameScreen:
             for y in range(32):
                 for x in range(32):
                     screen.blit(bg, (x * 32, y * 32))
+            #print player.current_level.level_ID
             player.current_level.update(screen,up, down, left, right, running)

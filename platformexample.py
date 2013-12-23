@@ -3,20 +3,27 @@ from gamescreen import *
 
     #IMMEDIATE STUFF
 
-#sort out player collisions with hostile monsters.
-    #TODO: fix the glitch where the player can be pushed really far up by repeated monster collisions 
-        #(might already be impossible. Need someone to test.)
-        #IDEA: make the player "invincible" (not knocked back by monster collisions) for a little longer than the actual knockback duration
-       
+#Make levels more extensible and built from rooms. (mostly done)
+    #experiment with different level configurations, like T-shaped.
+        #don't need to worry about weird configurations (like awkward diagonals) because 
+        #level configurations are not set by the end user.
+    #expand levelData into its own class which may include sprite/tile sets, indoors/outdoors, and other data 
+        #not necessarily found in Room
+    #fix movement/rect related stuff, and put all relevant methods in gameImage, to be called by subclasses.
+        #there seems to be some inconsistency about which parts of rects are moved (left,top,centerx,centery,etc)
+    #fix imports
+
+    #LESS IMMEDIATE STUFF
 
 #build the enemies extensibly. Make temporary classes/methods if necessary, but plan to replace them later
     #Later, have the bat start hanging from the ceiling and maybe give it "dropping"
         #animation followed by the flying animation
+    #make lighting less laggy for large amounts of light
+        #one way might be to only udpate tiles within rectangular areas around light sources.
     #change the bat's attack patterns so that it periodically flaps around the player before diving, bounces off, 
         #moves away, and then dives again.
         #(some randomness may make this pattern look more natural)
-    #focus on visual aspects of collisions with player before HP-related stuff, and figure out/test which
-        #event will affect HP (if HP is even a thing in this game)
+    #consider possible combat systems (damage, HP, etc)
 
     #SPRITE STUFF
 
@@ -54,6 +61,8 @@ from gamescreen import *
 #TODO: consider making level-linking system more extensible, choosing player's 
         #local coords based on global coords measured on the same scale. 
         #(this might allow for differently-sized levels)
+#IDEA: make the level editor "zoomable" so that the entire dungeon can be viewed and
+    # levels can be added/moved, but it is also possible to select, expand and edit a specific level.
 
         #PLATFORM STUFF
 #TODO: make the "platform" system more complex, possibly with inheritance/factory
@@ -71,6 +80,58 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode(DISPLAY, FLAGS, DEPTH)
 
+    #TODO: try reading in the whole dungeon from one map instead
+    dungeon_map = [
+        "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",#1
+        "PPPP           PPPPPPPPPPPPPPPPPP                             PPP                              P",
+        "PPPP           PPPPPPPPPPPPPPPPPP                             PPP                              P",
+        "PPPP           P            PPPPP                             PPP                              P",
+        "PPPP           P            PPPPP                             PPP                              P",#5
+        "P              P            PPPPP                             PPP                              P",
+        "P              P            PPPPP                             PPP                              P",
+        "P              P            PPPPP                             PPP                              P",
+        "P              P            PPPPP                             PPP                              P",
+        "P                           PPPPP                             PPP                              P",#10
+        "P                              PP                             PPP                              P",
+        "P                    PPPP      PP                             PPP                              P",
+        "P                              PP                             PPP                              P",
+        "P                              PP                             PPP                              P",
+        "P                              PP                              PP                              P",#15
+        "P                              PP                              PP       PPPPP                  P",
+        "P             PPP              PP                                                 PPPP         P",
+        "PP      S                                                                                      P",
+        "PP                  L                     L                                                    P",
+        "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",#20
+        "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "PPPP                        PPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "PPPP                        PPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "PPPP                        PPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "PPPP         PPP            PPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "PPPP                        PPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "PPPP                  PPP   PPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "PPPP                        PPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "PPPP                        PPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+        "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+    ]  # 1   5    10   15   20   25   30  
+
+    level_1_rooms = [(0,0)]
+    level_1_origin = (0,0)
+    level_1_data = [0,level_1_origin,level_1_rooms]
+
+    level_2_rooms = [(1,0),(2,0)]
+    level_2_origin = (1,0)
+    level_2_data = [1,level_2_origin,level_2_rooms]
+
+    level_data = [level_1_data,level_2_data]
+
+    dungeon = LevelGroup(dungeon_map,level_data)
+    mainScreen = GameScreen()
+    mainScreen.runGame(screen,dungeon)
+   
+    #the level maps below here are not being used right now.
+
     level00 = [
         "PPP                                                                   PPP",
         "PPP                                                                   PPP",
@@ -81,7 +142,7 @@ def main():
         "PPP                                                                   PPP",
         "PPP                                                                   PPP",
         "PPP                                                                   PPP",
-        "PPP                                                         B       PPPPPP",
+        "PPP                                                         B      PPPPPP",
         "PPP                                                                PPPPPP",
         "PPP                                                                     N",
         "PPP                                                                     N",
@@ -109,7 +170,7 @@ def main():
         "PP     PPPPPPPPPPPPPPPP  PPPPP PPPP  PPPPPPPPPPPP    PP  PPPP  PP  PPPPPP",
         "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
         "PP      B                                                              PP",
-        "N                          S                                             N",
+        "N                          S                                            N",
         "N                                L                                      N",
         "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
         "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
@@ -227,13 +288,12 @@ def main():
         "PPPPPPPPPPPPPPPPPPPPPPPPPPPP    PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
         "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",]
 
-    levels_row0 = [level00,level01,level02]
-    levels_row1 = [level10,level11,level12]
+    #levels_row0 = [level00,level01,level02]
+    #levels_row1 = [level10,level11,level12]
 
-    dungeon_levels = [levels_row0,levels_row1]
-    dungeon = LevelGroup(dungeon_levels)
-    mainScreen = GameScreen()
-    mainScreen.runGame(screen,dungeon)
+    #dungeon_levels = [levels_row0,levels_row1]
+    #dungeon = LevelGroup(dungeon_levels)
+    
     
 if __name__ == "__main__":
     main()

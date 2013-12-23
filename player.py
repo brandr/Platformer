@@ -15,7 +15,7 @@ class Player(Being):
         self.animated = True
         self.default_image = self.animation.images[0]
         self.current_level = start_level
-        self.sightdist = 3
+        self.sightdist = 2
         
 
     @staticmethod
@@ -54,8 +54,8 @@ class Player(Being):
 
     def update(self, up, down, left, right, running):
         #TODO: move some or all of this stuff to "being", and break it up to be more extensible.
-        #print self.bounce_count
-        #this stuff can happen repeatedly after bouncing, but other stuff cannot
+            #could also make a Movement class, held as a data type by player or being.
+        self.exitLevelCheck()
         if(self.bounce_count > 0):
             self.bounce()
             return
@@ -100,11 +100,12 @@ class Player(Being):
         Being.updatePosition(self)
         self.updateView()
      
+     #this gets laggy when there is too much light. try to fix it. (might have to fix other methods instead)
     def updateView(self): #note: this is only to be used in "cave" settings. for areas that are outdoors, use something else.
         level = self.current_level
         tiles = level.getTiles()
         entities = level.getEntities()
-        monsters = level.getMonsters()
+        #monsters = level.getMonsters()
         lanterns = level.getLanterns()
         
         GameImage.updateAnimation(self,256) 
@@ -126,12 +127,7 @@ class Player(Being):
                 far_light_sources.append(l)
         for f in far_light_sources:
         	f.update_light(tiles)
-
         self.emit_light(self.sightdist,tiles,nearby_light_sources)
-
-    def moveTo(self, coords):
-        self.rect.left = coords[0]*32
-        self.rect.top = coords[1]*32
 
     def invisionrange(self, other):	#checks if the player can see a platform
         if(self.withindist(other, self.sightdist+other.light_distance())):
@@ -139,6 +135,11 @@ class Player(Being):
         else:
             return False 
 
+    def exitLevelCheck(self):
+        if(self.currenttile() == None):
+            self.exitLevel(self.coordinates())
+
+            #this could probably be moved up in inheritance
     def getpoint(self,start,end,slope,x):
         p = start
         if(start[0] > end[0]): 
@@ -146,11 +147,26 @@ class Player(Being):
         y = p[1] + slope*(x-p[0])
         return (x, y)
 
+            #this could probably be moved up in inheritance
     def insiderect(self,p,c1,c2):
         xrectcheck = p[0] >= c1[0] and p[0] <= c2[0] 
         yrectcheck = p[1] >= c1[1] and p[1] <= c2[1] 
         return xrectcheck and yrectcheck
 
+        #only difference between player and gameimage moverect is whether centerx/y or left/top are used
+        #for position. This is not very extensible, so should try to move these methods up in inheritance without breaking the program
+    def moveTo(self, coords):
+        self.moveRect(coords[0]*32,coords[1]*32,True)
+
+    def moveRect(self,x_offset,y_offset,absolute = False):
+        if(absolute):
+            self.rect.left = x_offset
+            self.rect.top = y_offset
+            return
+        self.rect.left += x_offset
+        self.rect.top += y_offset
+
+#TODO: collide could be an abstract method in the object we collide with
     def collide(self, xvel, yvel):
 
         level = self.current_level
@@ -158,22 +174,33 @@ class Player(Being):
 
         for p in platforms:
             if pygame.sprite.collide_rect(self, p):
-                if isinstance(p, Lantern): #TODO: break this off into its own method as the program grows (could be an abstract method in the object we collide with)
-                    p.delete()
-                    self.sightdist += p.lightvalue
-                if isinstance(p, ExitBlock):
-                    self.exitLevel(p)
-                    return
                 Being.collideWith(self, xvel,yvel,p)
+        self.collideExits()
+        self.collideLanterns()
         if(self.bounce_count <= 0):
             self.collideMonsters(xvel,yvel)
+
+    def collideExits(self):
+        exits = self.current_level.get_exit_blocks()
+        for e in exits:
+            if pygame.sprite.collide_rect(self, e):
+                self.exitLevel(e)
+                return
+                #TODO: figure out how to handle exitblocks with new system
+
+    def collideLanterns(self):
+        level = self.current_level
+        lanterns = level.getLanterns()
+        for l in lanterns:
+            if pygame.sprite.collide_rect(self, l):
+                l.delete()
+                self.sightdist += l.lightvalue
 
     def collideMonsters(self,xvel,yvel):
         x_direction_sign = 1
         y_direction_sign = 1
         level = self.current_level
         monsters = level.getMonsters()
-        #print self.bounce_count
         for m in monsters:
             if pygame.sprite.collide_rect(self, m):
                 if(self.rect.left < m.rect.left):
@@ -198,5 +225,5 @@ class Player(Being):
     def light_distance(self):
     	return self.sightdist
 
-    def exitLevel(self, exit_block):
-        self.current_level.movePlayer(exit_block)
+    def exitLevel(self, coords):
+        self.current_level.movePlayer(coords)

@@ -24,7 +24,9 @@ class Monster(Being):
         self.batUpdate(player) #TEMPORARY
 
     def batUpdate(self,player):
-        self.moveTowards(player.currenttile())
+        target = player.currenttile()
+        if(target != None):
+            self.moveTowards(player.currenttile())
         Being.updatePosition(self)
 
     def updateAnimation(self, light_value = None):

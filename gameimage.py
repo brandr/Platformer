@@ -10,7 +10,8 @@ BACKGROUND_COLOR = Color("#000000")
 class GameImage(pygame.sprite.Sprite):
     def __init__(self,animations):#,default_rect,colorkey = None):#,start_coords):
         pygame.sprite.Sprite.__init__(self)
-        self.unseen_color = Color("#000000")
+        #self.unseen_color = Color("#000000")\
+        self.unseen_image = Surface((32,32))
         self.mapped = False
         self.animated = False #Temporary. this should probably be determined some other way (eg as a property of the animationSet itself)
 
@@ -50,13 +51,29 @@ class GameImage(pygame.sprite.Sprite):
         still_animation = SpriteStripAnimator(still_image,rect, 1, colorkey, False, 1)
         return AnimationSet(still_animation)
 
+    def coordinates(self):
+        return (self.rect.centerx/32,self.rect.centery/32)
+
+    def rect_coords(self):
+        return (self.rect.left,self.rect.top)
+
+    def moveTo(self, coords):
+        self.moveRect(coords[0]*32,coords[1]*32,True)
+
+    def moveRect(self,x_offset,y_offset,absolute = False):
+        if(absolute):
+            self.rect.centerx = x_offset
+            self.rect.centery = y_offset
+            return
+        self.rect.centerx += x_offset
+        self.rect.centery += y_offset
+
     def changeAnimation(self, ID,direction):
         if(self.animation_id[0] == (ID)):
             if(direction == None or self.animation_id[1] == direction):
                return
         if(direction != None):
             self.changeDirection(direction)
-            #self.direction_id = direction 
         self.animation = self.direction_set[ID]
         self.animation.iter()
         self.animation_id = (ID,direction)
@@ -74,8 +91,8 @@ class GameImage(pygame.sprite.Sprite):
             if(self.mapped):
                 self.fully_darken()
                 return
-            self.image = Surface((32, 32))
-            self.image.fill(BACKGROUND_COLOR) 
+            #self.image = Surface((32, 32))
+            #self.image.fill(BACKGROUND_COLOR) 
 
     def updateAnimation(self, lightvalue = 0):
         if(self.animated):
@@ -85,6 +102,11 @@ class GameImage(pygame.sprite.Sprite):
             #self.image.set_alpha(lightvalue)
             return
         self.updateimage(lightvalue)
+
+    #def map_image(self,unseen_color = Color("#000000")):
+    #    if(self.mapped): return
+    #    self.mapped = True
+    #    self.unseen_color = unseen_color
 
     @staticmethod
     def setLightLevel(image,light_value):
@@ -107,5 +129,5 @@ class GameImage(pygame.sprite.Sprite):
         return brightness
 
     def fully_darken(self):
-        self.image = Surface((32, 32))
-        self.image.fill(self.unseen_color)
+        self.image = self.unseen_image#Surface((32, 32))
+        #self.image.fill(self.unseen_color)

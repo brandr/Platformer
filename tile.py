@@ -5,9 +5,6 @@ from math import *
 import gameimage
 from gameimage import *
 
-#OUTDOOR_SPRITE =  GameImage.loadImageFile('test_cave_tile_1.bmp',BACKGROUND_COLOR)
-#TODO: implement sunlight
-
 class Tile(GameImage):
     def __init__(self, tile_sprites, x , y): 
         GameImage.__init__(self,tile_sprites)#Rect(0, 0, 32, 32)) #TODO: replace with some getter (or arg) representing the tile's sprite.
@@ -39,7 +36,14 @@ class Tile(GameImage):
 
     def darkenTo(self,lightvalue):
         GameImage.darkenTo(self,lightvalue)
-        if(self.block != None): self.block.darkenTo(lightvalue)
+        if(self.block != None): 
+            self.block.darkenTo(0)
+            #self.block.darkenTo(lightvalue)
+
+    def fullyDarken(self):
+        GameImage.fully_darken(self)
+        if(self.block != None):
+            self.block.fully_darken()
     #emit_light: light is emitted in a circle from the tile, stopping at solid walls.
 
     def emit_light(self,dist,tiles,otherlights = []):
@@ -105,12 +109,19 @@ class Tile(GameImage):
         return None
 
     def coordinates(self):
-        return (self.rect.centerx/32,self.rect.centery/32)
+        return GameImage.coordinates(self)#(self.rect.centerx/32,self.rect.centery/32)
 
     def map(self):
+        if(self.mapped):return
         self.mapped = True 
         if(self.block != None):
             self.block.mapped =True
+            mapped_block_image = Surface((32,32))
+            mapped_block_image.fill(Color("#111111"))
+            self.block.unseen_image = mapped_block_image
+
+    def passable(self):
+        return self.block == None #TODO: change this if some blocks are passable.
 
     @staticmethod
     def validcoords(coords,tiles): #checks if a set of tile coords correspond to an actual tile on the level.

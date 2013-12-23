@@ -25,8 +25,11 @@ class Camera(object):
         _, _, w, h = camera
         l, t, _, _ = -l+HALF_WIDTH, -t+HALF_HEIGHT, w, h
 
-        l = min(-64, l)                           # stop scrolling at the left edge (and hide part of it)
-        l = max(-(camera.width-WIN_WIDTH)+64, l)   # stop scrolling at the right edge
-        t = max(-(camera.height-WIN_HEIGHT)+64, t) # stop scrolling at the bottom
-        t = min(-64, t) 
+        #l = min(-64, l)                            # stop scrolling at the left edge (and hide part of it)
+        l = min (0,l)                               # stop scrolling at the left edge 
+        #l = max(-(camera.width-WIN_WIDTH)+64, l)   # stop scrolling at the right edge (and hide part of it)
+        l = max(-(camera.width-WIN_WIDTH), l)       # stop scrolling at the right edge 
+        #t = max(-(camera.height-WIN_HEIGHT)+64, t) # stop scrolling at the bottom (and hide part of it)
+        t = max(-(camera.height-WIN_HEIGHT), t)  # stop scrolling at the bottom 
+        t = min(0, t) 
         self.state = Rect(l, t, w, h)

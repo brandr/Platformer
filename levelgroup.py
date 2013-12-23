@@ -4,32 +4,30 @@ import player
 from player import *
 
 class LevelGroup(object):
-	def __init__(self,levels):
-		global_x = 0
-		global_y = 0
-		self.levels = []
+	def __init__(self,dungeon_map,level_data):
 		factory = LevelFactory()
-		for row in levels:
-			self.levels.append([])
-			for L in row:
-				next_level = factory.newLevel(L,(global_x, global_y),self)
-				self.levels[global_y].append(next_level)
-				global_x += 1
-			global_y += 1
-			global_x = 0
+		self.rooms = factory.dungeon_rooms(self,dungeon_map) #maybe this should be done by a room factory instead of a level factory
+		self.levels = factory.dungeon_levels(self,self.rooms,level_data)
 
 	def start_level(self):
-		for row in self.levels:
-			for L in row:
-				if(L.start_coords != None):
-					return L
+		for L in self.levels:
+			if(L.start_coords != None):
+				return L
 		return None
 
-	def movePlayer(self,player,global_coords,direction):
+		#TODO: this may be used when the player travels between levels.
+	def movePlayer(self,player,global_coords,local_coords,direction):
 		x_coord = global_coords[0] + direction[0]
 		y_coord = global_coords[1] + direction[1]
-		next_level = self.levels[y_coord][x_coord]
-		current_coords = player.currenttile().coordinates()
-		next_coords = next_level.flipped_coords(current_coords)
+		next_level = self.level_at(x_coord,y_coord)
+		room_coords = (local_coords[0]%Room.ROOM_WIDTH,local_coords[1]%Room.ROOM_HEIGHT)
+		next_coords = next_level.flipped_coords(global_coords,room_coords) #TODO: will have to change this
 		next_level.addPlayer(player,next_coords)
 		
+	def level_at(self,x,y):
+		for L in self.levels:
+			global_coords = L.origin
+			level_end = L.level_end_coords()
+			if(global_coords[0]<=x<=level_end[0] and global_coords[1]<=y<=level_end[1]):
+				return L
+		return None

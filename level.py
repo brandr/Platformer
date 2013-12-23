@@ -1,30 +1,70 @@
-import pygame
-from pygame import *
-import camera
-from camera import *
-import levelobjects
-from levelobjects import *
-import gameimage
-from gameimage import *
+import room
+from room import *
 
 class Level(object):
-	#NOTE: this is a lot of args. May want to put them in levelObjects before creating the level, not after.
-	def __init__(self, tiles,entities,platforms,monsters,lanterns,dungeon,global_coords,start_coords):#,outdoors = True):
-		total_level_width  = len(tiles[0])*32
-		total_level_height = len(tiles)*32
-		self.level_camera = Camera(total_level_width, total_level_height)	
-		self.level_objects = LevelObjects(self,tiles,entities,platforms,monsters,lanterns)
-		self.global_coords = global_coords
+	#TODO: make level take in room arg, along with maybe leveldata
+	#def __init__(self, tiles,entities,platforms,monsters,lanterns,dungeon,global_coords,start_coords):
+	def __init__(self, dungeon, level_ID,origin,rooms):
+		self.dungeon = dungeon #could probably get dungeon from rooms instead, if that would work better
+		self.level_ID = level_ID
+		self.origin = origin
+		self.level_objects = LevelObjects(self)
 		self.start_coords = None
-		self.setStartCoords(start_coords)
-		self.dungeon = dungeon
-		self.outdoors = self.outdoors() #TODO: take this as an arg from the factory
+		self.addRooms(rooms)
+		tiles = self.getTiles()
+		total_level_width = len(tiles[0])*32
+		total_level_height = len(tiles)*32
+		self.level_camera = Camera(total_level_width, total_level_height) #might not be the best way to make the camera
+		self.outdoors = False #TODO: take this as an arg from the factory (could also be in levelData)
 		self.calibrateLighting()
+		#self.calibrateExits()
 
-	def setStartCoords(self, start_coords):
-		if(start_coords[0]):
-			self.start_coords = (start_coords[1],start_coords[2])
+		#toString test methods
+	def to_string(self): #will only be used for testing, I  think
+		level_string = ""
+		tiles = self.getTiles()
+		for row in tiles:
+			for t in row:
+				if t.block != None:
+					level_string += "P"
+				else:
+					level_string += " "
+			level_string += "\n"
+		return level_string
 
+	def entities_to_string(self): #for testing
+		dimensions = self.get_dimensions()
+		entities_string_array = []
+		while(len(entities_string_array)<=dimensions[1]):
+			entities_string_array.append([])
+		for s in entities_string_array:
+			while len(s)<=dimensions[0]:
+				s.append(" ")
+		entities = self.getEntities()
+		for e in entities:
+			coords = (e.rect.centerx/32,e.rect.centery/32)
+			entities_string_array[coords[1]][coords[0]] = "E"
+		entities_string = ""
+		for y in range(0,dimensions[1]):
+			for x in range(0,dimensions[0]):
+				entities_string += entities_string_array[y][x]
+			entities_string += "\n"
+		return entities_string
+
+		#level building methods (called in constructor)
+	def addRooms(self,rooms):
+		for r in rooms:
+			level_objects = r.level_objects
+			self.level_objects.addLevelObjects(r.global_coords,level_objects)
+			self.setStartCoords(r)
+
+	def setStartCoords(self, room):
+		if self.start_coords != None: return
+		if room.start_coords[0]:
+			self.start_coords = (room.start_coords[1],room.start_coords[2])
+			return
+
+	#outdoor-related methods
 	def outdoors(self):
 		if(self.global_coords[1] > 0): return False
 		tiles = self.getTiles()
@@ -46,41 +86,75 @@ class Level(object):
 		tiles = self.getTiles()
 		for row in tiles:
 			for t in row:
-				t.updateimage()
+				t.fullyDarken()
+	
+	def calibrateExits(self):
+		tiles = self.getTiles()
+		x_tiles = len(tiles[0])-1
+		y_tiles = len(tiles)-1
+		exit_tiles = []
+		for t in tiles[0]: #ceiling
+			if(t.passable()):
+				exit_tiles.append(t)
+		for t in tiles[y_tiles]: #floor
+			if(t.passable()):
+				exit_tiles.append(t)
+		for row in tiles: #walls
+			if(row[0].passable()): #left wall
+				exit_tiles.append(row[0])
+			if(row[x_tiles].passable()): #right wall
+				exit_tiles.append(row[x_tiles])
 
-	def direction_of(self,exit_block):
+		for e in exit_tiles:
+			default_platform_image = GameImage.loadImageFile('exitblock1.bmp') #TEMPORARY
+			default_platform = GameImage.still_animation_set(default_platform_image) #TEMPORARY
+			x = e.rect_coords()[0]
+			y = e.rect_coords()[1]
+			self.level_objects.addBlock(ExitBlock(default_platform,x,y),t)
+		#TODO
+
+		#directonal/movement methods
+	def direction_of(self,coords):
 		dimensions = self.get_dimensions()
-		exit_tile = exit_block.currenttile()
-		tile_coordinates = exit_tile.coordinates()
-		if(tile_coordinates[0] <= 1): return (-1,0)
-		if(tile_coordinates[0] >= dimensions[0] - 1): return (1,0)
-		if(tile_coordinates[1] <= 1): return (0,-1)
-		if(tile_coordinates[1] >= dimensions[1] - 1): return (0,1)
+		#exit_tile = exit_block.currenttile()
+		if(coords[0] <= 1): return (-1,0)
+		if(coords[0] >= dimensions[0] - 1): return (1,0)
+		if(coords[1] <= 1): return (0,-1)
+		if(coords[1] >= dimensions[1] - 1): return (0,1)
 		return (0,0)
 
-	def flipped_coords(self,coords):
+	def global_coords(self,position):
+		min_x = self.origin[0]
+		min_y = self.origin[1]
+		x_offset = position[0]/Room.ROOM_WIDTH
+		y_offset = position[1]/Room.ROOM_HEIGHT
+		return (min_x+x_offset,min_y+y_offset)
+
+	def flipped_coords(self,global_coords,local_coords):
 		dimensions = self.get_dimensions()
-		if(coords[0] <= 1):
-			return (dimensions[0] - 2, coords[1])		
-		if(coords[0] >= dimensions[0] - 3):
-			return (2, coords[1])
-		if(coords[1] <= 1):
-			return (coords[0],dimensions[1] - 2)
-		if(coords[1] >= dimensions[1] - 3):
-			return (coords[0],2)
+		origin_x = self.origin[0]
+		if(local_coords[0] <= 1):
+			return (dimensions[0] - 2, local_coords[1])		
+		if(local_coords[0] >= Room.ROOM_WIDTH - 2):
+			return (3, local_coords[1])
+		if(local_coords[1] <= 1):
+			return (local_coords[0],dimensions[1] - 2)
+		if(local_coords[1] >= Room.ROOM_HEIGHT - 2):
+			return (local_coords[0],2)
 		#TODO: error case (no possible edge detected for exitblock)
 
-	def movePlayer(self,exit_block):
+	def movePlayer(self,coords):
 		player = self.getPlayer()
-		direction = self.direction_of(exit_block)
+		direction = self.direction_of(coords)
+		adjusted_coords = (coords[0]-direction[0],coords[1]-direction[1])
 		self.removePlayer()
-		self.dungeon.movePlayer(player,self.global_coords,direction)
+		self.dungeon.movePlayer(player,self.global_coords(adjusted_coords),adjusted_coords,direction)
 
 	def addPlayer(self,player,coords = None):
 		player.current_level = self
 		self.level_objects.addPlayer(player)
 		if(coords == None):	
-			player.rect = Rect(self.start_coords[0], self.start_coords[1], 32, 64) #TODO: get size from player's image instead
+			player.moveRect(self.start_coords[0],self.start_coords[1],True)
 			return
 		player.moveTo(coords)
 		self.level_camera.update(player)
@@ -104,6 +178,12 @@ class Level(object):
 
 			pygame.display.update()
 
+	def level_end_coords(self):
+		tiles = self.getTiles()
+		width  = len(tiles[0])-1
+		height = len(tiles)-1
+		return (self.origin[0]+(width/Room.ROOM_WIDTH),self.origin[1]+(height/Room.ROOM_HEIGHT))
+
 	def get_dimensions(self):
 		tiles = self.getTiles()
 		width  = len(tiles[0])
@@ -124,14 +204,17 @@ class Level(object):
 		return self.level_objects.tiles
 
 	def getEntities(self):
-		return self.level_objects.entities
+		return self.level_objects.get_entities(Entity)#self.level_objects.entities
 		
 	def getPlatforms(self):
-		return self.level_objects.platforms
+		return self.level_objects.get_entities(Platform)#platforms
 		
 	def getMonsters(self):
-		return self.level_objects.monsters
+		return self.level_objects.get_entities(Monster)#self.level_objects.monsters
 
 	def getLanterns(self):
-		return self.level_objects.lanterns
+		return self.level_objects.get_entities(Lantern)#self.level_objects.lanterns
+
+	def get_exit_blocks(self):
+		return self.level_objects.get_entities(ExitBlock)
 		
