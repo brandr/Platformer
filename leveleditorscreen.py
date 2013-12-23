@@ -4,7 +4,7 @@ from leveleditor import *
 class LevelEditorScreen:
 
 	def __init__(self):
-		self.level_editor = LevelEditor()
+		self.level_editor = LevelEditor((8,8)) #the tuple arg represets the size of the dungeon to be created.
 
 	def openEditor(self,screen):
 		pygame.display.set_caption("Level Editor")
