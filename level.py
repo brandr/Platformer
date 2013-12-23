@@ -195,7 +195,6 @@ class Level(object):
 					screen.blit(t.image, self.level_camera.apply(t))
 			for e in self.getEntities():
 				screen.blit(e.image, self.level_camera.apply(e))
-
 			pygame.display.update()
 
 	def level_end_coords(self):

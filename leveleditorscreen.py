@@ -13,7 +13,7 @@ class LevelEditorScreen:
 		bg.convert()
 
 		while 1:
-			timer.tick(100)
+			timer.tick(60)
 			for e in pygame.event.get():
 				self.processEvent(e) #IDEA: do something similar for gamescreen
 			for y in range(32):
