@@ -39,6 +39,14 @@ class LevelEditor(object):
 		#screen.blit(self.dungeon_grid,(TILE_SIZE,TILE_SIZE)) #TEMPORARY
 		pygame.display.update()
 
+	def button_at(self,pos):
+		for g in self.grids:
+			if g.contains(pos):
+				relative_pos = g.relative_pos(pos)
+				return g.button_at(relative_pos)
+			#print pos
+		return None
+
 	def dungeon_grid(self,dimensions):
 		#TODO: consider making the grid menu its own object type, which contains the grid
 		TILE_SIZE = LevelEditor.TILE_SIZE

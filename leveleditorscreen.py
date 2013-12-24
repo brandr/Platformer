@@ -14,11 +14,8 @@ class LevelEditorScreen:
 
 		while 1:
 			timer.tick(60)
-			#events = []
 			for e in pygame.event.get():
 				self.processEvent(e)
-				#next_event = self.processedEvent(e) #IDEA: do something similar for gamescreen
-				#if(next_event != None): events.append[next_event]
 			for y in range(32):
 				for x in range(32):
 					screen.blit(bg, (x * 32, y * 32))
@@ -38,5 +35,7 @@ class LevelEditorScreen:
 			return
 
 	def processClick(self,down,pos,mouse_button):
-		#TODO: get the clicked button from self.level_editor, and apply the event to that button.
-		pass
+		#TODO: make this more general so that any component can be clicked.
+		clicked_button = self.level_editor.button_at(pos)
+		if(clicked_button == None): return
+		clicked_button.processClick(down,mouse_button)

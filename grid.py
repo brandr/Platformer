@@ -6,6 +6,7 @@ class Grid(object):
 
 	def __init__(self,x,y,width,height,tile_size): #TODO: consider including button type here, along with maybe button data (both with defaults, probably)
 		self.x,self.y = x,y
+		#self.width,self.height = (width,height)
 		self.image = Surface((width*tile_size,height*tile_size))
 		self.image.fill(Button.BLACK)
 		self.tile_size = tile_size
@@ -24,6 +25,31 @@ class Grid(object):
 				b.update()
 				self.image.blit(b.image,(b.x*self.tile_size,b.y*self.tile_size))
 
+	def button_at(self,pos):
+		if(not self.valid_button_pos(pos)): return None
+		x_coord = pos[0]/self.tile_size
+		y_coord = pos[1]/self.tile_size
+		return self.buttons[y_coord][x_coord]
+
+	def valid_button_pos(self,pos):
+		xcheck = 0 <= pos[0] < self.tile_size*len(self.buttons[0])
+		ycheck = 0 <= pos[1] < self.tile_size*len(self.buttons)
+
+		return xcheck and ycheck
+
+	def contains(self,pos):
+		#if(not self.y <= pos[1] <=self.height()*self.tile_size):
+		#	print (str((self.x,self.y))+", "+str(pos))
+		return (self.x <= pos[0] <= self.x+self.width()*self.tile_size and self.y <= pos[1] <=self.y+self.height()*self.tile_size)
+
+	def relative_pos(self,pos):
+		return (pos[0]-self.x,pos[1]-self.y)
+
+	def width(self):
+		return len(self.buttons[0])
+
+	def height(self):
+		return len(self.buttons)
 
 	@staticmethod
 	def blank_grid_button(tile_size,x,y):
