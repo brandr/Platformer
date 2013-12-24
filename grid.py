@@ -3,12 +3,13 @@ import button
 from button import *
 
 class Grid(object):
+	#TODO: consider making grid inherit from guicomponent.
 
 	def __init__(self,x,y,width,height,tile_size): #TODO: consider including button type here, along with maybe button data (both with defaults, probably)
 		self.x,self.y = x,y
 		#self.width,self.height = (width,height)
 		self.image = Surface((width*tile_size,height*tile_size))
-		self.image.fill(Button.BLACK)
+		self.image.fill(BLACK)
 		self.tile_size = tile_size
 		self.buttons = []
 		if(width <= 0 or height <= 0):return
@@ -61,7 +62,7 @@ class Grid(object):
 	@staticmethod
 	def blank_grid_tile(tile_size):
 		blank_tile = Surface((tile_size,tile_size))
-		blank_tile.fill(Button.WHITE)
+		blank_tile.fill(WHITE)
 		return Grid.grid_tile(blank_tile)
 
 	#trims a tile to fit within gridlines, then returns it
