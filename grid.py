@@ -7,13 +7,11 @@ class Grid(object):
 
 	def __init__(self,x,y,width,height,tile_size): #TODO: consider including button type here, along with maybe button data (both with defaults, probably)
 		self.x,self.y = x,y
-		#self.width,self.height = (width,height)
-		self.image = Surface((width*tile_size,height*tile_size))
+		self.image = Surface((width*tile_size+1,height*tile_size+1)) #+1s needed to fit gridlines
 		self.image.fill(BLACK)
 		self.tile_size = tile_size
 		self.buttons = []
 		if(width <= 0 or height <= 0):return
-		#self.initBackground() #not sure if I'll actually use this
 		for y in range (0,height):
 			self.buttons.append([])
 			for x in range(0,width):
@@ -25,6 +23,14 @@ class Grid(object):
 			for b in row:
 				b.update()
 				self.image.blit(b.image,(b.x*self.tile_size,b.y*self.tile_size))
+		self.draw_gridlines()
+
+	def draw_gridlines(self):
+		tile_size = self.tile_size
+		for y in range (0,self.height()):
+			pygame.draw.line(self.image,BLACK,(0,y*tile_size),(self.width()*tile_size,y*tile_size))
+		for x in range(0,self.width()):
+			pygame.draw.line(self.image,BLACK,(x*tile_size,0),(x*tile_size,self.height()*tile_size))
 
 	def button_at(self,pos):
 		if(not self.valid_button_pos(pos)): return None
@@ -39,8 +45,6 @@ class Grid(object):
 		return xcheck and ycheck
 
 	def contains(self,pos):
-		#if(not self.y <= pos[1] <=self.height()*self.tile_size):
-		#	print (str((self.x,self.y))+", "+str(pos))
 		return (self.x <= pos[0] <= self.x+self.width()*self.tile_size and self.y <= pos[1] <=self.y+self.height()*self.tile_size)
 
 	def relative_pos(self,pos):
@@ -57,13 +61,18 @@ class Grid(object):
 		button_image = Grid.blank_grid_tile(tile_size)
 		return Button(button_image,x,y)
 
-	#TODO: make an update method which blits all of the grid's buttons' images against its background.
-
 	@staticmethod
 	def blank_grid_tile(tile_size):
 		blank_tile = Surface((tile_size,tile_size))
 		blank_tile.fill(WHITE)
-		return Grid.grid_tile(blank_tile)
+		return blank_tile
+
+	@staticmethod
+	def grid_box(tile_size):
+		transparent = Surface(tile_size-2,tile_size-2)
+		transparent
+		box = Surface(tile_size,tile_size)
+		return box
 
 	#trims a tile to fit within gridlines, then returns it
 	@staticmethod	

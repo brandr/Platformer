@@ -3,6 +3,7 @@ from pygame import *
 
 BLACK = Color("#000000")
 WHITE = Color("#FFFFFF")
+DEFAULT_MARGIN = 32
 
 class GuiComponent(object):
 
@@ -20,20 +21,37 @@ class GuiComponent(object):
 			if c.contains(pos):
 				relative_pos = c.relative_pos(pos)
 				return c.button_at(relative_pos)
+		#TODO: consider allowing the stadard guicomponent to have buttons on it.
 		return None
 
 	def insert(self,subcomponent):
 		self.subcomponents.append(subcomponent)
 		pos = (subcomponent.x,subcomponent.y)
-		#self.image.blit(subcomponent.image,pos)
 
 	def update(self):
 		for c in self.subcomponents:
 			c.update()
 			self.image.blit(c.image,(c.x,c.y))
 
+	def get_window_at(self,x,y,width,height):
+		window = Surface((width,height))
+		window.blit(self.image,(-x,-y))
+		return window
+
 	def contains(self,pos):
 		return (self.x <= pos[0] <= self.x+self.width and self.y <= pos[1] <=self.y+self.height)
 
 	def relative_pos(self,pos):
 		return (pos[0]-self.x,pos[1]-self.y)
+
+	def addTitle(self,title,x,y):
+		title_text = GuiComponent.text_component(title,36,BLACK,(x,y))
+		self.insert(title_text)
+
+	@staticmethod
+	def text_component(text,font_size,color,offset):
+		font = pygame.font.Font(None, font_size)
+		text = font.render(text, 1, color)
+		width = text.get_rect().width
+		height = text.get_rect().height
+		return GuiComponent(offset[0],offset[1],width,height,WHITE,text)
