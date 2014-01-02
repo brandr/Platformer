@@ -1,5 +1,6 @@
 import levelselectcontainer
 from levelselectcontainer import *
+#TODO: dungeongridcontainer
 import pygame
 from pygame import *
 from ocempgui.widgets import *
@@ -19,15 +20,21 @@ class DungeonEditorScreen(object):
 
 	def initComponents(self,renderer): #could maybe be static
 
-		level_select_container = DungeonEditorScreen.level_select_container()
-		#level_table = DungeonEditorScreen.empty_level_table()
-		#TODO: dungeon grid, other stuff
+		level_select_container = DungeonEditorScreen.level_select_container(32,32,312,360)
+		#dungeon_grid_container = DungeonEditorScreen.dungeon_grid_container(level_select_container.right+48,level_select_container.top)
+		#TODO: anything else the leveleditor might need
 
-		#TODO: level table
 		self.renderer.add_widget(level_select_container)
 
+
 	@staticmethod
-	def level_select_container():
-		position = (32,32)
-		dimensions = (312,360)
+	def level_select_container(pos_x,pos_y,width,height):
+		position = (pos_x,pos_y)
+		dimensions = (width,height)
 		return LevelSelectContainer(position,dimensions)
+
+	@staticmethod
+	def dungeon_grid_container(pos_x,pos_y,width,height):
+		position = (pos_x,pos_y)
+		dimensions = (width,height)
+		return DungeonGridContainer(position,dimensions)
