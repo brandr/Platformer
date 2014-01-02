@@ -7,6 +7,7 @@ class LevelSelectCell(Table):
 		#self.name = name	#TODO:specify which level (consider retrieving frm self.level_data)
 		name_label = Label(name)
 		self.add_child(0,0,name_label)
+		#print self.height
 		#self.addText("Level 1:",22,DEFAULT_MARGIN/8,DEFAULT_MARGIN/8) #TODO: consider 
 		#self.level_data = None		#TODO: a new level select cell should create a new levelData data member (have to define this class)
 		#self.initializeButtons()

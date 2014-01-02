@@ -4,6 +4,7 @@ from ocempgui.widgets import *
 from ocempgui.widgets.Constants import *
 
 MAX_LEVELS = 99
+CELL_HEIGHT = 28 #TODO: get this better
 
 class LevelSelectContainer(Box):
 	def __init__(self,position,dimesions):
@@ -24,20 +25,19 @@ class LevelSelectContainer(Box):
 		self.add_child(self.level_table)
 		self.add_child(self.add_level_button)
 
-
 	def add_level_button(self):
 		button = Button("Add a level")
 		button.connect_signal (SIG_CLICKED, self.addLevel)
 		#button.SIG_CLICKED = self.addLevel(added_level_name) #TEMP. TODO: try to do this bit witout actually calling the fuction.
 		return button
 
-	def addLevel(self):#,level_name):
+	def addLevel(self):
 		level_name = "level "+str(self.level_count)
 		added_level_cell = LevelSelectCell(level_name)
 		self.level_count += 1
+
+		self.add_level_button.top += CELL_HEIGHT 
 		self.level_table.add_child(self.level_count,0,added_level_cell)
-		#sel.
-		#print "COUNT: "+str(self.level_count)
 
 	@staticmethod
 	def empty_level_table():
