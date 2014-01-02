@@ -3,7 +3,8 @@ from levelselectcontainer import *
 import pygame
 from pygame import *
 from ocempgui.widgets import *
-#from ocempgui.widgets.Constants import *
+
+#TODO: make the level select container a scrollable window instead.
 
 WIN_WIDTH = 800
 WIN_HEIGHT = 640
@@ -27,6 +28,6 @@ class DungeonEditorScreen(object):
 
 	@staticmethod
 	def level_select_container():
-		position = (128,128)
-		dimensions = (256,256)
+		position = (32,32)
+		dimensions = (312,360)
 		return LevelSelectContainer(position,dimensions)
