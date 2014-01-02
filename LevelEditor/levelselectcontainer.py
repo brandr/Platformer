@@ -2,8 +2,7 @@ import levelselectcell
 from levelselectcell import *
 from ocempgui.widgets import *
 from ocempgui.widgets.Constants import *
-from ocempgui.widgets.components import ListItemCollection
-from ocempgui.widgets.components import ListItem, TextListItem
+
 MAX_LEVELS = 99
 
 
@@ -36,7 +35,7 @@ class LevelSelectContainer(Box):
 
 		#TODO: edit level button (will require processing Dungeon/Room Data, also Dungeon grid)
 		#TODO: resize level button
-		#TODO: delete level button
+		#TODO: delete level button(NICK)
 		#TODO: buttons for any levelData attributes external to rooms
 
 		self.updateSelectedLevel()
@@ -145,13 +144,7 @@ class LevelSelectContainer(Box):
 
 	@staticmethod
 	def empty_level_table():
-		table = Table (9, 1)
+		table = Table (1, 1)
 		table.spacing = 5
 		table.topleft = 5, 5
 		return table
-
-	
-	#TODO 
-	#@staticmethod
-	#def level_select_cell():
-	#	label = Label()
