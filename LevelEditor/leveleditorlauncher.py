@@ -1,14 +1,17 @@
 import dungeoneditorscreen
 from dungeoneditorscreen import *
-#TEMPORARY
-
 
 
 #TODO: use ocempgui to reproduce current level editor screen fuctionality.
+#currently used classes include:
+	#leveleditorlauncher.py
+	#dungeoneditorscreen.py
+	#levelselectcontainer.py
+	#levelselectcell.py
 
-#button = Button ("Hello World")
-#button.topleft = (10, 10)
-#re.add_widget (button)
+#Other classes in this folder will not be used in the final version of this gui,
+	#unless they are heavily rewritten. Do not delete unused classes yet, though,
+	#because it may be useful to look at them to copy their functionality.
 
 def loadMapEditor():
 	pygame.init()

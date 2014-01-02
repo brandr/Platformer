@@ -27,11 +27,7 @@ class LevelEditor(object):
 	#IDEA: upon clicking on a tile in the dungeon grid, the user prompts the level grid to change to the
 		#level corresponding to that tile, and for all that level's tiles to be highlighted somehow in the dungeon grid.
 	#might need a special object type corresponding to levels for the editor to work with.
-		#these would be very different from actual levels
-	#IDEA: generalize GUIs a little more, and consider making some sort of "guiscreen" that contains
-		#and handles multiple components
-	#IDEA: focus on a particular component at a time, or none at all. If no component is focused, input can go anywhere.
-		#	Otherwise, input only goes to the focused component.
+		#these would be very different from actual levels (might be called LevelDta)
 
 	def __init__(self,dungeon_dimensions):
 		dungeon_grid = self.dungeon_grid(dungeon_dimensions)

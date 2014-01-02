@@ -34,6 +34,11 @@ class LevelSelectContainer(Box):
 		self.add_child(self.rename_level_button)
 		self.add_child(self.level_name_entry)
 
+		#TODO: edit level button (will require processing Dungeon/Room Data, also Dungeon grid)
+		#TODO: resize level button
+		#TODO: delete level button
+		#TODO: buttons for any levelData attributes external to rooms
+
 		self.updateSelectedLevel()
 
 	#buttons/entry fields
