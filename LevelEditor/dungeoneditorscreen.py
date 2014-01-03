@@ -29,6 +29,11 @@ class DungeonEditorScreen(object):
 		self.renderer.add_widget(level_select_container)
 		self.renderer.add_widget(dungeon_grid_container)
 
+	#def notify(self,event):
+	#	if(event.signal != "entered"):
+	#		print event.signal
+	#		print event.data
+
 	@staticmethod
 	def level_select_container(pos_x,pos_y,width,height):
 		position = (pos_x,pos_y)
