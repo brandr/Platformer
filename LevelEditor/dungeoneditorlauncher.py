@@ -13,6 +13,7 @@ from dungeoneditorscreen import *
 		#somehow, all of the deleted level's rooms should become empty.
 #IDEA: consider planning out the entire editors' GUI ahead of time and simply making components with TODOs on them,
 	# to show where everything should go. (ROBERT)
+#TODO: figure out how to open the level editor for a level that already has rooms. (might be the same as making an empty one)
 #TODO: decide whether or not we actually need a "resize level" button,since levels are currently resizable.
 #TODO: make the actual level Editor.
 	#it will probably work best if this is a separate window that pops up when the "Edit Level" button is clicked.

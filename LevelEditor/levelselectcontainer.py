@@ -105,7 +105,7 @@ class LevelSelectContainer(Box):
 
 	def editSelectedLevel(self):
 		title = "Level Editor" #might have title vary more and include level's name
-		level_editor_window = LevelEditorWindow(self,title,self.selected_level_cell,(32,32),(400,400))
+		level_editor_window = LevelEditorWindow(self,title,self.selected_level_cell,(32,32),(800,550))
 		level_editor_window.depth = 1
 		self.editor_screen.dungeon_renderer.add_widget(level_editor_window)
 		self.setSensitivity(self.dungeon_grid_container,False)
@@ -142,7 +142,6 @@ class LevelSelectContainer(Box):
 		
 		self.setSensitivity(self.rename_level_button,rename_sensitive)
 		self.setSensitivity(self.level_name_entry,rename_sensitive)
-
 		self.setSensitivity(self.edit_level_button,edit_level_sensitive)
 
 		if self.dungeon_grid_container != None and reset_rooms:

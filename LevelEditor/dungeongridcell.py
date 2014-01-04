@@ -10,7 +10,7 @@ DESELECTED = "deselected"
 EMPTY = "empty"
 
 class DungeonGridCell(ImageButton):
-
+	#a cell that reprensents a room.
 	def __init__(self,row,col): #TODO: consider making it possible to init non-empty cells
 		ImageButton.__init__(self,"")
 		self.minsize = DUNGEON_CELL_WIDTH,DUNGEON_CELL_HEIGHT
@@ -18,6 +18,8 @@ class DungeonGridCell(ImageButton):
 		self.empty = True #TODO: if more useful, replace this with setting self.level_cell = None, or something similar
 		self.cell_state = EMPTY
 		self.row,self.col = row,col
+		
+		self.room_data = None #TODO: make room_data a thing
 
 	def select(self): #TODO: consider passing in level_cell arg here
 		self.set_picture(DungeonGridCell.selected_level_tile())

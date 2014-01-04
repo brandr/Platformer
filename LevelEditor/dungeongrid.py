@@ -24,7 +24,7 @@ class DungeonGrid(Table): #table might not be the best source.
 		row = int(coords[1]/height)
 		col = int(coords[0]/width)
 		if (row, col) not in self.grid:
-			return
+			return None
 		cell = self.grid[(row,col)]
 		return cell
 

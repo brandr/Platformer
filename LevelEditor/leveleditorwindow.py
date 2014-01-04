@@ -1,6 +1,6 @@
 from leveleditorcontainer import *
 
-LEVEL_WIN_WIDTH = 1000
+LEVEL_WIN_WIDTH = 1000	#not sure these are needed
 LEVEL_WIN_HEIGHT = 650
 
 class LevelEditorWindow(Window):
