@@ -25,7 +25,6 @@ class DungeonGridContainer(Box):
 		window.set_child(dungeon_grid)
 		window.topleft = (18,45)
 		window.connect_signal(SIG_MOUSEDOWN,self.clickDungeonCell)#self.dungeon_grid.clickDungeonCell,offset) #TODO: make it possible to select grid parts
-		#window.set_state(Constants.STATE_INSENSITIVE)
 		return window
 
 	def clickDungeonCell(self,event):

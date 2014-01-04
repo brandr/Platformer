@@ -94,6 +94,7 @@ class DungeonGrid(Table): #table might not be the best source.
 		level_cell = self.level_select_container.selected_level_cell
 		if level_cell == None: return
 		level_cell.set_rooms(self.selected_cells)
+		self.level_select_container.updateSelectedLevel(False)
 
 	#def setSelectedLevelCell(self,level_cell):
 	def resetRooms(self): #reset currently selected rooms to match currently selected level cell.
