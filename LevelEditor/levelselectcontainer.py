@@ -38,6 +38,7 @@ class LevelSelectContainer(Box):
 		#TODO: delete level button(NICK)
 		#TODO: buttons for any levelData attributes external to rooms
 
+		self.dungeon_grid_container = None #might just use the actual grid
 		self.updateSelectedLevel()
 
 	#buttons/entry fields
@@ -127,6 +128,9 @@ class LevelSelectContainer(Box):
 			self.rename_level_button.sensitive = True
 			self.level_name_entry.set_state(Constants.STATE_NORMAL)
 			self.level_name_entry.sensitive = True
+		if self.dungeon_grid_container != None:
+			#print "HERE"
+			self.dungeon_grid_container.dungeon_grid.resetRooms()#setSelectedLevelCell(self.selected_level_cell)
 
 	def cell_at(self,coords):
 		height = CELL_HEIGHT+2

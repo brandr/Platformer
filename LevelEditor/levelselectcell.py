@@ -12,9 +12,14 @@ class LevelSelectCell(Table):
 		self.name = name#TODO:specify which level (consider retrieving frm self.level_data instead)
 		self.name_label = Label(self.name)
 		self.add_child(0,0,self.name_label)
+		self.room_cells = None
 		
-	def get_name(self):
+	def get_name(self): #TODO: consider making this getter access level data instead.
 		return self.name
+
+		#TODO: takes a set of dungeongridcells and connects them to this level cell.
+	def set_rooms(self,dungeon_cells):
+		self.room_cells = dungeon_cells #not sure this is what we want, but using it for now
 	
 	def rename_level(self,level_name):
 		self.name = level_name
