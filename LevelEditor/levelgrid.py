@@ -19,7 +19,6 @@ class LevelGrid(Table):
 		self.init_cells(rows,cols) #might not needs args
 
 		#IDEA: could get rows and cols from level cell insted
-		#TODO: consider making the level cells something besides a button (maybe a Bin?)
 	
 	def init_cells(self,rows,cols):
 		for i in xrange (rows):
@@ -65,13 +64,25 @@ class LevelGrid(Table):
 		#minsize 32x32
 		return cell
 
-		#TODO: replace this with various click methods for different click types
-	def testClick(self,event,calculate_offset):
-		if event.button != LEFT_MOUSE_BUTTON: return
+	def processClick(self,event,calculate_offset):
 		offset = calculate_offset()
 		pos = event.pos 
 		adjusted_pos = ((pos[0]-offset[0],pos[1]-offset[1]))
-		coordinate_pos = (int(adjusted_pos[1]/30),int(adjusted_pos[0]/30)) #this bit will still need some tweaking
-		#TODO
-		#if(coordinate_pos in self.grid):
-		#	self.grid[(coordinate_pos[0],coordinate_pos[1])].set_text("O")
+		coordinate_x = int(adjusted_pos[0]/(LEVEL_TILE_WIDTH+1.1))
+		coordinate_y = int(adjusted_pos[1]/(LEVEL_TILE_HEIGHT+1.25))
+		coordinate_pos = (coordinate_y,coordinate_x) #this bit is still a little wonky, but functional for now.
+		if(coordinate_pos not in self.grid): return
+		clicked_tile = self.grid[(coordinate_pos[0],coordinate_pos[1])]
+		if event.button == LEFT_MOUSE_BUTTON:
+			self.leftClick(clicked_tile)
+		else:
+			#TODO: other click types
+			return
+
+	def leftClick(self,clicked_tile):
+		image = self.level_editor.entity_select_container.current_image()
+		clicked_tile.set_picture(image)
+		#TODO: need to make tiles store more useful data than just images.
+
+
+		

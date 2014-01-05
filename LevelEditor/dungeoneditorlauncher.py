@@ -13,12 +13,13 @@ from dungeoneditorscreen import *
 		#somehow, all of the deleted level's rooms should become empty.
 #IDEA: consider planning out the entire editors' GUI ahead of time and simply making components with TODOs on them,
 	# to show where everything should go. (ROBERT)
-#TODO: figure out how to open the level editor for a level that already has rooms. (might be the same as making an empty one)
+#TODO: figure out how to open the level editor for a level that already has rooms. (will have to define room data first)
 #TODO: decide whether or not we actually need a "resize level" button,since levels are currently resizable.
 #TODO: make the actual level Editor.
-	#it will probably work best if this is a separate window that pops up when the "Edit Level" button is clicked.
-	#consider making it impossible to interact with the dungeon editor until the level editor is closed.
-		#This will prevent the user from resizing/renaming/deleting/etc the level from the dungeon editor while editing it.
+	#currently, this is a separate window that pops up when the "Edit Level" button is clicked.
+	#need to make it possible to add platforms, enemies, lanterns, etc.
+		#in the long run, all of these should be loaded from some kind of library.
+		#might end up moving the folder that currently holds sprite data into the LevelEditor folder
 #TODO: conisder whether room data should be wiped when a level is deleted or resized (and if not, how it should be handled).
 	#IDEA: a special state for rooms which are deselected and not empty, but have no corresponding level.
 		#(might need to rename the "deselected" state for clarity.)
