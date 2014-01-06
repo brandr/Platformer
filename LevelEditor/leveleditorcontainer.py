@@ -10,7 +10,8 @@ class LevelEditorContainer(Box):
 		self.level_cell = level_cell
 		
 		level_name_label = Label(level_cell.get_name())
-		self.level_grid_window = LevelGridWindow(self,self.left+400,self.top+8,360,360) #TODO: more args
+		self.level_grid_window = self.level_grid_window()
+		
 		self.entity_select_container = self.entity_select_container(self.left+8,level_name_label.bottom+8,self.level_grid_window.left - 16,200)
 		close_editor_button = self.close_editor_button(self.left + 8, self.bottom - 32) #also consider lower right corner
 		
@@ -30,8 +31,19 @@ class LevelEditorContainer(Box):
 		button = Button("Close Editor")
 		button.topleft = x,y
 		button.connect_signal(SIG_CLICKED,self.closeEditor) #TODO (might need access to window)
+		self.level_cell.initialize_grid(self.level_grid_window.level_grid)
 		return button
 
 	def closeEditor(self):	#I sometimes have trouble making this work for some reason. (I think it happens if something is childless but needs children, like a window.)
+		self.level_cell.initialize_grid(self.level_grid_window.level_grid)
 		self.master_window.level_select_container.resume()
 		self.master_window.destroy()
+
+	def level_grid_window(self):
+		level_cell = self.level_cell
+		if level_cell.initialized():
+			window = LevelGridWindow(self,self.left+400,self.top+8,360,360) 
+			window.setLevelData(level_cell.level_data)
+			return window
+		window = LevelGridWindow(self,self.left+400,self.top+8,360,360) 
+		return window

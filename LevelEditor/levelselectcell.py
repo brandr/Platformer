@@ -1,6 +1,7 @@
 from ocempgui.widgets import *
 from ocempgui.widgets.Constants import *
 from pygame import *
+from leveleditorcontainer import *
 
 CELL_WIDTH = 242
 CELL_HEIGHT = 36 
@@ -13,6 +14,7 @@ class LevelSelectCell(Table):
 		self.name_label = Label(self.name)
 		self.add_child(0,0,self.name_label)
 		self.room_cells = None
+		self.level_data = None
 		
 	def get_name(self): #TODO: consider making this getter access level data instead.
 		return self.name
@@ -44,6 +46,12 @@ class LevelSelectCell(Table):
 		#takes a set of dungeongridcells and connects them to this level cell.
 	def set_rooms(self,dungeon_cells):
 		self.room_cells = dungeon_cells #not sure this is what we want, but using it for now
+
+	def initialize_grid(self,grid):
+		self.level_data = grid.get_level_data() #not sure if this should be set entirely from grid or not. might consider adding roomdata as an attribute of leveldata.
+
+	def initialized(self):
+		return self.level_data != None
 	
 	def rename_level(self,level_name):
 		self.name = level_name

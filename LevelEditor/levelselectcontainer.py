@@ -37,7 +37,6 @@ class LevelSelectContainer(Box):
 		self.add_child(self.level_name_entry)
 		self.add_child(self.edit_level_button)
 
-		#TODO: edit level button (partially done. will require processing Dungeon/Room Data)
 		#TODO: resize level button (not sure this is necessary, since levels are resizable already.)
 		#TODO: delete level button(NICK)
 		#TODO: buttons for any levelData attributes external to rooms (though maybe these should be in the level editor)

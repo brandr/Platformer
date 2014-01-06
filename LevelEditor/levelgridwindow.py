@@ -9,6 +9,9 @@ class LevelGridWindow(ScrolledWindow):
 		self.master_editor = level_editor
 		self.connect_signal(SIG_MOUSEDOWN,self.level_grid.processClick,self.calculate_offset) #TEMP (but will probably connect this signal here)
 
+	def setLevelData(self,data):
+		self.level_grid.setLevelData(data)
+
 	def calculate_offset(self):
 		window_pos = (self.left,self.top)
 		x_scroll_offset = self.hscrollbar.value
