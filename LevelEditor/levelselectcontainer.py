@@ -103,6 +103,7 @@ class LevelSelectContainer(Box):
 		self.updateSelectedLevel()
 
 	def editSelectedLevel(self):
+		#TODO: open level editor using the dungeon grid cells associated with the selected level.
 		title = "Level Editor" #might have title vary more and include level's name
 		level_editor_window = LevelEditorWindow(self,title,self.selected_level_cell,(32,32),(800,550))
 		level_editor_window.depth = 1

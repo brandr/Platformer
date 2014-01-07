@@ -2,6 +2,8 @@ from ocempgui.widgets import *
 from ocempgui.widgets.Constants import *
 from pygame import *
 
+from roomdata import *
+
 DUNGEON_CELL_WIDTH = 18
 DUNGEON_CELL_HEIGHT = 18
 
@@ -19,7 +21,10 @@ class DungeonGridCell(ImageButton):
 		self.cell_state = EMPTY
 		self.row,self.col = row,col
 		
-		self.room_data = None #TODO: make room_data a thing
+		self.room_data = None #TODO: make it possible to alter room data after it is initialized.
+
+	def init_room_data(self,width,height):
+		self.room_data = RoomData(width,height)
 
 	def select(self): #TODO: consider passing in level_cell arg here
 		self.set_picture(DungeonGridCell.selected_level_tile())
@@ -34,6 +39,9 @@ class DungeonGridCell(ImageButton):
 		else:
 			self.set_picture(DungeonGridCell.deselected_level_tile())
 			self.cell_state = DESELECTED
+
+	def add_entity(self,tile_data,col,row):
+		self.room_data.set_tile(tile_data,col,row)
 
 	@staticmethod
 	def empty_level_tile():

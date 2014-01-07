@@ -6,7 +6,7 @@ MAX_DUNGEON_COLS = 16
 LEFT_MOUSE_BUTTON = 1
 
 class DungeonGridContainer(Box):
-	def __init__(self,level_select_container,position,dimensions): #TODO: make level_select_container do something
+	def __init__(self,level_select_container,position,dimensions):
 		Box.__init__(self,dimensions[0],dimensions[1])
 		self.topleft = (position[0],position[1])
 		self.level_select_container = level_select_container
@@ -15,7 +15,7 @@ class DungeonGridContainer(Box):
 		dungeon_grid_label = Label("Dungeon Grid:")
 
 		self.dungeon_grid = DungeonGrid(level_select_container,MAX_DUNGEON_ROWS,MAX_DUNGEON_COLS)
-		self.dungeon_window = self.dungeon_window(dimensions[0]-36,dimensions[1]-128,self.dungeon_grid)#TODO
+		self.dungeon_window = self.dungeon_window(dimensions[0]-36,dimensions[1]-128,self.dungeon_grid)
 
 		self.add_child(dungeon_grid_label)
 		self.add_child(self.dungeon_window)
@@ -24,7 +24,7 @@ class DungeonGridContainer(Box):
 		window = ScrolledWindow(width,height)
 		window.set_child(dungeon_grid)
 		window.topleft = (18,45)
-		window.connect_signal(SIG_MOUSEDOWN,self.clickDungeonCell)#self.dungeon_grid.clickDungeonCell,offset) #TODO: make it possible to select grid parts
+		window.connect_signal(SIG_MOUSEDOWN,self.clickDungeonCell)
 		return window
 
 	def clickDungeonCell(self,event):

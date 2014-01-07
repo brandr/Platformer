@@ -7,10 +7,10 @@ CELL_WIDTH = 242
 CELL_HEIGHT = 36 
 #not yet sure if the cell should store level data, or simply be used to create it. (I would prefer the latter.)
 class LevelSelectCell(Table):
-	def __init__(self,name):#TODO: args specific to LevelSelectCells 
+	def __init__(self,name):#TODO: consider ways of setting level data (not room data, though)
 		Table.__init__(self,1,1) #TODO: consider making this a label or other type
 		self.set_minimum_size(CELL_WIDTH,CELL_HEIGHT)
-		self.name = name#TODO:specify which level (consider retrieving frm self.level_data instead)
+		self.name = name#TODO:consider retrieving from self.level_data instead
 		self.name_label = Label(self.name)
 		self.add_child(0,0,self.name_label)
 		self.room_cells = None
@@ -22,12 +22,10 @@ class LevelSelectCell(Table):
 	def origin(self): #find the upper left corner of the level
 		total_height = len(self.room_cells)
 		total_width = len(self.room_cells[0])
-
 		for y in range (0,total_height):
 			for x in range(0, total_width):
 				if self.room_cells[y][x] != None:
 					return x,y
-
 		return 0,0 #might not be the best default
 
 	def aligned_rooms(self):
@@ -39,7 +37,7 @@ class LevelSelectCell(Table):
 		for y in range(origin[1],total_height):
 			rooms.append([])
 			for x in range(origin[0],total_width):
-				rooms[aligned_y].append(self.room_cells[y][x].room_data)
+				rooms[aligned_y].append(self.room_cells[y][x])
 			aligned_y += 1
 		return rooms
 
@@ -47,11 +45,18 @@ class LevelSelectCell(Table):
 	def set_rooms(self,dungeon_cells):
 		self.room_cells = dungeon_cells #not sure this is what we want, but using it for now
 
-	def initialize_grid(self,grid):
-		self.level_data = grid.get_level_data() #not sure if this should be set entirely from grid or not. might consider adding roomdata as an attribute of leveldata.
-
 	def initialized(self):
 		return self.level_data != None
+
+	def add_entity(self,tile_data,col,row):
+		room_offset = self.origin()
+		room_col = col/ROOM_WIDTH	#make sure we have access to these
+		room_row = row/ROOM_HEIGHT
+		adjusted_room_col = room_col + room_offset[0]
+		adjusted_room_row = room_row + room_offset[1]
+		relative_col = col%ROOM_WIDTH
+		relative_row = row%ROOM_HEIGHT
+		self.room_cells[adjusted_room_row][adjusted_room_col].add_entity(tile_data,relative_col,relative_row) 
 	
 	def rename_level(self,level_name):
 		self.name = level_name

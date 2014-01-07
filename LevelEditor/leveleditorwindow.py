@@ -3,7 +3,7 @@ from leveleditorcontainer import *
 LEVEL_WIN_WIDTH = 1000	#not sure these are needed
 LEVEL_WIN_HEIGHT = 650
 
-class LevelEditorWindow(Window):
+class LevelEditorWindow(Window): #TODO: build editor's tile grid from dungeon grid cells (or their data) accessed through level_cell.
 	def __init__(self,level_select_container,title,level_cell,position,dimensions):
 		Window.__init__(self,title)
 		self.level_select_container = level_select_container #need this to access click sensitivity

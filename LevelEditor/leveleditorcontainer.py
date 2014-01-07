@@ -28,22 +28,22 @@ class LevelEditorContainer(Box):
 		return container
 
 	def close_editor_button(self,x,y):
-		button = Button("Close Editor")
+		button = Button("Close and Save")
 		button.topleft = x,y
 		button.connect_signal(SIG_CLICKED,self.closeEditor) #TODO (might need access to window)
-		self.level_cell.initialize_grid(self.level_grid_window.level_grid)
+		#self.level_cell.initialize_grid(self.level_grid_window.level_grid)
 		return button
 
 	def closeEditor(self):	#I sometimes have trouble making this work for some reason. (I think it happens if something is childless but needs children, like a window.)
-		self.level_cell.initialize_grid(self.level_grid_window.level_grid)
+		#self.level_cell.initialize_grid(self.level_grid_window.level_grid)
 		self.master_window.level_select_container.resume()
 		self.master_window.destroy()
 
-	def level_grid_window(self):
+	def level_grid_window(self): #TODO: build from dungeon grid cells, not level data.
 		level_cell = self.level_cell
 		if level_cell.initialized():
 			window = LevelGridWindow(self,self.left+400,self.top+8,360,360) 
-			window.setLevelData(level_cell.level_data)
+			window.setGridData(level_cell)
 			return window
 		window = LevelGridWindow(self,self.left+400,self.top+8,360,360) 
 		return window

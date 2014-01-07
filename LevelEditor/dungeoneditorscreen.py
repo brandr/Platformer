@@ -2,13 +2,10 @@ import levelselectcontainer
 from levelselectcontainer import *
 import dungeongridcontainer
 from dungeongridcontainer import *
-#TODO: dungeongridcontainer
 import pygame
 from leveleditorscreen import *
 
-#TODO: make the level select container a scrollable window instead.
-
-DUNGEON_WIN_WIDTH = LEVEL_WIN_WIDTH	  #TEMP
+DUNGEON_WIN_WIDTH = LEVEL_WIN_WIDTH	  #TEMP (maybe?)
 DUNGEON_WIN_HEIGHT = LEVEL_WIN_HEIGHT #TEMP
 
 class DungeonEditorScreen(object):
@@ -23,18 +20,18 @@ class DungeonEditorScreen(object):
 
 		level_select_container = self.level_select_container(32,32,312,428)
 		dungeon_grid_container = self.dungeon_grid_container(level_select_container,level_select_container.right+36,level_select_container.top,312,360)
-		#TODO: anything else the leveleditor might need
+		#TODO: anything else the dungeoneditor might need (consider buttons for saving and loading here)
 
 		self.dungeon_renderer.add_widget(level_select_container)
 		self.dungeon_renderer.add_widget(dungeon_grid_container)
 
+		#I forget if we're still using this method.
 	def openLevelEditor(self,level_cell): #consider making this pass some object held by the LevelSelectCell instead, if that's simpler.
 		#TODO: figure out what data/updates will need to pass betweent the dungeon and level editors.
 		level_renderer = Renderer()
 		level_renderer.screen = self.dungeon_renderer.screen
 		level_renderer.title = "Level Editor"
 		level_renderer.color = (250,250,250)
-		#level_renderer.topleft = (16,16)
 		
 		level_editor_screen = LevelEditorScreen(self,level_renderer)#,level_renderer)
 		level_editor_screen.openLevelEditor() #add more args if necessary

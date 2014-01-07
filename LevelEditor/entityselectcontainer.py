@@ -1,27 +1,13 @@
 from ocempgui.widgets import *
 from ocempgui.widgets.Constants import *
 from ocempgui.widgets.components import *
-from pygame import *
-import pygame, pygame.locals
-from ocempgui.draw import Image
+#from pygame import *
+
+from tiledata import *
 
 MAX_ENTITY_WINDOWS = 4
 #TODO: consider associating with more complex data objects than strings for the actual entities. (or just add another dict for those.)
 #TODO: Ideally, build these data structures from some input, like a set of files/folders.
-PLATFORMS = "platforms"
-MONSTERS = "monsters"
-PRIMARY_ENTITY_NAMES = (PLATFORMS,MONSTERS)
-
-DEFAULT_PLATFORM,FIRE_PLATFORM = "default_platform","fire_platform"
-PLATFORM_NAMES = (DEFAULT_PLATFORM,FIRE_PLATFORM)
-
-BAT,GIANT_FROG = "bat","giant_frog"
-MONSTER_NAMES = (BAT,GIANT_FROG)
-#MONSTERS = (BAT,GIANT FROG) #could potentially do something like this
-PRIMARY_ENTITY_MAP = {PLATFORMS:PLATFORM_NAMES, MONSTERS:MONSTER_NAMES} #could potentially map category names to more maps, rather than name lists.
-
-SELECTABLE_ENTITY_MAP = {DEFAULT_PLATFORM:"default_platform.bmp",FIRE_PLATFORM:"fire_platform.bmp",
-						BAT:"bat.bmp", GIANT_FROG:"giant_frog.bmp"}	#TODO: find a good way to organize more data than this, since we want to map to actual objects, not just image filenames.
 
 class EntitySelectContainer(Box): #window might not be the right name anymore.
 	"""docstring for EntitySelectContainer"""
@@ -43,13 +29,6 @@ class EntitySelectContainer(Box): #window might not be the right name anymore.
 		self.add_child(self.current_entity_label)
 		self.add_child(self.current_entity_image)
 
-
-		#TODO: add a connect_signal for the entity select window so that when something is selected, it will update:
-		#1) an image label showing the image corresponding to the currently selected entity, and
-		#2) the actual current seletion, which will affect both visual and data-related changes that occur
-			#when a tile is clicked.
-			#NOTE: this might not take the form of a connect_signal.
-
 	def primary_entity_window(self): #maybe entity windows should be their own class (unless it is easier to organize some other way.)
 		window = ScrolledList(self.width/MAX_ENTITY_WINDOWS, self.height/2)
 		entity_collection = EntitySelectContainer.primary_entity_collection()
@@ -70,17 +49,18 @@ class EntitySelectContainer(Box): #window might not be the right name anymore.
 
 	def select_entity(self,key): #might benefit from layer arg
 		if not key in SELECTABLE_ENTITY_MAP:
-			self.current_entity = "None" #TEMP. We want to store more data than just the name in the long run. (unless this data can be retrieved with this key later.)
+			self.current_entity = None
+			#TODO: might need to set current image to None here, not sure though
 			self.current_entity_label.set_text("Current Entity: None")
 			return
-		self.current_entity = key #TEMP
-		self.current_entity_label.set_text("Current Entity: "+key) #TEMP. need much more to actually place entities.
-		self.udpateCurrentEntityImage(key)
+		self.current_entity = TileData(key) #TODO: make this method
+		self.current_entity_label.set_text("Current Entity: "+key) 
+		self.updateCurrentEntityImage() #might be able to  do this without an arg (and just use current entity)
 
-	def udpateCurrentEntityImage(self,key):
-		if not key in SELECTABLE_ENTITY_MAP: return #might not be the right error action
-		filename = SELECTABLE_ENTITY_MAP[key]
-		image = Image.load_image ("./images/"+filename) #might not be correct. also, if we have a lot of images, might need a way to specify filepath better.
+	def updateCurrentEntityImage(self):
+		tile_data = self.current_entity
+		if tile_data == None: return #return might not be the correct action here
+		image = tile_data.tile_image
 		self.current_entity_image.set_picture(image)
 
 	def open_entity_window(self,layer,collection):

@@ -1,53 +1,41 @@
 from leveltilecell import *
+from roomdata import *
 
-#TODO: figure out where room dimensions should be stored.
+#TODO: figure out where room dimensions should be stored. (mabye roomdata but not sure.)
 ROOM_WIDTH = 10
 ROOM_HEIGHT = 8
 LEFT_MOUSE_BUTTON = 1      #NOTE: this variable is repeated in dungeongridcontainer.py. Not sure if this could become a problem.
-
-#TODO: consider gridlines 
 
 class LevelGrid(Table):
 	def __init__(self,level_editor,rows,cols):
 		self.level_editor = level_editor
 		level_cell = self.level_cell()
-		#room_cells = level_cell.room_cells #might make a getter for this if it helps
 		cols,rows = self.get_room_dimensions()
 		Table.__init__(self,rows*ROOM_HEIGHT,cols*ROOM_WIDTH)
 		self.spacing = 0
 		self.padding = 0
-		self.init_cells(rows,cols) #might not needs args
+		room_cells = level_cell.aligned_rooms()
+		self.init_cells(room_cells,rows,cols)
+		#self.level_data = ...#NOTE: might use level data later, but not for rooms.
 
-	def get_level_data(self):
-		data = [] #TODO: change the type of this as necessary. (might make leveldata its own class.)
-		for y in xrange(self._rows):
-			data.append([])
-			for x in xrange(self._cols):
-				next_data = self.grid[(y,x)].image #TODO: make this a different data member of leveltilecell instead if necessary.
-				data[y].append(next_data)
-		return data
-
-	def setLevelData(self,data):
-		for y in xrange(self._rows):
-			for x in xrange(self._cols):
-				next_image = data[y][x] #TODO: make sure this matches the data memebr in get_level_data.
-				self.grid[(y,x)].set_picture(next_image)
-
-		#IDEA: could get rows and cols from level cell insted
-	def init_cells(self,rows,cols):
+	def init_cells(self,room_cells,rows,cols):
 		for i in xrange (rows):
 			rooms = self.level_cell().aligned_rooms()
 			for j in xrange (cols):
-				room_data = rooms[i][j]
-				self.add_room(i,j,room_data)
+				cell = room_cells[i][j]
+				self.add_room(i,j,cell)
 
-	def add_room(self,row,col,room_data = None):
-		if room_data == None:
+	def add_room(self,row,col,room_cell):
+		if room_cell.room_data == None:
+			room_cell.init_room_data(ROOM_WIDTH,ROOM_HEIGHT) #might want to store these in roomdata instead, not sure.
 			self.add_empty_room(row,col)
 			return
-		#TODO: actually use roomdata (OR decide  that resizing a level removes whatever is in it)
-		#TODO: make it possible to save all room data to self.level_cell, possibly upon closing editor (could change button to "save and close")
-		#there might be other ways to save, like associating each level cell with a levelgrid.
+		room_data = room_cell.room_data
+		origin_x,origin_y = col*ROOM_WIDTH,row*ROOM_HEIGHT
+		for y in range (origin_y,origin_y+ROOM_HEIGHT):
+			for x in range(origin_x,origin_x+ROOM_WIDTH):
+				tile_data = room_data.tile_at(x - origin_x,y - origin_y)
+				self.add_tile_cell(tile_data,x,y)
 
 	def add_empty_room(self,row,col):
 		origin_x,origin_y = col*ROOM_WIDTH,row*ROOM_HEIGHT
@@ -55,26 +43,36 @@ class LevelGrid(Table):
 			for x in range(origin_x,origin_x+ROOM_WIDTH):
 				self.add_empty_tile_cell(x,y)
 
+	def add_tile_cell(self,tile_data,x,y):
+		if(tile_data == None):
+			self.add_empty_tile_cell(x,y)
+			return
+		cell = self.create_cell(tile_data)
+		self.add_child (y, x, cell)
+
 	def add_empty_tile_cell(self,x,y):
-		cell = self.empty_cell() #Should also make a method for reading corresponding room cell at these coords.
+		cell = self.empty_cell() 
 		self.add_child (y, x, cell)
 
 	def level_cell(self):
 		return self.level_editor.level_cell
 
-	def get_room_dimensions(self):#,room_cells):
+	def get_room_dimensions(self):
 		level_cell = self.level_cell()
 		room_cells = level_cell.room_cells
 		x1,y1 = level_cell.origin()
 		width, height = 0,0
-		for y in range(y1,len(room_cells)): #might not always be correct
+		for y in range(y1,len(room_cells)):
 			height += 1
 		for x in range(x1,len(room_cells[0])):
 			width += 1
 		return width, height
 
-	#@staticmethod
-	def empty_cell(self):	#args might help here
+	def create_cell(self,tile_data):
+		cell = LevelTileCell(tile_data)
+		return cell
+
+	def empty_cell(self):	
 		cell = LevelTileCell()
 		return cell
 
@@ -86,17 +84,17 @@ class LevelGrid(Table):
 		coordinate_y = int(adjusted_pos[1]/(LEVEL_TILE_HEIGHT+1.25))
 		coordinate_pos = (coordinate_y,coordinate_x) #this bit is still a little wonky, but functional for now.
 		if(coordinate_pos not in self.grid): return
-		clicked_tile = self.grid[(coordinate_pos[0],coordinate_pos[1])]
 		if event.button == LEFT_MOUSE_BUTTON:
-			self.leftClick(clicked_tile)
+			self.leftClick(coordinate_pos[0],coordinate_pos[1])
 		else:
 			#TODO: other click types
+			#IDEA: right click to delete
 			return
 
-	def leftClick(self,clicked_tile):
-		image = self.level_editor.entity_select_container.current_image()
+	def leftClick(self,row,col):
+		tile = self.level_editor.entity_select_container.current_entity 
+		if tile == None: return #could also make this delete
+		image = tile.get_image()
+		self.level_cell().add_entity(tile,col,row)
+		clicked_tile = self.grid[(row,col)]	
 		clicked_tile.set_picture(image)
-		#TODO: need to make tiles store more useful data than just images.
-
-
-		
