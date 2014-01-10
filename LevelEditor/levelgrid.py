@@ -1,9 +1,6 @@
 from leveltilecell import *
 from roomdata import *
 
-#TODO: figure out where room dimensions should be stored. (mabye roomdata but not sure.)
-ROOM_WIDTH = 10
-ROOM_HEIGHT = 8
 LEFT_MOUSE_BUTTON = 1      #NOTE: this variable is repeated in dungeongridcontainer.py. Not sure if this could become a problem.
 
 class LevelGrid(Table):
@@ -16,8 +13,7 @@ class LevelGrid(Table):
 		self.padding = 0
 		room_cells = level_cell.aligned_rooms()
 		self.init_cells(room_cells,rows,cols)
-		#self.level_data = ...#NOTE: might use level data later, but not for rooms.
-
+		
 	def init_cells(self,room_cells,rows,cols):
 		for i in xrange (rows):
 			rooms = self.level_cell().aligned_rooms()

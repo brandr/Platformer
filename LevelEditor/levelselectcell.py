@@ -2,13 +2,14 @@ from ocempgui.widgets import *
 from ocempgui.widgets.Constants import *
 from pygame import *
 from leveleditorcontainer import *
+from leveldata import * #might not be necessary if this is reachable through other imports
 
 CELL_WIDTH = 242
 CELL_HEIGHT = 36 
 #not yet sure if the cell should store level data, or simply be used to create it. (I would prefer the latter.)
 class LevelSelectCell(Table):
 	def __init__(self,name):#TODO: consider ways of setting level data (not room data, though)
-		Table.__init__(self,1,1) #TODO: consider making this a label or other type
+		Table.__init__(self,1,1) 
 		self.set_minimum_size(CELL_WIDTH,CELL_HEIGHT)
 		self.name = name#TODO:consider retrieving from self.level_data instead
 		self.name_label = Label(self.name)
@@ -19,7 +20,15 @@ class LevelSelectCell(Table):
 	def get_name(self): #TODO: consider making this getter access level data instead.
 		return self.name
 
+	def get_level_data(self): #add other information here if more is needed for level data.
+		if (self.room_cells == None): return LevelData(self.name,None,None)
+		origin = self.origin()
+		lower_right = self.lower_right()
+		data = LevelData(self.name,origin,lower_right)
+		return data
+
 	def origin(self): #find the upper left corner of the level
+		if self.room_cells == None: return None #might not be right. also, deal with empty levels.
 		total_height = len(self.room_cells)
 		total_width = len(self.room_cells[0])
 		for y in range (0,total_height):
@@ -27,6 +36,11 @@ class LevelSelectCell(Table):
 				if self.room_cells[y][x] != None:
 					return x,y
 		return 0,0 #might not be the best default
+
+	def lower_right(self):
+		total_height = len(self.room_cells)
+		total_width = len(self.room_cells[0])
+		return total_width - 1, total_height - 1
 
 	def aligned_rooms(self):
 		total_height = len(self.room_cells)

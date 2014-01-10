@@ -7,10 +7,13 @@ import lantern
 from lantern import *
 import exitblock
 from exitblock import *
+import sys
+sys.path.insert(0, './LevelEditor')
+from roomdata import *
 
 class LevelObjects(object):
-	ROOM_WIDTH = 32
-	ROOM_HEIGHT = 20
+	#ROOM_WIDTH = 32
+	#ROOM_HEIGHT = 20
 	
 	def __init__(self,level,tiles = None,entities = None):
 		self.level = level
@@ -49,8 +52,8 @@ class LevelObjects(object):
 		y_offset = room_coords[1]-level.origin[1]
 		for e in level_objects.entities:
 			self.entities.append(e)
-			entity_x_offset = LevelObjects.ROOM_WIDTH*x_offset
-			entity_y_offset = LevelObjects.ROOM_HEIGHT*y_offset
+			entity_x_offset = ROOM_WIDTH*x_offset
+			entity_y_offset = ROOM_HEIGHT*y_offset
 			if(entity_x_offset != 0 or entity_y_offset != 0):
 				e.moveRect(entity_x_offset*32,entity_y_offset*32)
 			e.current_level = level
@@ -64,8 +67,8 @@ class LevelObjects(object):
 
 	def addTile(self,tile,x_offset,y_offset):
 		level = self.level
-		new_x = tile.coordinates()[0] + LevelObjects.ROOM_WIDTH*x_offset
-		new_y = tile.coordinates()[1] + LevelObjects.ROOM_HEIGHT*y_offset
+		new_x = tile.coordinates()[0] + ROOM_WIDTH*x_offset
+		new_y = tile.coordinates()[1] + ROOM_HEIGHT*y_offset
 		while len(self.tiles) <= new_y:
 			self.tiles.append([])
 		while len(self.tiles[new_y]) <= new_x:

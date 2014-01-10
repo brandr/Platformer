@@ -6,12 +6,12 @@ import levelobjects
 from levelobjects import *
 import gameimage
 from gameimage import *
-#import levelfactory
-#from levelfactory import *
+
+
 
 class Room(object):
-	ROOM_WIDTH = LevelObjects.ROOM_WIDTH
-	ROOM_HEIGHT = LevelObjects.ROOM_HEIGHT
+	#ROOM_WIDTH = LevelObjects.ROOM_WIDTH
+	#ROOM_HEIGHT = LevelObjects.ROOM_HEIGHT
 	def __init__(self, level_objects,dungeon,global_coords,start_coords):
 		tiles = level_objects.get_tiles()
 		self.level_objects = level_objects
@@ -28,7 +28,7 @@ class Room(object):
 		self.level_objects.setLevel(level)
 
 	def entities_to_string(self): #for testing
-		dimensions = (Room.ROOM_WIDTH,Room.ROOM_HEIGHT)
+		dimensions = (ROOM_WIDTH,ROOM_HEIGHT)
 		entities_string_array = []
 		while(len(entities_string_array)<=dimensions[1]):
 			entities_string_array.append([])

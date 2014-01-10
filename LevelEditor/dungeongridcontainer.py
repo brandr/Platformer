@@ -14,18 +14,29 @@ class DungeonGridContainer(Box):
 
 		dungeon_grid_label = Label("Dungeon Grid:")
 
+		self.dungeon_window_dimensions = dimensions[0]-36,dimensions[1]-128
 		self.dungeon_grid = DungeonGrid(level_select_container,MAX_DUNGEON_ROWS,MAX_DUNGEON_COLS)
-		self.dungeon_window = self.dungeon_window(dimensions[0]-36,dimensions[1]-128,self.dungeon_grid)
+		self.dungeon_window = self.create_dungeon_window(self.dungeon_window_dimensions[0],self.dungeon_window_dimensions[1],self.dungeon_grid)
 
 		self.add_child(dungeon_grid_label)
 		self.add_child(self.dungeon_window)
 
-	def dungeon_window(self,width,height,dungeon_grid):
+	def create_dungeon_window(self,width,height,dungeon_grid):
 		window = ScrolledWindow(width,height)
 		window.set_child(dungeon_grid)
 		window.topleft = (18,45)
 		window.connect_signal(SIG_MOUSEDOWN,self.clickDungeonCell)
 		return window
+
+	def room_save_data(self):
+		return self.dungeon_grid.room_save_data()
+
+	def reset(self):
+		self.dungeon_grid.reset()
+
+	def setRooms(self,room_data_set):
+		self.reset()
+		self.dungeon_grid.setRooms(room_data_set)
 
 	def clickDungeonCell(self,event):
 		#TODO: consider only allowing level resizing after pressing the resize level button

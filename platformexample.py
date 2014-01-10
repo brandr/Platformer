@@ -1,5 +1,6 @@
 import gamescreen
 from gamescreen import *
+from dungeonfactory import *
 #import leveleditorscreen
 #from leveleditorscreen import *
 #PLATFORMEXAMPLE (name will probably change):
@@ -79,7 +80,14 @@ def runGame():
 
     level_data = [level_1_data,level_2_data,level_3_data,level_4_data]
 
-    dungeon = LevelGroup(dungeon_map,level_data)
+    #old way of creating a dungeon
+    #dungeon = LevelGroup(dungeon_map,level_data)
+
+    #new way of creating a dungeon (in progress)
+    factory = DungeonFactory() #might need args like filename, filepath, etc later
+    dungeon = factory.build_dungeon("./LevelEditor/dungeon_map_files/dungeon0")
+    
+    #uncomment these to test actually launching the dungeon
     mainScreen = GameScreen()
     mainScreen.runGame(screen,dungeon)
    

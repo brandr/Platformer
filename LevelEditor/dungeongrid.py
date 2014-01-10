@@ -8,15 +8,44 @@ class DungeonGrid(Table): #table might not be the best source.
 		self.level_select_container = level_select_container
 		self.spacing = 0
 		self.padding = 0
-		self.init_cells(rows,cols)
+		self.init_cells()
 		self.rect_corner = None #a corner used to draw rectangular levels
-		self.selected_cells = None #TODO: make it possible to select cells
+		self.selected_cells = None 
 
-	def init_cells(self,rows,cols):
+	def init_cells(self):
 		for i in xrange (self._rows):
 			for j in xrange (self._cols):
 				cell = DungeonGrid.empty_cell(i,j)
 				self.add_child (i, j, cell)
+
+	def reset_cells(self):
+		for i in xrange (self._rows):
+			for j in xrange (self._cols):
+				self.grid[(i,j)].reset(i,j)
+
+	def reset(self):
+		self.reset_cells() 
+		self.rect_corner = None
+		self.selected_cells = None
+
+	def setRooms(self,room_data_set):
+		for i in xrange (self._rows):
+			for j in xrange (self._cols):
+				next_room = room_data_set[i][j]
+				self.grid[(i,j)].setRoom(next_room)
+
+	def setLevelRooms(self,corners):
+		#set the rooms for  the current level based on a pair of corners, rather than user input.
+		if corners == None or corners[0] == None or corners[1] == None: return
+		corner1 = corners[0]
+		corner2 = corners[1]
+		self.deselect_all_cells()
+		#self.rect_corner = None
+		cell1 = self.cell_at(corner1)
+		cell2 = self.cell_at(corner2)
+		self.set_rect_corner(cell1)
+		self.draw_level_rect(cell2)
+		#not sure about this method
 
 	def cell_at(self,coords):
 		width = DUNGEON_CELL_WIDTH+10
@@ -28,8 +57,20 @@ class DungeonGrid(Table): #table might not be the best source.
 		cell = self.grid[(row,col)]
 		return cell
 
+	def level_cell(self):
+		return self.level_select_container.selected_level_cell
+
+	def room_save_data(self):
+		data_set = []
+		for row in xrange (self._rows):
+			data_set.append([])
+			for col in xrange (self._cols):
+				cell = self.grid[(row,col)]
+				data_set[row].append(cell.room_data) #TODO: deal with None room_datas at some point.
+		return data_set
+
 	def leftClickDungeonCell(self,cell):
-		if(cell == None or cell.cell_state == DESELECTED): return
+		if(cell == None or cell.cell_state == DESELECTED or cell.cell_state == DESELECTED_EMPTY): return
 		if(self.rect_corner != None):
 			self.draw_level_rect(cell)
 			self.levelSelectUpdate()
@@ -40,7 +81,7 @@ class DungeonGrid(Table): #table might not be the best source.
 
 	def set_rect_corner(self,cell):
 		self.rect_corner = cell
-		cell.select()
+		cell.select(self.level_cell())
 		self.selected_cells = []
 		while len(self.selected_cells) <= cell.row:
 				self.selected_cells.append([])
@@ -55,7 +96,7 @@ class DungeonGrid(Table): #table might not be the best source.
 			self.rect_corner = None
 			return
 		self.selected_cells = []
-		corner1 = self. rect_corner
+		corner1 = self.rect_corner
 		x1,x2 = min(corner1.col,corner2.col), max(corner1.col,corner2.col)
 		y1,y2 = min(corner1.row,corner2.row), max(corner1.row,corner2.row)
 		if not self.valid_level_rect(x1,y1,x2,y2):
@@ -66,39 +107,47 @@ class DungeonGrid(Table): #table might not be the best source.
 		for y in range (0,y2+1):
 			while len(self.selected_cells[y]) <= x2:
 					self.selected_cells[y].append(None)
-
+		level_cell = self.level_cell()
 		for y in range (y1,y2+1):
 			for x in range(x1,x2+1):
 				next_cell = self.grid[(y,x)]
 				self.selected_cells[y][x] = next_cell
-				if next_cell.cell_state != SELECTED:
-					next_cell.select()
+				if not next_cell.is_selected():
+					next_cell.select(level_cell)
 		self.rect_corner = None
 
 	def valid_level_rect(self,x1,y1,x2,y2):
 		for y in range (y1,y2+1):
 			for x in range(x1,x2+1):
 				next_cell = self.grid[(y,x)]
-				if next_cell.cell_state == DESELECTED: return False
+				if next_cell.level_cell != None and next_cell.level_cell != self.level_cell(): return False
 		return True
 
-	def deselect_all_cells(self,set_empty = False):
+	def deselect_all_cells(self,detach_level = False): 
 		self.selected_cells = None
 		for y in range (self._rows):
 			for x in range(self._cols):
 				next_cell = self.grid[(y,x)]
-				if next_cell.cell_state == SELECTED:
-					next_cell.deselect(set_empty)
+				if next_cell.is_selected():
+					next_cell.deselect(detach_level)
+
+	def updateSelectedCells(self):
+		if self.selected_cells == None: return
+		level_cell = self.level_cell
+		cells = self.selected_cells
+		for row in cells:
+			for c in row:
+				if c != None: c.select(level_cell)
 
 	def levelSelectUpdate(self):
-		level_cell = self.level_select_container.selected_level_cell
-		if level_cell == None: return
+		level_cell = self.level_cell()
+		if level_cell == None: return #might need a deselect here
 		level_cell.set_rooms(self.selected_cells)
 		self.level_select_container.updateSelectedLevel(False)
 
 	#def setSelectedLevelCell(self,level_cell):
 	def resetRooms(self): #reset currently selected rooms to match currently selected level cell.
-		level_cell = self.level_select_container.selected_level_cell
+		level_cell = self.level_cell()
 		self.rect_corner = None
 		self.deselect_all_cells(False)#not sure about this True yet
 		if(level_cell == None): return
@@ -111,9 +160,7 @@ class DungeonGrid(Table): #table might not be the best source.
 			for x in range (0,cols):
 				next_room = selected_cells[y][x]
 				if(next_room != None):
-					self.grid[(y,x)].select()
-		#TODO: if selected_cells is not None, fill
-
+					self.grid[(y,x)].select(level_cell)
 
 	@staticmethod
 	def empty_cell(row,col):

@@ -8,13 +8,14 @@ from player import *
     #fit neatly into one grid, etc) then we might make it possible to travel between LevelGroups.
 
 class LevelGroup(object):
-	def __init__(self,dungeon_map,level_data): #levelGroup builds the dungeon from a single map (currently ascii) along with some other data about the level.
+	def __init__(self,level_data_set,room_data_set): #levelGroup builds the dungeon from a single map (currently ascii) along with some other data about the level.
+		#new init
 		factory = LevelFactory()
-		self.rooms = factory.dungeon_rooms(self,dungeon_map) #maybe this should be done by a room factory instead of a level factory
-		self.dungeon_levels = factory.dungeon_levels(self,self.rooms,level_data)
+		self.rooms = factory.dungeon_rooms(self,room_data_set)
+		self.dungeon_levels = factory.dungeon_levels(self,self.rooms,level_data_set)
 		for L in self.dungeon_levels:
 			L.calibrateExits() #needed in case there are ways out of levels that don't lead to other levels.
-
+			
 	#level where the player starts the game
 	def start_level(self):
 		for L in self.dungeon_levels:

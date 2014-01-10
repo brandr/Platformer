@@ -1,7 +1,6 @@
 from ocempgui.widgets import *
 from ocempgui.widgets.Constants import *
 from ocempgui.widgets.components import *
-#from pygame import *
 
 from tiledata import *
 
@@ -38,7 +37,7 @@ class EntitySelectContainer(Box): #window might not be the right name anymore.
 		return window
 
 	def change_selection(self,layer,entity_window):
-		entity_key = entity_window.get_selected()[0].text
+		entity_key = entity_window.get_selected()[0].text #the [0] is here because get_selected returns a tuple, but since we have the window set to only select one item, that item is always at [0]
 		if entity_key in self.entity_map: #TODO: change this bit to be more extensible by checking layer, text, selection before layer, etc
 			name_collection = self.entity_map[entity_key]
 			collection = EntitySelectContainer.entity_collection(name_collection)
@@ -53,7 +52,7 @@ class EntitySelectContainer(Box): #window might not be the right name anymore.
 			#TODO: might need to set current image to None here, not sure though
 			self.current_entity_label.set_text("Current Entity: None")
 			return
-		self.current_entity = TileData(key) #TODO: make this method
+		self.current_entity = TileData(key) 
 		self.current_entity_label.set_text("Current Entity: "+key) 
 		self.updateCurrentEntityImage() #might be able to  do this without an arg (and just use current entity)
 

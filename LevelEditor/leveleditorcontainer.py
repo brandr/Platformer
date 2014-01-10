@@ -22,7 +22,7 @@ class LevelEditorContainer(Box):
 
 	#TODO: label for the entity select container
 
-	def entity_select_container(self,x,y,width,height): #TEMP: will probably get much more complicated and become its own class
+	def entity_select_container(self,x,y,width,height):
 		container = EntitySelectContainer(width,height) #may need "self" arg
 		container.topleft = x,y
 		return container
@@ -30,12 +30,10 @@ class LevelEditorContainer(Box):
 	def close_editor_button(self,x,y):
 		button = Button("Close and Save")
 		button.topleft = x,y
-		button.connect_signal(SIG_CLICKED,self.closeEditor) #TODO (might need access to window)
-		#self.level_cell.initialize_grid(self.level_grid_window.level_grid)
+		button.connect_signal(SIG_CLICKED,self.closeEditor)
 		return button
 
 	def closeEditor(self):	#I sometimes have trouble making this work for some reason. (I think it happens if something is childless but needs children, like a window.)
-		#self.level_cell.initialize_grid(self.level_grid_window.level_grid)
 		self.master_window.level_select_container.resume()
 		self.master_window.destroy()
 

@@ -11,23 +11,18 @@ class LevelFactory(object):
 		self.global_x = 0
 		self.global_y = 0
 
-
 	#maybe this should go in roomfactory instead
 
-	def dungeon_rooms(self,dungeon,dungeon_map):
-		return RoomFactory.dungeon_rooms(dungeon,dungeon_map)
+	#new  dungeon_rooms method
+	def dungeon_rooms(self,dungeon,room_data_set):
+		return RoomFactory.dungeon_rooms(dungeon,room_data_set)
 
-	def dungeon_levels(self,dungeon,rooms,level_data):
+	def dungeon_levels(self,dungeon,rooms,level_data_set):
 		levels = []
-		#TODO:conisder making level_data its own class (to make this more extensible)
-		for d in level_data:
-			level_ID = d[0]
-			origin = d[1]
-			room_coords = d[2]
-			level_rooms = []
-			for c in room_coords: #TODO: error checking
-				next_room = rooms[c[1]][c[0]]
-				level_rooms.append(next_room)
+		for d in level_data_set:
+			level_ID = d.name
+			level_rooms = d.room_set(rooms)
+			origin = d.corners[0]
 			next_level = self.build_level(dungeon,level_ID,origin,level_rooms)
 			levels.append(next_level)
 		return levels

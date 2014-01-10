@@ -19,7 +19,7 @@ class LevelEditorScreen(object):
 		close_editor_button = self.close_editor_button(32,32) #TEMP
 		self.level_renderer.add_widget(close_editor_button)	  #TEMP
 
-	def closeLevelEditor(self):
+	def closeLevelEditor(self):	#might not be using this
 		pass
 		#self.level_renderer.screen.
 

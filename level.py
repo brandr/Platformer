@@ -138,8 +138,8 @@ class Level(object):
 	def global_coords(self,position):
 		min_x = self.origin[0]
 		min_y = self.origin[1]
-		x_offset = position[0]/Room.ROOM_WIDTH
-		y_offset = position[1]/Room.ROOM_HEIGHT
+		x_offset = position[0]/ROOM_WIDTH
+		y_offset = position[1]/ROOM_HEIGHT
 		return (min_x+x_offset,min_y+y_offset)
 
 	def flipped_coords(self,global_coords,local_coords):
@@ -147,11 +147,11 @@ class Level(object):
 		origin_x = self.origin[0]
 		if(local_coords[0] <= 1):
 			return (dimensions[0] - 2, local_coords[1])		
-		if(local_coords[0] >= Room.ROOM_WIDTH - 2):
+		if(local_coords[0] >= ROOM_WIDTH - 2):
 			return (3, local_coords[1])
 		if(local_coords[1] <= 1):
 			return (local_coords[0],dimensions[1] - 2)
-		if(local_coords[1] >= Room.ROOM_HEIGHT - 2):
+		if(local_coords[1] >= ROOM_HEIGHT - 2):
 			return (local_coords[0],2)
 		#TODO: error case (no possible edge detected for exitblock)
 
@@ -201,7 +201,7 @@ class Level(object):
 		tiles = self.getTiles()
 		width  = len(tiles[0])-1
 		height = len(tiles)-1
-		return (self.origin[0]+(width/Room.ROOM_WIDTH),self.origin[1]+(height/Room.ROOM_HEIGHT))
+		return (self.origin[0]+(width/ROOM_WIDTH),self.origin[1]+(height/ROOM_HEIGHT))
 
 	def get_dimensions(self):
 		tiles = self.getTiles()
