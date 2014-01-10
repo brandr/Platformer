@@ -11,7 +11,7 @@ class DungeonFactory(object):
 
 		#returns a LevelGroup object by loading a dungeon file.
 	def build_dungeon(self,filename):
-		dungeon_data = FileManagerContainer.dungeonDataFromFile(filename)
+		dungeon_data = FileManagerContainer.dungeonDataFromFile(filename,"./LevelEditor/images/")
 		level_data_set = dungeon_data.level_data_set
 		room_data_set = dungeon_data.rooms
 		return LevelGroup(level_data_set,room_data_set) #could also give the factory itself more of the work than this

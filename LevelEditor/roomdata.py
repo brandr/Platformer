@@ -1,7 +1,7 @@
 from tiledata import *
 
-ROOM_WIDTH = 10
-ROOM_HEIGHT = 8
+ROOM_WIDTH = 30
+ROOM_HEIGHT = 25
 
 class RoomData(object):
 	"""docstring for RoomData"""
@@ -43,7 +43,7 @@ class RoomData(object):
 		return tiles
 
 	@staticmethod
-	def deformatted_room_set(formatted_data):
+	def deformatted_room_set(formatted_data,filepath = None):
 		rooms = []
 		for y in xrange (len(formatted_data)):
 			rooms.append([])
@@ -51,14 +51,14 @@ class RoomData(object):
 				next_data = None
 				next_room = formatted_data[y][x]
 				if next_room != None:
-					next_data = RoomData.deformatted_room(next_room)
+					next_data = RoomData.deformatted_room(next_room,filepath)
 				rooms[y].append(next_data)
 		return rooms
 
 	@staticmethod
-	def deformatted_room(formatted_data):
+	def deformatted_room(formatted_data,filepath=None):
 		x,y = formatted_data[0],formatted_data[1]
-		tile_set = TileData.deformatted_tile_set(formatted_data[2]) #have to deformat tiles before returning the room_data.
+		tile_set = TileData.deformatted_tile_set(formatted_data[2],filepath) #have to deformat tiles before returning the room_data.
 		width,height = len(tile_set[0]),len(tile_set) #might need a None exeception handler
 		room_data = RoomData(width,height,x,y)
 		room_data.setAllTiles(tile_set)

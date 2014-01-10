@@ -11,26 +11,32 @@ from dungeoneditorscreen import *
 	#IDEA: could resize the dungeonData to only include a rectangular area containing all of the nonempty rooms
 		#if this proves difficult, we may need to keep track of the overall dungeon dimensions via the dungeon grid, and store this info in dungeondata.
 
-#TODO: now that the level editor can read/write correctly, create an actual test dungeon for playing the game.
-	  #1. keep track of the starting level (and that level's starting tile) as the dungeon is built. 
-	  	#Alternately, just let the dungeon factory determine this by finding the corresponding tile object as it reads the tiles.
-	 	#since the player is larger than a tile, the "player start" tile data should "block out" the tile below it 
-	 		#(and therefore be impossible to place at the bottom of the screen).
-	 		#Think of a general way of placing entites into the level editor, given dimensions greater than 1 tile.
-	  #2. Make sure the dungeon factory used to launch the game can properly import DungeonData, along with the 
-	  	# static dungeonDataFromFile method in filemanagercontainer.py.
-	  #3. figure out how tiles will be set (as oppossed to actual entities)
+#TODO: the "load level" button doesn't seem to properly associate loaded levels with their corresponding rooms. Investigate and fix.
+
+#TODO: make the process of opening the level editor less laggy.
+	#actually editing seems to cause lag, too.
+	#Use print tests to pinpoint the source of the lag.
+
+#TODO: Trim the room sets in DungeonData, preferrably upon its creation if possible.
+	 # This means having the roomdata array start at 0,0 and end at the last non-empty room
+	 # contained in the dungeondata object.
+
+#TODO: once the leveleditor is a little easier to use, test making multiple connected levels and navigating between them in the game.
+
+#TODO: make the tiledatas created through the leveleditor correspond more closely with the entites than can actually be created in the game.
+	# i.e., get entity sets (monster,platforms, etc) from filepaths or something
+	# use the same images/image sets when building the level as when playing the game (with some exceptions, like player start position)
+
+#TODO: make it possible to add entities to the leveleditor which take up more than 1 tile (will need some kind of dimensions arg)
+
+#TODO: plan out how tiles, entities, images, animated sprites, etc will all be stored in relation to the Dungeon Editor and the game launcher.
 
 #TODO: delete level button
 	#should probably just do this myself
 	#once this is working, I will have to figure out how level deletion translates to the dungeon grid.
 		#either the deleted level's rooms should become empty, or they should simply become ununused but not empty.
 
-#TODO: make the process of opening the level editor less laggy.
-
 #TODO: make clicking in the level editor more accurate. (might require in-depth testing)
-
-#TODO: decide whether or not we actually need a "resize level" button,since levels are already resizable.
 
 #TODO: Flesh out the actual level Editor.
 	#make it possible to have more than 2 layers of entity selection.
