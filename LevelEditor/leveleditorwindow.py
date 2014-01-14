@@ -8,5 +8,6 @@ class LevelEditorWindow(Window):
 		Window.__init__(self,title)
 		self.level_select_container = level_select_container #need this to access click sensitivity
 		self.topleft = (position[0],position[1])
+		print "Making the level editor container..."
 		level_editor_container = LevelEditorContainer(self,level_cell,dimensions)
 		self.set_child(level_editor_container)

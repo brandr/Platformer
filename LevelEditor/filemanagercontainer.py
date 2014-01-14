@@ -91,6 +91,7 @@ class FileManagerContainer(Box):
 	#save-related methods
 
 	def saveDungeon(self):
+		self.level_select_container.editor_screen.adjustSensitivity(False)
 		if self.selected_slot == None: return
 		slot = self.selected_slot
 		filename = "./dungeon_map_files/dungeon"+slot
@@ -98,9 +99,11 @@ class FileManagerContainer(Box):
 		dungeon_data = self.dungeon_save_data()
 		save_data = dungeon_data.formatted_data()
 		json.dump(save_data, dungeon_file)
+		self.level_select_container.editor_screen.adjustSensitivity(True)
 
 	def dungeon_save_data(self): #return a DungeonData object used for reading/writing files
 		#TODO: (make sure to deal with ununsed rooms/levels properly when building the DungeonData)
+
 		level_data_set = self.level_select_container.level_save_data() 
 		room_data_set = self.dungeon_grid_container.room_save_data() 
 		dungeon_data = DungeonData(level_data_set,room_data_set)
@@ -110,11 +113,13 @@ class FileManagerContainer(Box):
 
 	#TODO: make this less laggy.
 	def loadDungeon(self):
+		self.level_select_container.editor_screen.adjustSensitivity(False)
 		if self.selected_slot == None: return
 		slot = self.selected_slot
 		filename = "./dungeon_map_files/dungeon"+slot
 		deformatted_dungeon = FileManagerContainer.dungeonDataFromFile(filename)
 		self.buildDungeon(deformatted_dungeon)
+		self.level_select_container.editor_screen.adjustSensitivity(True)
 
 	@staticmethod
 	def dungeonDataFromFile(filename,filepath = None):

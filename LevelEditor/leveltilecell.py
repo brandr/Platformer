@@ -4,7 +4,7 @@ from pygame import *
 
 from tiledata import *
 
-LEVEL_TILE_WIDTH, LEVEL_TILE_HEIGHT = 32,32
+#LEVEL_TILE_WIDTH, LEVEL_TILE_HEIGHT = 32,32
 
 #consider ImageMap instead of ImageLabel, maybe
 class LevelTileCell(ImageLabel):

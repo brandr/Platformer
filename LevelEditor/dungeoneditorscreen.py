@@ -18,7 +18,6 @@ class DungeonEditorScreen(object):
 		self.dungeon_renderer.start()
 
 	def initComponents(self):#,renderer): #could maybe be static
-
 		self.level_select_container = self.level_select_container(32,32,312,400)
 		self.dungeon_grid_container = self.dungeon_grid_container(self.level_select_container,self.level_select_container.right+36,self.level_select_container.top,312,400)
 		self.file_manager_container = self.file_manager_container(self.level_select_container,self.dungeon_grid_container, self.level_select_container.left,self.level_select_container.bottom+16, 700,128)
@@ -32,10 +31,10 @@ class DungeonEditorScreen(object):
 		self.dungeon_grid_container.reset()
 
 	def resume(self):
-		self.adjustSensitivty(True)
+		self.adjustSensitivity(True)
 		self.file_manager_container.updateFileSelection()
 
-	def adjustSensitivty(self,sensitive):
+	def adjustSensitivity(self,sensitive):
 		self.setSensitivity(self.level_select_container,sensitive)
 		self.setSensitivity(self.dungeon_grid_container,sensitive)
 		self.setSensitivity(self.file_manager_container,sensitive)

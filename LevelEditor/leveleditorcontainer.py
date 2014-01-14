@@ -10,8 +10,9 @@ class LevelEditorContainer(Box):
 		self.level_cell = level_cell
 		
 		level_name_label = Label(level_cell.get_name())
-		self.level_grid_window = self.level_grid_window()
-		
+		print "Creating level grid window..."
+		self.level_grid_window = self.level_grid_window() #this is the most time consuming part of opening the editor right now.
+		print "Creating entity select container..."
 		self.entity_select_container = self.entity_select_container(self.left+8,level_name_label.bottom+8,self.level_grid_window.left - 16,200)
 		close_editor_button = self.close_editor_button(self.left + 8, self.bottom - 32) #also consider lower right corner
 		
@@ -19,6 +20,8 @@ class LevelEditorContainer(Box):
 		self.add_child(self.level_grid_window)
 		self.add_child(self.entity_select_container)#TEMP (object selection will mostly likely require more than one window.)
 		self.add_child(close_editor_button)
+		print "Level editor container created."
+		print ""
 
 	#TODO: label for the entity select container
 
@@ -40,8 +43,10 @@ class LevelEditorContainer(Box):
 	def level_grid_window(self): #TODO: build from dungeon grid cells, not level data.
 		level_cell = self.level_cell
 		if level_cell.initialized():
+			print "Creating level grid window for initialized level..."
 			window = LevelGridWindow(self,self.left+400,self.top+8,360,360) 
 			window.setGridData(level_cell)
 			return window
+		print "Creating level grid window for uninitialized level..."
 		window = LevelGridWindow(self,self.left+400,self.top+8,360,360) 
 		return window

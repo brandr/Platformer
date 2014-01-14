@@ -38,7 +38,6 @@ class LevelSelectContainer(Box):
 		self.add_child(self.level_name_entry)
 		self.add_child(self.edit_level_button)
 
-		#TODO: resize level button (not sure this is necessary, since levels are resizable already.)
 		#TODO: delete level button(NICK)
 		#TODO: buttons for any levelData attributes external to rooms (though maybe these should be in the level editor)
 		#TODO: whatever other useful buttons we can think of
@@ -122,7 +121,6 @@ class LevelSelectContainer(Box):
 			self.level_data_table.add_child(self.level_count,0,added_level_cell)
 			self.level_count += 1
 			return
-		#level_name = level_data.name
 		added_level_cell = LevelSelectCell(level_data.name)#,level_data.corners) #this constructor might be a good place to connect to the dungeongrid
 		self.level_data_table.add_child(self.level_count,0,added_level_cell)
 		self.level_count += 1
@@ -135,7 +133,6 @@ class LevelSelectContainer(Box):
 			self.addLevel(next_level)
 			self.selected_level_cell = self.level_data_table.grid[(L,0)]
 			if next_level != None and next_level.corners != None:
-				#print (next_level.name, next_level.corners)
 				dungeon_grid.setLevelRooms(next_level.corners)
 				self.selected_level_cell.room_cells = dungeon_grid.selected_cells
 				dungeon_grid.deselect_all_cells()
@@ -148,11 +145,15 @@ class LevelSelectContainer(Box):
 		self.updateSelectedLevel()
 
 	def editSelectedLevel(self):
+		print "Starting level editor..."
 		title = "Level Editor" #might have title vary more and include level's name
+		print "Creating the level editor window..."
 		level_editor_window = LevelEditorWindow(self,title,self.selected_level_cell,(32,32),(800,550))
 		level_editor_window.depth = 1
+		print "Opening the window for the editor..."
 		self.editor_screen.dungeon_renderer.add_widget(level_editor_window)
-		self.editor_screen.adjustSensitivty(False)
+		self.editor_screen.adjustSensitivity(False)
+		print "Done."
 
 	def clickLevelCell(self,event):
 		coords = event.pos

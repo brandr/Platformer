@@ -4,7 +4,9 @@ class LevelGridWindow(ScrolledWindow):
 	def __init__(self,level_editor,x,y,width,height):
 		ScrolledWindow.__init__(self,width,height)
 		self.topleft = x,y
-		self.level_grid = LevelGrid(level_editor,16,16)
+		print "Creating level grid..."
+		self.level_grid = LevelGrid(level_editor)  #TODO: make this less time-consuming.
+		print "Level grid created."
 		self.set_child(self.level_grid)
 		self.master_editor = level_editor
 		self.connect_signal(SIG_MOUSEDOWN,self.level_grid.processClick,self.calculate_offset) 

@@ -2,9 +2,17 @@ from leveltilecell import *
 from roomdata import *
 
 LEFT_MOUSE_BUTTON = 1      #NOTE: this variable is repeated in dungeongridcontainer.py. Not sure if this could become a problem.
+LEVEL_TILE_WIDTH, LEVEL_TILE_HEIGHT = 32,32
+BLACK = Color("#000000")
+WHITE = Color("#FFFFFF")
+#TODO: replace the grid with a large image, which has gridlines blitted over it with each update (or just upon opening the grid).
+		#instead of updating the image/entity data for actual tile cells, simply: 
+			#1. add the entity data to a double (string?) array (None to signify empty)
+			#2. blit the associated image at the corresponding postion in the grid image.
+
 
 class LevelGrid(Table):
-	def __init__(self,level_editor,rows,cols):
+	def __init__(self,level_editor):
 		self.level_editor = level_editor
 		level_cell = self.level_cell()
 		cols,rows = self.get_room_dimensions()
@@ -13,18 +21,31 @@ class LevelGrid(Table):
 		self.padding = 0
 		room_cells = level_cell.aligned_rooms()
 		self.init_cells(room_cells,rows,cols)
+
+	def draw_gridlines(self):
+		for y in range (0,self.rows):
+			pygame.draw.line(self.grid_image.image,BLACK,(0,y*LEVEL_TILE_HEIGHT),(self.width(),y*LEVEL_TILE_HEIGHT))
+		for x in range(0,self.cols):
+			pygame.draw.line(self.grid_image.image,BLACK,(x*LEVEL_TILE_WIDTH,0),(x*LEVEL_TILE_WIDTH,self.height()))
+
+	def width(self):
+		return self.cols*LEVEL_TILE_WIDTH
+
+	def height(self):
+		return self.rows*LEVEL_TILE_HEIGHT
 		
 	def init_cells(self,room_cells,rows,cols):
 		for i in xrange (rows):
-			rooms = self.level_cell().aligned_rooms()
 			for j in xrange (cols):
 				cell = room_cells[i][j]
-				self.add_room(i,j,cell)
+				self.add_room(i,j,cell) #this part is taking too long.
 
 	def add_room(self,row,col,room_cell):
 		if room_cell.room_data == None:
 			room_cell.init_room_data(ROOM_WIDTH,ROOM_HEIGHT) #might want to store these in roomdata instead, not sure.
-			self.add_empty_room(row,col)
+			print "Adding an empty room..."
+			self.add_empty_room(row,col) #this is taking too long.
+			print "Room added."
 			return
 		room_data = room_cell.room_data
 		origin_x,origin_y = col*ROOM_WIDTH,row*ROOM_HEIGHT
@@ -35,9 +56,17 @@ class LevelGrid(Table):
 
 	def add_empty_room(self,row,col):
 		origin_x,origin_y = col*ROOM_WIDTH,row*ROOM_HEIGHT
+		blank = Surface((32,32))	#temp
+		blank.fill(WHITE)#temp
+		#empty_cell = ImageLabel(blank)#temp
 		for y in range (origin_y,origin_y+ROOM_HEIGHT):
+			print "Adding row "+str(y)+":"
 			for x in range(origin_x,origin_x+ROOM_WIDTH):
-				self.add_empty_tile_cell(x,y)
+				empty_cell = ImageLabel(blank)
+				self.add_child (y, x, empty_cell)
+				#print "adding cell..."
+				#self.add_empty_tile_cell(x,y,blank)
+				#print "cell added."
 
 	def add_tile_cell(self,tile_data,x,y):
 		if(tile_data == None):
@@ -46,8 +75,9 @@ class LevelGrid(Table):
 		cell = self.create_cell(tile_data)
 		self.add_child (y, x, cell)
 
-	def add_empty_tile_cell(self,x,y):
-		cell = self.empty_cell() 
+	def add_empty_tile_cell(self,x,y,blank_image):
+		#cell = self.empty_cell() 
+		cell = ImageLabel(blank_image) 
 		self.add_child (y, x, cell)
 
 	def level_cell(self):
@@ -94,3 +124,10 @@ class LevelGrid(Table):
 		self.level_cell().add_entity(tile,col,row)
 		clicked_tile = self.grid[(row,col)]	
 		clicked_tile.set_picture(image)
+
+	@staticmethod
+	def blank_grid_image(x,y):
+		grid_image = Surface((x,y))
+		grid_image.fill(WHITE)
+		return grid_image
+		#return ImageLabel(image)

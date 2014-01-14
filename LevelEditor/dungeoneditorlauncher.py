@@ -2,20 +2,14 @@ import dungeoneditorscreen
 from dungeoneditorscreen import *
 
 
-#can currently read/write dungeons to and from files, though there are some minor problems.
-
-#TODO: make saving/loading (mostly loading) levels less laggy.
-	#may need some print tests to pinpoint where the bulk of the lag is coming from.
-		#start with the end and work backwards until the time before the first print is negligible.
-		#alternately, put prints in places where I expect there is a lot of redundancy/repetition.
-	#IDEA: could resize the dungeonData to only include a rectangular area containing all of the nonempty rooms
-		#if this proves difficult, we may need to keep track of the overall dungeon dimensions via the dungeon grid, and store this info in dungeondata.
-
-#TODO: the "load level" button doesn't seem to properly associate loaded levels with their corresponding rooms. Investigate and fix.
+#can currently read/write dungeons to and from files. Still need to optimize the process and test for bugs, however.
 
 #TODO: make the process of opening the level editor less laggy.
-	#actually editing seems to cause lag, too.
-	#Use print tests to pinpoint the source of the lag.
+	#the bulk of the lag happens in levelgrid.py, in the addRoom and addEmptyRoom methods.
+	#IDEA: replace the grid with a large image, which has gridlines blitted over it with each updates.
+		#instead of updating the image/entity data for actual tile cells, simply: 
+			#1. add the entity data to a double (string?) array (None to signify empty)
+			#2. blit the associated image at the corresponding postion in the grid image.
 
 #TODO: Trim the room sets in DungeonData, preferrably upon its creation if possible.
 	 # This means having the roomdata array start at 0,0 and end at the last non-empty room
