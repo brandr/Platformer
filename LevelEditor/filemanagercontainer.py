@@ -33,10 +33,9 @@ class FileManagerContainer(Box):
 		self.new_dungeon_button = self.new_dungeon_button(8,8)
 		self.save_dungeon_button = self.save_dungeon_button(self.new_dungeon_button.right+16,self.new_dungeon_button.top)
 		self.load_dungeon_button = self.load_dungeon_button(self.save_dungeon_button.right+16,self.save_dungeon_button.top)
-		
 		self.selected_slot_label = self.selected_slot_label(dimensions[0]-164,8)
 		self.file_slot_window = self.file_slot_window(self.selected_slot_label.left+32,self.selected_slot_label.bottom+8)
-		#delete level button? Other buttons?
+		#TODO: delete dungeon data button? Other buttons?
 
 		#add components to contaier
 		self.add_child(self.new_dungeon_button)
@@ -47,7 +46,7 @@ class FileManagerContainer(Box):
 
 		self.updateFileSelection()
 
-	#methods for making components
+	#methods for making GUI components
 
 	def new_dungeon_button(self,x,y):
 		button = Button("New Dungeon")
@@ -98,10 +97,10 @@ class FileManagerContainer(Box):
 		dungeon_file = open(filename,'wb') #'wb' means "write binary"
 		dungeon_data = self.dungeon_save_data()
 		save_data = dungeon_data.formatted_data()
-		json.dump(save_data, dungeon_file) #TODO: change this to something json can actually parse
+		json.dump(save_data, dungeon_file)
 
-	def dungeon_save_data(self): #should eventually return a DungeonData object used for reading/writing files
-		#TODO: (remember to deal with ununsed rooms/levels when building the DungeonData)
+	def dungeon_save_data(self): #return a DungeonData object used for reading/writing files
+		#TODO: (make sure to deal with ununsed rooms/levels properly when building the DungeonData)
 		level_data_set = self.level_select_container.level_save_data() 
 		room_data_set = self.dungeon_grid_container.room_save_data() 
 		dungeon_data = DungeonData(level_data_set,room_data_set)
@@ -109,6 +108,7 @@ class FileManagerContainer(Box):
 
 	#load method
 
+	#TODO: make this less laggy.
 	def loadDungeon(self):
 		if self.selected_slot == None: return
 		slot = self.selected_slot
@@ -123,29 +123,31 @@ class FileManagerContainer(Box):
 		deformatted_dungeon = DungeonData.deformatted_dungeon(dungeon_data,filepath)
 		return deformatted_dungeon
 
-	def buildDungeon(self,dungeon_data):
+	def buildDungeon(self,dungeon_data): #uncomment the prints in this method to test load times.
 		if dungeon_data == None: return
+		print "Building dungeon..."
 		level_data_set = dungeon_data.level_data_set
 		room_data_set = dungeon_data.rooms
+		print "Resetting the editor..."
 		self.level_select_container.editor_screen.resetEditor()
-		self.dungeon_grid_container.setRooms(room_data_set) #have to set rooms first so that levelData can be properly applied to them
-		self.level_select_container.setLevels(level_data_set) #TODO
-		
-		#TODO: make this method send commands to the levelselectcontainer and dungeongrid container to build the dungeon using this dungeonData.
-		#print data
+		#print "Loading rooms..."
+		self.dungeon_grid_container.setRooms(room_data_set) #NOTE: this part is currently the most time-consuming.
+		print "Loading levels..."
+		self.level_select_container.setLevels(level_data_set) 
+		print "Dungeon built."
 
 	#methods for file slot selection
 
 	def changeSelection(self,window):
 		slot = self.file_slot_window.get_selected()
 		self.selected_slot = None
-		if slot != None and len(slot) >= 1: #could also get away with ==
+		if slot != None and len(slot) >= 1:
 			self.selected_slot = slot[0].text
 		self.updateFileSelection()
 
 	def updateFileSelection(self):
 		selection_string = "Selected slot: "
-		slot = self.selected_slot #self.file_slot_window.get_selected()
+		slot = self.selected_slot
 		if slot == None:
 			selection_string += "None"
 		else:

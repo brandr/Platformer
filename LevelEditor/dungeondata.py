@@ -16,6 +16,7 @@ class DungeonData(object):
 		levels = []
 		for l in xrange (len(self.level_data_set)):
 			next_data = self.level_data_set[l].formatted_data()
+			#print next_data
 			levels.append(next_data)
 		return levels
 

@@ -4,10 +4,10 @@ from dungeoneditorscreen import *
 
 #can currently read/write dungeons to and from files, though there are some minor problems.
 
-#TODO: decide whether empty levels  should actually be deleted. (probably not since it might be useful to make placeholders)
-#TODO: call some kind of update methods for the level/dungeon screens so that there is no current level selection, and make sure
-	#this is represented in the GUI.
-#TODO: make saving/loading (mostly loading) levels less laggy. (may need some print tests to pinpoint where the bulk of the lag is coming from.)
+#TODO: make saving/loading (mostly loading) levels less laggy.
+	#may need some print tests to pinpoint where the bulk of the lag is coming from.
+		#start with the end and work backwards until the time before the first print is negligible.
+		#alternately, put prints in places where I expect there is a lot of redundancy/repetition.
 	#IDEA: could resize the dungeonData to only include a rectangular area containing all of the nonempty rooms
 		#if this proves difficult, we may need to keep track of the overall dungeon dimensions via the dungeon grid, and store this info in dungeondata.
 
@@ -32,7 +32,6 @@ from dungeoneditorscreen import *
 #TODO: plan out how tiles, entities, images, animated sprites, etc will all be stored in relation to the Dungeon Editor and the game launcher.
 
 #TODO: delete level button
-	#should probably just do this myself
 	#once this is working, I will have to figure out how level deletion translates to the dungeon grid.
 		#either the deleted level's rooms should become empty, or they should simply become ununused but not empty.
 

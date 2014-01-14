@@ -29,8 +29,9 @@ class DungeonGrid(Table): #table might not be the best source.
 		self.selected_cells = None
 
 	def setRooms(self,room_data_set):
-		for i in xrange (self._rows):
-			for j in xrange (self._cols):
+		rows, cols = len(room_data_set),len(room_data_set[0])
+		for i in xrange (rows):
+			for j in xrange (cols):
 				next_room = room_data_set[i][j]
 				self.grid[(i,j)].setRoom(next_room)
 
@@ -39,12 +40,27 @@ class DungeonGrid(Table): #table might not be the best source.
 		if corners == None or corners[0] == None or corners[1] == None: return
 		corner1 = corners[0]
 		corner2 = corners[1]
-		self.deselect_all_cells()
-		#self.rect_corner = None
-		cell1 = self.cell_at(corner1)
-		cell2 = self.cell_at(corner2)
-		self.set_rect_corner(cell1)
-		self.draw_level_rect(cell2)
+
+		x1,y1 = corner1[0],corner1[1]
+		x2,y2 = corner2[0],corner2[1]
+
+		level_cell = self.level_cell()
+		self.rect_corner = None
+		self.deselect_all_cells(False)
+
+		room_cells = []
+		for y in range (0, y2+1):
+			room_cells.append([])
+			for x in range (0,x2+1):
+				room_cells[y].append(None)
+
+		for y in range (y1, y2+1):
+			for x in range (x1,x2+1):
+				next_cell = self.grid[(y,x)]
+				next_cell.select(level_cell)
+				room_cells[y][x] = next_cell
+
+		self.selected_cells = room_cells
 		#not sure about this method
 
 	def cell_at(self,coords):
@@ -89,6 +105,7 @@ class DungeonGrid(Table): #table might not be the best source.
 			while len(self.selected_cells[y]) <= cell.col:
 					self.selected_cells[y].append(None)
 		self.selected_cells[cell.row][cell.col] = cell
+		#self.levelSelectUpdate()
 
 	#draw a rectangle using the current rect_corner and cell arg as opposite corners
 	def draw_level_rect(self,corner2):
@@ -115,6 +132,7 @@ class DungeonGrid(Table): #table might not be the best source.
 				if not next_cell.is_selected():
 					next_cell.select(level_cell)
 		self.rect_corner = None
+		#self.levelSelectUpdate()
 
 	def valid_level_rect(self,x1,y1,x2,y2):
 		for y in range (y1,y2+1):
@@ -124,12 +142,14 @@ class DungeonGrid(Table): #table might not be the best source.
 		return True
 
 	def deselect_all_cells(self,detach_level = False): 
-		self.selected_cells = None
-		for y in range (self._rows):
-			for x in range(self._cols):
+		if self.selected_cells == None: return
+		width,height = len(self.selected_cells[0]),len(self.selected_cells)
+		for y in range (height):#self._rows):
+			for x in range(width):
 				next_cell = self.grid[(y,x)]
 				if next_cell.is_selected():
 					next_cell.deselect(detach_level)
+		self.selected_cells = None
 
 	def updateSelectedCells(self):
 		if self.selected_cells == None: return
@@ -145,19 +165,21 @@ class DungeonGrid(Table): #table might not be the best source.
 		level_cell.set_rooms(self.selected_cells)
 		self.level_select_container.updateSelectedLevel(False)
 
-	#def setSelectedLevelCell(self,level_cell):
 	def resetRooms(self): #reset currently selected rooms to match currently selected level cell.
 		level_cell = self.level_cell()
 		self.rect_corner = None
-		self.deselect_all_cells(False)#not sure about this True yet
+		self.deselect_all_cells(False)
 		if(level_cell == None): return
 		selected_cells = level_cell.room_cells
 		self.selected_cells = selected_cells
 		if(selected_cells == None):return
-		rows = len(selected_cells)
-		cols = len(selected_cells[0])
-		for y in range (0, rows):
-			for x in range (0,cols):
+		x2 = len(selected_cells[0])
+		y2 = len(selected_cells)
+		origin = level_cell.origin()
+		#print "ORIGIN: "+ str(origin)
+		x1, y1 = origin[0],origin[1]
+		for y in range (y1, y2):
+			for x in range (x1,x2):
 				next_room = selected_cells[y][x]
 				if(next_room != None):
 					self.grid[(y,x)].select(level_cell)

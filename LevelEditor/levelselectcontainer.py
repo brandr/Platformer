@@ -127,14 +127,18 @@ class LevelSelectContainer(Box):
 		self.level_data_table.add_child(self.level_count,0,added_level_cell)
 		self.level_count += 1
 
-	def setLevels(self,level_data_set):
+	def setLevels(self,level_data_set): #used when building the dungeon from a save file.
 		self.clearLevelTable()
+		dungeon_grid = self.dungeon_grid_container.dungeon_grid
 		for L in xrange(len(level_data_set)):
 			next_level = level_data_set[L]
 			self.addLevel(next_level)
-			self.selected_level_cell = self.cell_at((0,L))
+			self.selected_level_cell = self.level_data_table.grid[(L,0)]
 			if next_level != None and next_level.corners != None:
-				self.dungeon_grid_container.dungeon_grid.setLevelRooms(next_level.corners)
+				#print (next_level.name, next_level.corners)
+				dungeon_grid.setLevelRooms(next_level.corners)
+				self.selected_level_cell.room_cells = dungeon_grid.selected_cells
+				dungeon_grid.deselect_all_cells()
 		self.selected_level_cell = None
 
 	def renameSelectedLevel(self):

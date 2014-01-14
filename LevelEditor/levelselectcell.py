@@ -15,7 +15,7 @@ class LevelSelectCell(Table):
 		self.name_label = Label(self.name)
 		self.add_child(0,0,self.name_label)
 		self.room_cells = None
-		self.level_data = None
+		self.level_data = None #this might not be right
 		
 	def get_name(self): #TODO: consider making this getter access level data instead.
 		return self.name

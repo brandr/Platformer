@@ -16,7 +16,7 @@ UNUSED_EMPTY = "unused_empty"
 
 class DungeonGridCell(ImageButton):
 	#a cell that reprensents a room.
-	def __init__(self,row,col): #TODO: consider making it possible to init non-empty cells (like by loading from file, unless we want to start with empty cells but load in data)
+	def __init__(self,row,col):
 		ImageButton.__init__(self,"")
 		self.minsize = DUNGEON_CELL_WIDTH,DUNGEON_CELL_HEIGHT
 		self.set_picture(DungeonGridCell.unused_empty_tile())
@@ -29,6 +29,7 @@ class DungeonGridCell(ImageButton):
 		self.room_data = RoomData(width,height,self.col,self.row)
 
 	def reset(self,row,col):
+		if(self.cell_state == UNUSED_EMPTY):return
 		self.set_picture(DungeonGridCell.unused_empty_tile())
 		self.level_cell = None
 		self.cell_state = UNUSED_EMPTY
@@ -36,14 +37,13 @@ class DungeonGridCell(ImageButton):
 		self.room_data = None
 
 	def setRoom(self,room_data):
+		if room_data == None: return #not sure if we want this yet
 		self.level_cell = None
 		self.cell_state = UNUSED_EMPTY
 		self.set_picture(DungeonGridCell.unused_empty_tile())
-		if room_data != None:
-			self.room_data = room_data
-			self.cell_state = UNUSED
-			self.set_picture(DungeonGridCell.unused_tile())
-		#TODO: this might not be right and it certainly isn't complete. (will need other methods to handle level selection)
+		self.room_data = room_data
+		self.cell_state = UNUSED
+		self.set_picture(DungeonGridCell.unused_tile())
 
 	def empty(self):
 		return self.room_data == None or self.room_data.empty()
@@ -63,10 +63,12 @@ class DungeonGridCell(ImageButton):
 	def deselect(self,detach_level): 
 		if(detach_level):
 			self.level_cell = None
+		#print "GOT HERE"
 		if self.level_cell != None:
 			if self.empty():
 				self.set_picture(DungeonGridCell.deselected_empty_tile())	#NOTE: could also make the image correspond to the level
 				self.cell_state = DESELECTED_EMPTY
+				#print "HERE"
 				return
 			self.set_picture(DungeonGridCell.deselected_tile())	#NOTE: could also make the image correspond to the level
 			self.cell_state = DESELECTED 

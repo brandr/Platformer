@@ -34,9 +34,14 @@ class DungeonGridContainer(Box):
 	def reset(self):
 		self.dungeon_grid.reset()
 
+		#used when loading the dungeon from file. Uncomment the prints to test load times.
 	def setRooms(self,room_data_set):
-		self.reset()
-		self.dungeon_grid.setRooms(room_data_set)
+		print "Loading rooms..."
+		print "Resetting dungeon grid..."
+		self.reset()	#this will take a long time if there are many non-empty cells.
+		print "Setting up rooms..."
+		self.dungeon_grid.setRooms(room_data_set) #this is taking too long.
+		#print "Done."
 
 	def clickDungeonCell(self,event):
 		#TODO: consider only allowing level resizing after pressing the resize level button
