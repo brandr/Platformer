@@ -1,9 +1,9 @@
 import dungeoneditorscreen
 from dungeoneditorscreen import *
 
-#TODO: make it possible to "paint" tiles in the level editor by holding and dragging the mouse.
+	#LEVEL EDITOR GRID STUFF
 
-#TODO: make it possible to clear tiles in the level editor by right-clicking.
+#TODO: make it possible to "paint" tiles in the level editor by holding and dragging the mouse.
 
 #TODO: make the tiledatas created through the leveleditor correspond more closely with the entites that can actually be created in the game.
     # i.e., get entity sets (monster,platforms, etc) from filepaths or something
@@ -15,12 +15,18 @@ from dungeoneditorscreen import *
 
 #TODO: plan out how tiles, entities, images, animated sprites, etc will all be stored in relation to the Dungeon Editor and the game launcher.
 
-#TODO: Flesh out the actual level Editor.
-    #make it possible to have more than 2 layers of entity selection.
+#TODO: make it possible to have more than 2 layers of entity selection.
 
-#NOTE: might end up moving the folder that currently holds sprite data into the LevelEditor folder
+#IDEA: in the level editor, consider axis labels for the level grid to number rooms/tiles by their coords.
+
+	#DUNGEON GRID CONTAINER STUFF
 
 #IDEA: give the dungeon grid container a color key explaining what the six different colors mean.
+
+#IDEA: make the deselected color of a dungeon grid tile correspond to its associated level's color.
+    #A level's color would be set by the user.
+
+	#LEVEL SELECT CONTAINER STUFF
 
 #IDEA: make it clear somehow which levels are empty (no rooms) in the LevelSelectContainer (not the dungeon grid).
     #could grey out the names of these levels
@@ -32,13 +38,12 @@ from dungeoneditorscreen import *
 
 #IDEA: a quick way of deleting everything in each room of a level without deleting or resizing the level itself.
 
-#IDEA: make the deselected color of a dungeon grid tile correspond to its associated level's color.
-    #A level's color would be set by the user.
-    
-#IDEA: in the level editor, consider axis labels for the level grid to number rooms/tiles by their coords.
- 
-#consider a set of "level tags" for the editor, as well as
-    #different "layers" that can be toggled (i.e.,background layer, platforms layer, and (at dungeon zoom level)
+	#MISC STUFF
+
+#NOTE: might end up moving the folder that currently holds sprite data into the LevelEditor folder
+
+#consider a set of "level tags", as well as different "layers" that can be toggled 
+	#(i.e.,background layer, platforms layer, and (at dungeon zoom level)
          #a layer which shows which levels contain which rooms)
 
 def loadMapEditor():

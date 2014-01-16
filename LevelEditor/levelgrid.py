@@ -4,6 +4,8 @@ from ocempgui.widgets import *
 from ocempgui.widgets.Constants import *
 
 LEFT_MOUSE_BUTTON = 1      #NOTE: this variable is repeated in dungeongridcontainer.py. Not sure if this could become a problem.
+RIGHT_MOUSE_BUTTON = 3
+
 TILE_WIDTH, TILE_HEIGHT = 32,32
 WHITE = Color(("#FFFFFF"))
 BLACK = Color(("#000000"))
@@ -53,23 +55,15 @@ class LevelGrid(ImageLabel):#Table):
 				tile_data = room_data.tile_at(x - origin_x,y - origin_y)
 				self.add_tile_cell(tile_data,x,y)
 
-	#def add_empty_room(self,row,col):
-	#	origin_x,origin_y = col*ROOM_WIDTH,row*ROOM_HEIGHT
-	#	for y in range (origin_y,origin_y+ROOM_HEIGHT):
-	#		for x in range(origin_x,origin_x+ROOM_WIDTH):
-	#			self.add_empty_tile_cell(x,y)
-
 	def add_tile_cell(self,tile_data,x,y):
 		if(tile_data == None): return
 		self.updateTileImage(tile_data.get_image(),x,y)
-		#cell = self.create_cell(tile_data)
-		#self.add_child (y, x, cell)
 
-	#def add_empty_tile_cell(self,x,y):
-	#	cell = self.empty_cell() 
-	#	self.add_child (y, x, cell)
 	def updateTileImage(self,image,x,y):
-		self.grid_image.blit(image,(x*TILE_WIDTH,y*TILE_HEIGHT))
+		tile_image = image
+		pygame.draw.line(tile_image,BLACK,(0,0),(0,TILE_HEIGHT))
+		pygame.draw.line(tile_image,BLACK,(0,0),(TILE_WIDTH,0))
+		self.grid_image.blit(tile_image,(x*TILE_WIDTH,y*TILE_HEIGHT))
 		self.set_picture(self.grid_image)
 
 	def level_cell(self):
@@ -90,10 +84,6 @@ class LevelGrid(ImageLabel):#Table):
 		cell = LevelTileCell(tile_data)
 		return cell
 
-	#def empty_cell(self):	
-	#	cell = LevelTileCell()
-	#	return cell
-
 	def valid_coords(self,coords):
 		return coords[0] >= 0 and coords[0] < self.cols and coords[1] >= 0 and coords[1] < self.rows
 
@@ -107,24 +97,32 @@ class LevelGrid(ImageLabel):#Table):
 		if not self.valid_coords(coordinate_pos):return
 		if event.button == LEFT_MOUSE_BUTTON:
 			self.leftClick(coordinate_pos[1],coordinate_pos[0])
-		else:
+		elif event.button == RIGHT_MOUSE_BUTTON:
+			self.rightClick(coordinate_pos[1],coordinate_pos[0])
 			#TODO: other click types
 			#IDEA: right click to delete
 			return
 
 	def leftClick(self,row,col):
 		tile = self.level_editor.entity_select_container.current_entity 
-		if tile == None: return #could also make this delete
-		self.level_cell().add_entity(tile,col,row) 	#TODO: redo this with new imagelabel version.
-		image = tile.get_image() #figure out how to force an update without scrolling.
+		if tile == None: return 
+		self.level_cell().add_entity(tile,col,row) 	
+		image = tile.get_image() 
 		self.updateTileImage(image,col,row)
-		#self.grid_image.blit(image,(col*TILE_WIDTH,row*TILE_HEIGHT))
-		#self.set_picture(self.grid_image)
-		#clicked_tile = self.grid[(row,col)]	
-		#clicked_tile.set_picture(image)
+
+	def rightClick(self,row,col):
+		self.level_cell().add_entity(None,col,row) 
+		image = LevelGrid.empty_tile_image()
+		self.updateTileImage(image,col,row)
 
 	@staticmethod
 	def empty_grid_image(cols,rows):
 		image = Surface((cols*TILE_WIDTH,rows*TILE_HEIGHT))
+		image.fill(WHITE)
+		return image
+
+	@staticmethod
+	def empty_tile_image():
+		image = Surface((TILE_WIDTH,TILE_HEIGHT))
 		image.fill(WHITE)
 		return image
