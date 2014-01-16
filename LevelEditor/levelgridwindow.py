@@ -4,13 +4,18 @@ class LevelGridWindow(ScrolledWindow):
 	def __init__(self,level_editor,x,y,width,height):
 		ScrolledWindow.__init__(self,width,height)
 		self.topleft = x,y
-		self.level_grid = LevelGrid(level_editor,16,16)
+		self.level_grid = LevelGrid(level_editor)
 		self.set_child(self.level_grid)
 		self.master_editor = level_editor
-		self.connect_signal(SIG_MOUSEDOWN,self.level_grid.processClick,self.calculate_offset) 
+		self.connect_signal(SIG_MOUSEDOWN,self.processClick) 
 
 	def setLevelData(self,level_cell):#TODO: build from dungeon grid cells, not level data.
 		self.level_grid.setLevelData(level_cell)
+
+	def processClick(self,event):
+		check_pos = (event.pos[0]-self.left-38,event.pos[1]-self.top-54)
+		if check_pos[0] >= self.hscrollbar.top or check_pos[1] >= self.vscrollbar.left: return
+		self.level_grid.processClick(event,self.calculate_offset)
 
 	def calculate_offset(self):
 		window_pos = (self.left,self.top)

@@ -153,6 +153,7 @@ class DungeonGrid(Table): #table might not be the best source.
 
 	def updateSelectedCells(self):
 		if self.selected_cells == None: return
+		self.rect_corner = None #not sure about this
 		level_cell = self.level_cell
 		cells = self.selected_cells
 		for row in cells:
@@ -176,7 +177,6 @@ class DungeonGrid(Table): #table might not be the best source.
 		x2 = len(selected_cells[0])
 		y2 = len(selected_cells)
 		origin = level_cell.origin()
-		#print "ORIGIN: "+ str(origin)
 		x1, y1 = origin[0],origin[1]
 		for y in range (y1, y2):
 			for x in range (x1,x2):

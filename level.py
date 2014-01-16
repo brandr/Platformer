@@ -11,8 +11,10 @@ class Level(object):
 		self.origin = origin#upper-left corner of the level (in terms of global coords, so each coordinate pair corresponds to a room)
 		self.level_objects = LevelObjects(self) #all objects in the level (tiles and entities)
 		self.start_coords = None #coords where the player appears upon entering the level (set by addRooms)
+		#if len(rooms) < 1: return
 		self.addRooms(rooms)
 		tiles = self.getTiles()
+
 		total_level_width = len(tiles[0])*32
 		total_level_height = len(tiles)*32
 		self.level_camera = Camera(total_level_width, total_level_height) #might not be the best way to make the camera

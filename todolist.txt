@@ -8,15 +8,9 @@
     #it's possible that other bugs may occur if the player does this combination of actions, even when not leaving the level.
 
     #IMMEDIATE STUFF
- 
-#expand levelData into its own class which might include sprite/tile sets, indoors/outdoors, and other data 
-    #not necessarily found in Room
-    #MOST IMPORTANTLY, consider how levelData might be derived from input
-        #in the long run, this input may come from the level editor.
-        #consider a set of "level tags" for the editor, as well as
-            #different "layers" that can be toggled (i.e.,background layer, platforms layer, and (at dungeon zoom level)
-                #a layer which shows which levels contain which rooms)
-    #Conisder determining origin from the list of room coords (we want the one with both the lowest x *and* the lowest y)
+
+#NOTE: see dungeoneditorlauncher.py for dungeon editor TODOs, which are currently the most immediate.
+
 #fix movement/rect related stuff, and put all relevant methods in gameImage, to be called by subclasses.
     #there seems to be some inconsistency about which parts of rects are moved (left,top,centerx,centery,etc)
 #fix imports
@@ -27,7 +21,9 @@
 
     #LESS IMMEDIATE STUFF
 
-#rename this class to something besides "platformexample"
+#TODO: delete level button
+    #once this is working, I will have to figure out how level deletion translates to the dungeon grid.
+        #either the deleted level's rooms should become empty, or they should simply become ununused but not empty.
 #store/organize sprites a little better.
     #keep in mind that we need an extensible way to load sprites, so if they are in different directories
         #we need to plan out how we'll access them.

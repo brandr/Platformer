@@ -25,7 +25,7 @@ class LevelGroup(object):
 
 		#TODO: error case where next_level is None.
 	def movePlayer(self,player,next_level,global_coords,local_coords):
-		room_coords = (local_coords[0]%Room.ROOM_WIDTH,local_coords[1]%Room.ROOM_HEIGHT)
+		room_coords = (local_coords[0]%ROOM_WIDTH,local_coords[1]%ROOM_HEIGHT)
 		next_coords = next_level.flipped_coords(global_coords,room_coords) #TODO: will have to change this
 		next_level.addPlayer(player,next_coords)
 		

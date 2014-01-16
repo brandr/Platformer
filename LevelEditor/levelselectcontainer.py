@@ -122,7 +122,6 @@ class LevelSelectContainer(Box):
 			self.level_data_table.add_child(self.level_count,0,added_level_cell)
 			self.level_count += 1
 			return
-		#level_name = level_data.name
 		added_level_cell = LevelSelectCell(level_data.name)#,level_data.corners) #this constructor might be a good place to connect to the dungeongrid
 		self.level_data_table.add_child(self.level_count,0,added_level_cell)
 		self.level_count += 1
@@ -135,7 +134,6 @@ class LevelSelectContainer(Box):
 			self.addLevel(next_level)
 			self.selected_level_cell = self.level_data_table.grid[(L,0)]
 			if next_level != None and next_level.corners != None:
-				#print (next_level.name, next_level.corners)
 				dungeon_grid.setLevelRooms(next_level.corners)
 				self.selected_level_cell.room_cells = dungeon_grid.selected_cells
 				dungeon_grid.deselect_all_cells()

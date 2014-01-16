@@ -10,9 +10,9 @@ class LevelData(object):
 		room_set = []
 		corner1 = self.corners[0]
 		corner2 = self.corners[1]
-		for y in range(corner1[0],corner1[1]+1): #not sure if +1 is correct or not
+		for y in range(corner1[1],corner2[1]+1): #not sure if +1 is correct or not
 			#room_set.append([]) #not sure if this would be necessary/useful
-			for x in range(corner2[0],corner2[1]+1):
+			for x in range(corner1[0],corner2[0]+1):
 				room_set.append(rooms[y][x])
 		return room_set
 
