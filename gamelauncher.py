@@ -13,8 +13,9 @@ def runGame():
 
     #new way of creating a dungeon (works for now)
     factory = DungeonFactory() #might need args like filename, filepath, etc later
+    print "Building dungeon..."
     dungeon = factory.build_dungeon("./LevelEditor/dungeon_map_files/dungeon0")
-    
+    print "Dungeon built."
     #uncomment these to test actually launching the dungeon
     mainScreen = GameScreen()
     mainScreen.runGame(screen,dungeon)

@@ -12,20 +12,34 @@ class RoomFactory(object):
 
 	@staticmethod
 	def dungeon_rooms(dungeon,room_data_set):
-		#ROOM_WIDTH = Room.ROOM_WIDTH
-		#ROOM_HEIGHT = Room.ROOM_HEIGHT
 		rooms = []
-		#map_width = len(room_data_set[0]) #might want to trim room_data_set before this point. (preferrably in the LevelEditor itself)
-		#map_height = len(room_data_set)
-		rooms_x = len(room_data_set[0])  #assuming evenly divisible right now
-		rooms_y = len(room_data_set)
-		for y in range(0,rooms_y):	#NOTE: this for loop seems to obviate the need for global coords.
+		x1,y1 = RoomFactory.origin(room_data_set)
+		x2,y2 = RoomFactory.lower_right(room_data_set)
+		print "Setting up rooms..."
+		for y in range(y1,y2+1):	#NOTE: this for loop seems to obviate the need for global coords.
 			rooms.append([])
-			for x in range(0,rooms_x):
+			for x in range(x1,x2+1):
 				next_data = room_data_set[y][x]
 				next_room = RoomFactory.build_room(dungeon,next_data,x,y)
 				rooms[y].append(next_room)
+		print "Rooms set up."
 		return rooms
+
+	@staticmethod
+	def origin(room_data_set):
+		for y in xrange(len(room_data_set)):
+			for x in xrange(len(room_data_set[y])):
+				next_data = room_data_set[y][x]
+				if(room_data_set[y][x] != None):return x,y
+		return None
+
+	@staticmethod
+	def lower_right(room_data_set):
+		for y in range(len(room_data_set)-1,-1,-1):
+			for x in range(len(room_data_set[y])-1,-1,-1):
+				next_data = room_data_set[y][x]
+				if(room_data_set[y][x] != None):return x,y
+		return None
 
 	@staticmethod
 	def build_room(dungeon,room_data,global_x,global_y): #might be able to get global x and global y through roomdata's coords instead

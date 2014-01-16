@@ -11,6 +11,7 @@ class LevelGroup(object):
 	def __init__(self,level_data_set,room_data_set): #levelGroup builds the dungeon from a single map (currently ascii) along with some other data about the level.
 		#new init
 		factory = LevelFactory()
+		print "Building dungeon rooms..."
 		self.rooms = factory.dungeon_rooms(self,room_data_set)
 		self.dungeon_levels = factory.dungeon_levels(self,self.rooms,level_data_set)
 		for L in self.dungeon_levels:

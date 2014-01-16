@@ -1,12 +1,6 @@
 import dungeoneditorscreen
 from dungeoneditorscreen import *
 
-#TODO: make the game launch faster.
-
-#TODO: Trim the room sets in DungeonData, preferrably upon its creation if possible.
-     # This means having the roomdata array start at 0,0 and end at the last non-empty room
-     # contained in the dungeondata object.
-
 #TODO: make it possible to "paint" tiles in the level editor by holding and dragging the mouse.
 
 #TODO: make it possible to clear tiles in the level editor by right-clicking.
