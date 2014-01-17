@@ -56,8 +56,10 @@ class RoomFactory(object):
 		default_cave_tile = tile_factory.tile_at((0,0))
 		default_sky_tile = tile_factory.tile_at((1,0))
 		default_tile = default_cave_tile
+		
 		default_platform_image = GameImage.loadImageFile('testblock1.bmp')
 		default_platform = GameImage.still_animation_set(default_platform_image)
+		
 		default_lantern = Lantern.load_lantern_animation_set()
 		default_bat = Monster.load_bat_animation_set() 
 
@@ -71,8 +73,14 @@ class RoomFactory(object):
 				t = Tile(default_tile, x,y)
 				if next_tile_data != None:
 				#TODO: think of a more extensible way to build these objects (probably through dictionaries or something)
+				#IDEA: make PLAYER_START its own case, but make everything else create an object fetched via a dictionary.
+				#TODO: remember also that this part will need some checks if the object created is larger than 32*32.
+					raw_entity_image = next_tile_data.get_image("./LevelEditor")
+					still_entity_image = GameImage.still_animation_set(raw_entity_image)
+				#TODO: may need some way to allow transparency.
+				#TODO: might want to check still vs animated here (and fetch animation sheets that are mapped to the still image)
 					if next_tile_data.entity_key == DEFAULT_PLATFORM:
-						p = Platform(default_platform, x, y)
+						p = Platform(still_entity_image, x, y)	#TODO: use still entity image here (I think)
 						entities.append(p)
 						t.block = p
 					if next_tile_data.entity_key == PLAYER_START:

@@ -20,17 +20,16 @@ class LevelFactory(object):
 	def dungeon_levels(self,dungeon,rooms,level_data_set):
 		levels = []
 		for d in level_data_set:
-			level_ID = d.name
 			level_rooms = d.room_set(rooms)
 			origin = d.corners[0]
-			next_level = self.build_level(dungeon,level_ID,origin,level_rooms)
+			next_level = self.build_level(dungeon,d,origin,level_rooms)
 			levels.append(next_level)
 		return levels
 
 		#If I end up using the system where levelIDs are stored in arrays corresponding to rooms,
 			#should probably have this done for dungeon in this method.
-	def build_level(self,dungeon,level_ID,origin,rooms):
-		return Level(dungeon,level_ID,origin,rooms)
+	def build_level(self,dungeon,level_data,origin,rooms): #could also get orgin from level data
+		return Level(dungeon,level_data,origin,rooms)
 
 		#might not end up using this
 	def outdoors(self,depth,level_top):

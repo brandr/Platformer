@@ -7,7 +7,7 @@ class LevelGridWindow(ScrolledWindow):
 		self.level_grid = LevelGrid(level_editor)
 		self.set_child(self.level_grid)
 		self.master_editor = level_editor
-		self.connect_signal(SIG_MOUSEDOWN,self.processClick) 
+		self.connect_signal(SIG_MOUSEDOWN,self.processClick)
 
 	def setLevelData(self,level_cell):#TODO: build from dungeon grid cells, not level data.
 		self.level_grid.setLevelData(level_cell)

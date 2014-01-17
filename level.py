@@ -1,24 +1,26 @@
 import room
 from room import *
+from tilefactory import * #TEMPORARY IMPORT
 
 class Level(object):
 	#a level is built from a rectangular set of rooms.
 	#it copies all objects from the rooms into itself, and processes these objects as the game is running.
 	#only the player's current level should be active at any given time
-	def __init__(self, dungeon, level_ID,origin,rooms):
-		self.dungeon = dungeon #the LevelGroup that the level is part of
-		self.level_ID = level_ID #a currently unused int which identifies the level uniquely
-		self.origin = origin#upper-left corner of the level (in terms of global coords, so each coordinate pair corresponds to a room)
+	def __init__(self, dungeon,level_data,origin,rooms):
+		self.dungeon = dungeon 		#the LevelGroup that the level is part of
+		self.level_ID = level_data.name #a currently unused value which identifies the level uniquely
+		self.origin = origin 	#upper-left corner of the level (in terms of global coords, so each coordinate pair corresponds to a room)
 		self.level_objects = LevelObjects(self) #all objects in the level (tiles and entities)
 		self.start_coords = None #coords where the player appears upon entering the level (set by addRooms)
-		#if len(rooms) < 1: return
 		self.addRooms(rooms)
 		tiles = self.getTiles()
-
 		total_level_width = len(tiles[0])*32
 		total_level_height = len(tiles)*32
 		self.level_camera = Camera(total_level_width, total_level_height) #might not be the best way to make the camera
-		self.outdoors = False #TODO: take this as an arg from the factory (could also be in levelData)
+		self.outdoors = level_data.sunlit
+
+		if(self.outdoors): self.setTilesOutdoors() #TEMP
+		
 		self.calibrateLighting()
 
 		#toString test methods
@@ -52,6 +54,16 @@ class Level(object):
 				entities_string += entities_string_array[y][x]
 			entities_string += "\n"
 		return entities_string
+
+		#TEMP METHOD
+	def setTilesOutdoors(self):
+		default_sky_tile = GameImage.loadImageFile('test_sky_tile_1.bmp') 
+		dimensions =  self.get_dimensions()
+		tiles = self.getTiles()
+		for y in xrange(dimensions[1]):
+			for x in xrange(dimensions[0]):
+				tiles[y][x].changeImage(default_sky_tile) #Tile(default_sky_tile, x,y)
+		#TEMP METHOD
 
 		#level building methods (called in constructor)
 	def addRooms(self,rooms):

@@ -90,17 +90,16 @@ class LevelGrid(ImageLabel):#Table):
 	def processClick(self,event,calculate_offset):
 		offset = calculate_offset()
 		pos = event.pos 
-		adjusted_pos = ((pos[0]-offset[0]-3,pos[1]-offset[1]+15))
+		adjusted_pos = ((pos[0]-offset[0]-3,pos[1]-offset[1]+15))#this bit is still a little wonky, but functional for now.
 		coordinate_x = int(adjusted_pos[0]/(TILE_WIDTH))
 		coordinate_y = int(adjusted_pos[1]/(TILE_HEIGHT))
-		coordinate_pos = (coordinate_x,coordinate_y) #this bit is still a little wonky, but functional for now.
+		coordinate_pos = (coordinate_x,coordinate_y) 
 		if not self.valid_coords(coordinate_pos):return
 		if event.button == LEFT_MOUSE_BUTTON:
 			self.leftClick(coordinate_pos[1],coordinate_pos[0])
 		elif event.button == RIGHT_MOUSE_BUTTON:
 			self.rightClick(coordinate_pos[1],coordinate_pos[0])
-			#TODO: other click types
-			#IDEA: right click to delete
+			#TODO: other click types (not sure what)
 			return
 
 	def leftClick(self,row,col):

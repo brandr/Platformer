@@ -11,6 +11,10 @@
 
 #NOTE: see dungeoneditorlauncher.py for dungeon editor TODOs, which are currently the most immediate.
 
+#when building the dungeon with Factories, figure out how each created entity will have its default image,
+    #animation set, associated data, etc created.S
+        #It may be helpful to make an EntityFactory class.
+
 #fix movement/rect related stuff, and put all relevant methods in gameImage, to be called by subclasses.
     #there seems to be some inconsistency about which parts of rects are moved (left,top,centerx,centery,etc)
 #fix imports

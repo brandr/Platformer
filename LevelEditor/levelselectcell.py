@@ -15,16 +15,17 @@ class LevelSelectCell(Table):
 		self.name_label = Label(self.name)
 		self.add_child(0,0,self.name_label)
 		self.room_cells = None
-		self.level_data = None #this might not be right
+		self.sunlit = False #TEMP
+		#self.level_data = None #this might not be right
 		
 	def get_name(self): #TODO: consider making this getter access level data instead.
 		return self.name
 
 	def get_level_data(self): #add other information here if more is needed for level data.
-		if (self.room_cells == None): return LevelData(self.name,None,None)
+		if (self.room_cells == None): return LevelData(self.name,None,None,self.sunlit)
 		origin = self.origin()
 		lower_right = self.lower_right()
-		data = LevelData(self.name,origin,lower_right)
+		data = LevelData(self.name,origin,lower_right,self.sunlit)
 		return data
 
 	def origin(self): #find the upper left corner of the level
@@ -59,8 +60,8 @@ class LevelSelectCell(Table):
 	def set_rooms(self,dungeon_cells):
 		self.room_cells = dungeon_cells #not sure this is what we want, but using it for now
 
-	def initialized(self):
-		return self.level_data != None
+	#def initialized(self):
+	#	return self.level_data != None
 
 	def add_entity(self,tile_data,col,row):
 		room_offset = self.origin()
@@ -70,7 +71,10 @@ class LevelSelectCell(Table):
 		adjusted_room_row = room_row + room_offset[1]
 		relative_col = col%ROOM_WIDTH
 		relative_row = row%ROOM_HEIGHT
-		self.room_cells[adjusted_room_row][adjusted_room_col].add_entity(tile_data,relative_col,relative_row) 
+		self.room_cells[adjusted_room_row][adjusted_room_col].add_entity(tile_data,relative_col,relative_row)
+
+	def updateSunlit(self,sunlit):
+		self.sunlit = sunlit
 	
 	def rename_level(self,level_name):
 		self.name = level_name

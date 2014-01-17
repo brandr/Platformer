@@ -43,7 +43,7 @@ class RoomData(object):
 		return tiles
 
 	@staticmethod
-	def deformatted_room_set(formatted_data,filepath = None):
+	def deformatted_room_set(formatted_data):	
 		rooms = []
 		for y in xrange (len(formatted_data)):
 			rooms.append([])
@@ -51,14 +51,14 @@ class RoomData(object):
 				next_data = None
 				next_room = formatted_data[y][x]
 				if next_room != None:
-					next_data = RoomData.deformatted_room(next_room,filepath)
+					next_data = RoomData.deformatted_room(next_room)
 				rooms[y].append(next_data)
 		return rooms
 
 	@staticmethod
-	def deformatted_room(formatted_data,filepath=None):
+	def deformatted_room(formatted_data):	
 		x,y = formatted_data[0],formatted_data[1]
-		tile_set = TileData.deformatted_tile_set(formatted_data[2],filepath) #have to deformat tiles before returning the room_data.
+		tile_set = TileData.deformatted_tile_set(formatted_data[2]) #have to deformat tiles before returning the room_data.
 		width,height = len(tile_set[0]),len(tile_set) #might need a None exeception handler
 		room_data = RoomData(width,height,x,y)
 		room_data.setAllTiles(tile_set)
