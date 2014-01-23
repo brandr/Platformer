@@ -5,6 +5,7 @@ from ocempgui.widgets.Constants import *
 
 LEFT_MOUSE_BUTTON = 1      #NOTE: this variable is repeated in dungeongridcontainer.py. Not sure if this could become a problem.
 RIGHT_MOUSE_BUTTON = 3
+# IDEA: middle mouse button to "paint" tiles.
 
 TILE_WIDTH, TILE_HEIGHT = 32,32
 WHITE = Color(("#FFFFFF"))
@@ -56,7 +57,7 @@ class LevelGrid(ImageLabel):#Table):
 				self.add_tile_cell(tile_data,x,y)
 
 	def add_tile_cell(self,tile_data,x,y):
-		if(tile_data == None): return
+		if(tile_data == None or isinstance(tile_data,BlockedTileData)): return
 		self.updateTileImage(tile_data.get_image(),x,y)
 
 	def updateTileImage(self,image,x,y):
@@ -99,20 +100,51 @@ class LevelGrid(ImageLabel):#Table):
 			self.leftClick(coordinate_pos[1],coordinate_pos[0])
 		elif event.button == RIGHT_MOUSE_BUTTON:
 			self.rightClick(coordinate_pos[1],coordinate_pos[0])
-			#TODO: other click types (not sure what)
+			#TODO: other click types (maybe middle mouse?)
 			return
 
 	def leftClick(self,row,col):
 		tile = self.level_editor.entity_select_container.current_entity 
-		if tile == None: return 
+		if (tile == None or not self.room_for_tile(tile,row,col)): return
+		self.rightClick(row,col)
+		self.addEntity(tile,row,col)
+
+	def addEntity(self,tile,row,col):
+		width,height = tile.width,tile.height
 		self.level_cell().add_entity(tile,col,row) 	
-		image = tile.get_image() 
+		for x in range(col + 1,col + width):
+			next_block = BlockedTileData(tile,col,row)
+			self.level_cell().add_entity(next_block,x,row)
+		for y in range(row + 1, row + height):
+			for x in range(col, col + width):
+				next_block = BlockedTileData(tile,col,row)
+				self.level_cell().add_entity(next_block,x,y)
+		image = tile.get_image() 		#this part only needs to be done once.
 		self.updateTileImage(image,col,row)
 
 	def rightClick(self,row,col):
-		self.level_cell().add_entity(None,col,row) 
-		image = LevelGrid.empty_tile_image()
-		self.updateTileImage(image,col,row)
+		tile = self.tile_at(row,col)
+		if tile == None: return
+		if(isinstance(tile,BlockedTileData)):
+			origin_tile = tile.origin_tile
+			self.removeEntity(tile.origin_y,tile.origin_x,origin_tile.width,origin_tile.height)
+			return
+		self.removeEntity(row,col,tile.width,tile.height)
+
+	def removeEntity(self,row,col,width,height):
+		for y in range(row, row + height):
+			for x in range(col, col + width):
+				self.level_cell().add_entity(None,x,y) 
+				image = LevelGrid.empty_tile_image()
+				self.updateTileImage(image,x,y)
+
+	def room_for_tile(self,tile,row,col): #make sure any tile larger that 1x1 will fit in the room.
+		end_x = col + tile.width - 1
+		end_y = row + tile.height - 1
+		return (end_x < self.cols and end_y < self.rows)
+
+	def tile_at(self,row,col):
+		return self.level_cell().tile_at(col,row)
 
 	@staticmethod
 	def empty_grid_image(cols,rows):

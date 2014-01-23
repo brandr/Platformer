@@ -7,6 +7,7 @@ from entity import *
 class Being(Entity):
     def __init__(self,animations):
         Entity.__init__(self,animations)
+        self.direction_id = None
         self.xvel = 0
         self.yvel = 0
         self.mobile = True

@@ -4,6 +4,7 @@ import animationset
 from animationset import *
 
 BACKGROUND_COLOR = Color("#000000")
+DEF_COLORKEY = Color("#FF00FF")
 
 #consider an animation_data arg which determines # of animations and # of frames/duration in each.
 #alternately, consider taking animationSet as an arg.
@@ -47,7 +48,7 @@ class GameImage(pygame.sprite.Sprite):
         return SpriteStripAnimator(animation_strip,rect, count, colorkey, loop, frames)
 
     @staticmethod
-    def still_animation_set(still_image, rect = Rect(0,0,32,32), colorkey = None):
+    def still_animation_set(still_image, rect = Rect(0,0,32,32), colorkey = DEF_COLORKEY):#colorkey = None):
         still_animation = SpriteStripAnimator(still_image,rect, 1, colorkey, False, 1)
         return AnimationSet(still_animation)
 
@@ -91,8 +92,6 @@ class GameImage(pygame.sprite.Sprite):
             if(self.mapped):
                 self.fully_darken()
                 return
-            #self.image = Surface((32, 32))
-            #self.image.fill(BACKGROUND_COLOR) 
 
     def updateAnimation(self, lightvalue = 0):
         if(self.animated):

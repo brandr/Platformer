@@ -17,7 +17,6 @@ class Player(Being):
         self.current_level = start_level
         self.sightdist = 2
         
-
     @staticmethod
     def load_player_animation_set():
         player_rect = Rect(0,0,32,64)

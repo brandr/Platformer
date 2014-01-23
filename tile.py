@@ -109,7 +109,7 @@ class Tile(GameImage):
         return None
 
     def coordinates(self):
-        return GameImage.coordinates(self)#(self.rect.centerx/32,self.rect.centery/32)
+        return GameImage.coordinates(self)
 
     def map(self):
         if(self.mapped):return

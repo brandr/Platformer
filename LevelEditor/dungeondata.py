@@ -34,9 +34,9 @@ class DungeonData(object):
 		return rooms
 
 	@staticmethod
-	def deformatted_dungeon(formatted_data):	#TODO: can no longer use filepath  this way.
+	def deformatted_dungeon(formatted_data,filepath = "./"):
 		level_data_set = LevelData.deformatted_level_set(formatted_data[0])
-		room_data_set = RoomData.deformatted_room_set(formatted_data[1])
+		room_data_set = RoomData.deformatted_room_set(formatted_data[1],filepath)
 		return DungeonData(level_data_set,room_data_set)
 		#return dungeon_data
 		#TODO: return a DungeonData object.

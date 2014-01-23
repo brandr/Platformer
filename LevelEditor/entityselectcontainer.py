@@ -7,8 +7,7 @@ from tiledata import *
 MAX_ENTITY_WINDOWS = 4
 BMP_FILETYPE = 33204 #not sure if this will work cross-platform. (Then again, a lot of this game might not.)
 
-#TODO: replace current system with the filelist, which will use image filenames associated with both images and tiledata keys.
-	# the tiledata keys are then assosiated with any necessary data.
+#TODO: instead of showing current entity image in the pane, blit current entity image over a white square the size of max-sized image.
 
 class EntitySelectContainer(Box): #window might not be the right name anymore.
 	"""docstring for EntitySelectContainer"""
@@ -40,18 +39,8 @@ class EntitySelectContainer(Box): #window might not be the right name anymore.
 			return
 		self.select_entity(file_list._directory,file_list_item._text)
 
-		#entity_key = entity_window.get_selected()[0].text #the [0] is here because get_selected returns a tuple, but since we have the window set to only select one item, that item is always at [0]
-		#if entity_key in self.entity_map: #TODO: change this bit to be more extensible by checking layer, text, selection before layer, etc
-		#	name_collection = self.entity_map[entity_key]
-		#	collection = EntitySelectContainer.entity_collection(name_collection)
-		#	self.open_entity_window(layer+1,collection)
-		#	return
-		#self.select_entity(entity_key)
-
 	def select_entity(self,directory = None,file_key = None):
-		#TODO: once this is working, get file_key from the 2nd-to-last part of the filepath 
-			#(i.e., all sprites in the same folder correspond to a functionally identical object.)
-			#might also expand current entity label to indicate both the entity itself and the sprite.
+		#TODO: expand current entity label to indicate both the entity itself and the sprite.
 		if file_key == None: #not key in SELECTABLE_ENTITY_MAP:
 			self.current_entity = None
 			self.updateCurrentEntityImage()
@@ -65,7 +54,7 @@ class EntitySelectContainer(Box): #window might not be the right name anymore.
 
 	def updateCurrentEntityImage(self):
 		if(self.current_entity == None): 
-			blank_square = Surface((32,32))
+			blank_square = Surface((32,32)) #TODO: needs to be larger once current entity can be larger.
 			blank_square.fill(Color("#FFFFFF"))
 			self.current_entity_image.set_picture(blank_square)
 			return
@@ -73,7 +62,6 @@ class EntitySelectContainer(Box): #window might not be the right name anymore.
 		self.current_entity_image.set_picture(image)
 
 	def open_entity_window(self,layer,collection):
-		#TODO: make more extensible than this (I'm not 100% sure we can open more than two layers, though we might not need to.)
 		window = ScrolledList(self.width/MAX_ENTITY_WINDOWS,self.height/2)
 		window.left += (layer-1)*(self.width/MAX_ENTITY_WINDOWS)
 		window.set_items(collection)
@@ -110,6 +98,6 @@ class EntitySelectContainer(Box): #window might not be the right name anymore.
 
 	@staticmethod
 	def blank_entity_image():
-		blank_square = Surface((32,32))
+		blank_square = Surface((32,32)) #TODO: needs to be larger once current entity can be larger.
 		blank_square.fill(Color("#FFFFFF"))
 		return ImageLabel(blank_square)

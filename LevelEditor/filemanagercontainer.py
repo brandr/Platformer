@@ -108,7 +108,6 @@ class FileManagerContainer(Box):
 
 	#load method
 
-	#TODO: make this less laggy.
 	def loadDungeon(self):
 		if self.selected_slot == None: return
 		slot = self.selected_slot
@@ -117,10 +116,10 @@ class FileManagerContainer(Box):
 		self.buildDungeon(deformatted_dungeon)
 
 	@staticmethod
-	def dungeonDataFromFile(filename):
+	def dungeonDataFromFile(filename,filepath = "./"):
 		dungeon_file = open(filename,'rb') #'rb' means "read binary"
 		dungeon_data = json.load(dungeon_file) #this part reads the data from file
-		deformatted_dungeon = DungeonData.deformatted_dungeon(dungeon_data)
+		deformatted_dungeon = DungeonData.deformatted_dungeon(dungeon_data,filepath)
 		return deformatted_dungeon
 
 	def buildDungeon(self,dungeon_data): #uncomment the prints in this method to test load times.

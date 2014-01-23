@@ -3,15 +3,7 @@ from dungeoneditorscreen import *
 
 	#IMMEDIATE STUFF
 
-#TODO: figure out how image transparency will work for leveleditor images.
-	# remember that the GameImage method which loads these images has to deal with transparency
-		#I forget how it does it, though.
-
-#TODO: make it possible to add entities to the leveleditor which take up more than 1 tile (will need some kind of dimensions arg)
-	#test by actually making the giant frog giant, and put it in the game.
-
-#TODO: find a way to correctly associate animation sets with tiledata, either through filepath
-	#  or by storing sprite sheets (or some other way).
+#TODO: look into "painting" tiles in the level editor using the middle mouse button.
 
 #TODO: Since adding differently rotated platforms is currently annoying, consider ways of rotating selected entities, 
 	# or choosing from a 9x9 grid of possible orientations
@@ -37,6 +29,13 @@ from dungeoneditorscreen import *
 					#Might end up with an EntityData class. Each tileData would have an entitydata to represent
 						#its starting entity (*not* the data member called "block", unless the entity is a platform), set to None by default.
 		#NOTE: this is low priority since it will have little effect on game mechanics (the player does not interact with the tiles themselvels)
+
+#TODO: find a way to correctly associate animation sets with tiledata, either through filepath
+	#  or by storing sprite sheets (or some other way).
+
+#TODO: figure out how image transparency will work for leveleditor images.
+	# remember that the GameImage method which loads these images has to deal with transparency
+		#I forget how it does it, though.
 
 	#DUNGEON GRID CONTAINER STUFF
 

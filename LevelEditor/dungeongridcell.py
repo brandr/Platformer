@@ -63,12 +63,10 @@ class DungeonGridCell(ImageButton):
 	def deselect(self,detach_level): 
 		if(detach_level):
 			self.level_cell = None
-		#print "GOT HERE"
 		if self.level_cell != None:
 			if self.empty():
 				self.set_picture(DungeonGridCell.deselected_empty_tile())	#NOTE: could also make the image correspond to the level
 				self.cell_state = DESELECTED_EMPTY
-				#print "HERE"
 				return
 			self.set_picture(DungeonGridCell.deselected_tile())	#NOTE: could also make the image correspond to the level
 			self.cell_state = DESELECTED 
@@ -82,6 +80,9 @@ class DungeonGridCell(ImageButton):
 
 	def add_entity(self,tile_data,col,row):
 		self.room_data.set_tile(tile_data,col,row)
+
+	def tile_at(self,x,y):
+		return self.room_data.tile_at(x,y)
 
 	#NOTE: could put these tiles (or just the color codes) in a dict as constants
 	@staticmethod
