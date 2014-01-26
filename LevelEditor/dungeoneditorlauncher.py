@@ -3,10 +3,15 @@ from dungeoneditorscreen import *
 
 	#IMMEDIATE STUFF
 
-#TODO: look into "painting" tiles in the level editor using the middle mouse button.
+#TODO: reintroduce lanterns
+
+#TODO: figure out how to store animations/still images in one place
+	 # use lantern as example, then do the same with giant bat and giant frog
+	 #Alternately, store animations separately from still images, but still organize
+	 	#them by filepaths and keys based on direction/id.
 
 #TODO: Since adding differently rotated platforms is currently annoying, consider ways of rotating selected entities, 
-	# or choosing from a 9x9 grid of possible orientations
+	#  or choosing from a 9x9 grid of possible orientations
 	#  this may mean it will be easier to store a tiledata's associated image (or even animation), rather than the filepath.
 
 	#LEVEL EDITOR GRID STUFF
@@ -28,7 +33,7 @@ from dungeoneditorscreen import *
 				#the entity, and set the Tile's image to this image.
 					#Might end up with an EntityData class. Each tileData would have an entitydata to represent
 						#its starting entity (*not* the data member called "block", unless the entity is a platform), set to None by default.
-		#NOTE: this is low priority since it will have little effect on game mechanics (the player does not interact with the tiles themselvels)
+		#NOTE: this is low priority since it will have little effect on game mechanics (the player does not interact with the tiles themselves)
 
 #TODO: find a way to correctly associate animation sets with tiledata, either through filepath
 	#  or by storing sprite sheets (or some other way).

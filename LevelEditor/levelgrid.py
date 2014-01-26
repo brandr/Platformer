@@ -100,6 +100,9 @@ class LevelGrid(ImageLabel):#Table):
 			self.leftClick(coordinate_pos[1],coordinate_pos[0])
 		elif event.button == RIGHT_MOUSE_BUTTON:
 			self.rightClick(coordinate_pos[1],coordinate_pos[0])
+		else:
+			self.leftClick(coordinate_pos[1],coordinate_pos[0]) #TEMP
+			#print event
 			#TODO: other click types (maybe middle mouse?)
 			return
 
