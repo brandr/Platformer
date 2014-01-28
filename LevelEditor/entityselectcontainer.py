@@ -33,10 +33,17 @@ class EntitySelectContainer(Box): #window might not be the right name anymore.
 		return file_list
 
 	def change_selection(self,file_list):
+
+		def is_bmp(filename):
+			extension = filename[-4:]
+			return extension == ".bmp"
+
 		file_list_item = file_list.get_selected()[0]
-		if(file_list_item.filetype != BMP_FILETYPE): 
+	#print file_list_item.filetype
+		if(not is_bmp(file_list_item._text)): 
 			self.select_entity()
 			return
+
 		self.select_entity(file_list._directory,file_list_item._text)
 
 	def select_entity(self,directory = None,file_key = None):
