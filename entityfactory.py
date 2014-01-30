@@ -7,7 +7,7 @@ sys.path.insert(0, './LevelEditor')
 from roomdata import *
 
 ENTITY_CONSTRUCTOR_MAP = {
-	DEFAULT_PLATFORM:Platform,#.__init__,
+	DEFAULT_PLATFORM:Platform,
 	DEFAULT_LANTERN:Lantern,
 	BAT:Monster,
 	GIANT_FROG:Monster

@@ -3,7 +3,6 @@ from dungeoneditorscreen import *
 
 	#IMMEDIATE STUFF
 
-#TODO: change roomfactory's method of creating entities, starting with how their animations are set.
 	#  also change gameimage so that load_animation2 and load_image_file2 are used instead of their non-numbered counterparts.
 		# use prints to track down where the original methods are used.
 		# once finished, remove 2 from the method names.

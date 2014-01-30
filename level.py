@@ -57,7 +57,7 @@ class Level(object):
 
 		#TEMP METHOD
 	def setTilesOutdoors(self):
-		default_sky_tile = GameImage.loadImageFile('test_sky_tile_1.bmp') 
+		default_sky_tile = tile_images = GameImage.load_image_file('./data/', 'test_sky_tile_1.bmp') #GameImage.loadImageFile('test_sky_tile_1.bmp') 
 		dimensions =  self.get_dimensions()
 		tiles = self.getTiles()
 		for y in xrange(dimensions[1]):
@@ -127,7 +127,7 @@ class Level(object):
 			y = tile.coordinates()[1]
 			if self.next_level_exists(self.global_coords((x,y)),direction): #this is the sort of area whre we want to get rid of these 32s
 				continue
-			exit_platform_image = GameImage.loadImageFile('exitblock1.bmp') #TEMPORARY
+			exit_platform_image = tile_images = GameImage.load_image_file('./data/', 'exitblock1.bmp') #TODO: make exitblocks more terrifying in case anyone finds them
 			exit_platform = GameImage.still_animation_set(exit_platform_image) #TEMPORARY
 			block_x = 32*(x+direction[0])
 			block_y = 32*(y+direction[1])

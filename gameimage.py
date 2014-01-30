@@ -11,7 +11,7 @@ DEF_COLORKEY = Color("#FF00FF")
 class GameImage(pygame.sprite.Sprite):
     def __init__(self,animations):#,default_rect,colorkey = None):#,start_coords):
         pygame.sprite.Sprite.__init__(self)
-        #self.unseen_color = Color("#000000")\
+
         self.unseen_image = Surface((32,32))
         self.mapped = False
         self.animated = False #Temporary. this should probably be determined some other way (eg as a property of the animationSet itself)
@@ -26,33 +26,6 @@ class GameImage(pygame.sprite.Sprite):
         self.image = self.default_image
         self.image.convert()
         self.rect = self.image.get_bounding_rect()
-
-        #TODO: make this more general so it doesn't just grab from "data."
-    @staticmethod
-    def loadImageFile(name,colorkey = None):
-        fullname = os.path.join('data', name)
-        try:
-            image = pygame.image.load(fullname)
-        except pygame.error, message:
-            print 'Cannot load image:', name
-            raise SystemExit, message
-        image = image.convert()
-        if colorkey is not None:
-            if colorkey is -1:
-                colorkey = image.get_at((0,0))
-            image.set_colorkey(colorkey, RLEACCEL)
-        return image
-
-        #TODO: delete this method when possible.
-    #@staticmethod
-    #def load_animation(filename, rect, count, colorkey=None, loop=True, frames=10): #change to 50 if necessaryfor testing
-    #    animation_strip = GameImage.loadImageFile(filename)
-    #    return SpriteStripAnimator(animation_strip,rect, count, colorkey, loop, frames)
-
-    @staticmethod
-    def still_animation_set(still_image, rect = Rect(0,0,32,32), colorkey = DEF_COLORKEY):#colorkey = None):
-        still_animation = SpriteStripAnimator(still_image,rect, 1, colorkey, False, 1)
-        return AnimationSet(still_animation)
 
     def coordinates(self):
         return (self.rect.centerx/32,self.rect.centery/32)
@@ -133,6 +106,11 @@ class GameImage(pygame.sprite.Sprite):
         self.image = self.unseen_image
 
     @staticmethod
+    def still_animation_set(still_image, rect = Rect(0,0,32,32), colorkey = DEF_COLORKEY):#colorkey = None):
+        still_animation = SpriteStripAnimator(still_image,rect, 1, colorkey, False, 1)
+        return AnimationSet(still_animation)
+
+    @staticmethod
     def load_animation_set(tile_data, tile_size):
         image_pixel_width = tile_size*tile_data.width
         image_pixel_height = tile_size*tile_data.height
@@ -154,25 +132,23 @@ class GameImage(pygame.sprite.Sprite):
         for n in xrange(1, len(animation_keys)):
             anim_file_key = animation_keys[n][0]
             anim_key = animation_keys[n][1]
-            anim_direction = animation_keys[n][2] #need to fix
-            #print anim_direction
+            anim_direction = animation_keys[n][2] 
             animation_filename = key + "_" + anim_file_key + ".bmp"
             next_animation = GameImage.load_animation(animation_filepath, animation_filename, image_rect, -1)
-            #TODO: get the colorkey more generally.
+            #TODO: get the colorkey more generally (this may come up if we use animated blocks or square enemies).
             animation_set.insertAnimation(next_animation, anim_direction, anim_key)
 
         return animation_set
 
-        #TODO: eventually have this replace load_animation, once it works.
     @staticmethod
-    def load_animation(filepath, filename, rect, colorkey=None, loop=True, frames=10): #change frames to 50 if necessaryfor testing
-        animation_strip = GameImage.load_image_file2(filepath, filename)
+    def load_animation(filepath, filename, rect, colorkey = None, loop = True, frames = 10): #change frames to 50 if necessaryfor testing
+        animation_strip = GameImage.load_image_file(filepath, filename)
         count = animation_strip.get_width()/rect.width #assume that the animation strip is wide only, not long
         return SpriteStripAnimator(animation_strip,rect, count, colorkey, loop, frames)
 
         #TODO: gradually make this replace loadImageFile once it works.
     @staticmethod
-    def load_image_file2(path, name, colorkey = None):
+    def load_image_file(path, name, colorkey = None):
         fullname = os.path.join(path, name)
         try:
             image = pygame.image.load(fullname)
@@ -185,3 +161,19 @@ class GameImage(pygame.sprite.Sprite):
                 colorkey = image.get_at((0,0))
             image.set_colorkey(colorkey, RLEACCEL)
         return image
+
+    #TODO: delete this once we finish replacing it.
+    #@staticmethod
+    #def loadImageFile(name,colorkey = None):
+    #    fullname = os.path.join('data', name)
+    #    try:
+    #        image = pygame.image.load(fullname)
+    #    except pygame.error, message:
+    #        print 'Cannot load image:', name
+    #        raise SystemExit, message
+    #    image = image.convert()
+    #    if colorkey is not None:
+    #        if colorkey is -1:
+    #            colorkey = image.get_at((0,0))
+    #        image.set_colorkey(colorkey, RLEACCEL)
+    #    return image

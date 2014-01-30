@@ -10,7 +10,7 @@ class RoomFactory(object):
 		x1,y1 = RoomFactory.origin(room_data_set)
 		x2,y2 = RoomFactory.lower_right(room_data_set)
 		print "Setting up rooms..."
-		for y in range(y1, y2 + 1):	#NOTE: this for loop seems to obviate the need for global coords.
+		for y in range(y1, y2 + 1):	
 			rooms.append([])
 			for x in range(x1, x2 + 1):
 				next_data = room_data_set[y][x]
@@ -36,7 +36,7 @@ class RoomFactory(object):
 		return None
 
 	@staticmethod
-	def build_room(dungeon,room_data,global_x,global_y): #might be able to get global x and global y through roomdata's coords instead
+	def build_room(dungeon, room_data, global_x, global_y): #might be able to get global x and global y through roomdata's coords instead
 		if(room_data == None): return RoomFactory.empty_room(dungeon,global_x,global_y) 
 		tiles = []
 		entities = [] #TODO: figure out why the original platformer used Group
@@ -44,7 +44,8 @@ class RoomFactory(object):
 		start_coords = (False,0,0)
 		x = y = 0
 
-		tile_images = GameImage.loadImageFile('test_tiles_1.bmp') 
+		#TODO: will eventually store tile images somewhere besides "data"
+		tile_images = GameImage.load_image_file('./data/', 'test_tiles_1.bmp') 
 		tile_factory = TileFactory(tile_images, (2,1))
 		default_cave_tile = tile_factory.tile_at((0,0))
 		default_tile = default_cave_tile
@@ -99,7 +100,7 @@ class RoomFactory(object):
 		start_coords = (False,0,0)
 		x = y = 0
 
-		tile_images = GameImage.loadImageFile('test_tiles_1.bmp') 
+		tile_images = GameImage.load_image_file('./data/', 'test_tiles_1.bmp') 
 		tile_factory = TileFactory(tile_images, (2,1))
 		default_cave_tile = tile_factory.tile_at((0,0))
 		default_sky_tile = tile_factory.tile_at((1,0))
