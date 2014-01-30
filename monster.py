@@ -6,10 +6,13 @@ from being import *
 #it may have some commonalities with player. these should be moved up to Being where appropriate.
 #it may even make sense to make player inherit from monster. Not sure yet, though.
 
+
+
 class Monster(Being):
-    def __init__(self,animations,name,x,y): 
+    def __init__(self, animations, x, y):#name, x, y): 
         Being.__init__(self,animations)
-        self.name = name	#not yet sure how useful a monster name will be. It seems reasonable enough though.
+        # self.name = name	#not yet sure how useful a monster name will be. It seems reasonable enough though.
+        self.name = None
         self.animated = True
         self.rect.centerx += x
         self.rect.centery += y
@@ -30,10 +33,10 @@ class Monster(Being):
         #TODO: check if the monster can see the player. (using sightdist)
         #TODO: check if the monster is hostile the player.
 
-        #TODO: figure out a better way to assosciate the monster with its udpate action.
+        #TODO: figure out a better way to assosciate the monster with its udpate action (probably a dict.)
         if self.name == "bat": #TEMPORARY
             self.batUpdate(player)
-        elif self.name == "giant frog": #TEMPORARY
+        elif self.name == "giant_frog": #TEMPORARY
             self.frogUpdate(player)
         Being.updatePosition(self)
         #TODO: giant frog animations and AI

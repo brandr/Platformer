@@ -5,8 +5,6 @@ from tile import *
 import math
 from math import *
 
-#TODO: replace references to tiles/entities with levels
-
 class Entity(GameImage):
     def __init__(self,animations):#,default_rect = None,colorkey = None):
         GameImage.__init__(self,animations)#,default_rect,colorkey)

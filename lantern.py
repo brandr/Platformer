@@ -2,7 +2,7 @@ import entity
 from entity import *
 
 class Lantern(Entity):	#lantern which can help the player see
-    def __init__(self, animations,x, y, lightvalue):
+    def __init__(self, animations, x, y, lightvalue = 2):
         Entity.__init__(self,animations)#, Rect(0,0,32,32),-1)
         self.rect.centerx += x
         self.rect.centery += y

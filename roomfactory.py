@@ -1,12 +1,6 @@
 from tilefactory import *
-from platformfactory import *
+from entityfactory import *
 from level import *
-from lantern import *
-from exitblock import *
-from monster import *
-import sys
-sys.path.insert(0, './LevelEditor')
-from roomdata import *
 
 class RoomFactory(object):
 
@@ -49,15 +43,11 @@ class RoomFactory(object):
 
 		start_coords = (False,0,0)
 		x = y = 0
-		#global_x,global_y = room_data.global_x,room_data.global_y #probably redundant
 
 		tile_images = GameImage.loadImageFile('test_tiles_1.bmp') 
 		tile_factory = TileFactory(tile_images, (2,1))
 		default_cave_tile = tile_factory.tile_at((0,0))
 		default_tile = default_cave_tile
-
-		#default_lantern = Lantern.load_lantern_animation_set()	#TEMP
-		
 
 		end_x = ROOM_WIDTH
 		end_y = ROOM_HEIGHT
@@ -68,34 +58,30 @@ class RoomFactory(object):
 				next_tile_data = room_data.tile_at(col,row)
 				t = Tile(default_tile, x,y)
 				if next_tile_data != None and not isinstance(next_tile_data,BlockedTileData):
-				#TODO: think of a more extensible way to build these objects (probably through dictionaries or something)
-				#IDEA: make PLAYER_START its own case, but make everything else create an object fetched via a dictionary.
-				#TODO: remember also that this part will need some checks if the object created is larger than 32*32.
-					raw_entity_image = next_tile_data.get_image("./LevelEditor/")
-					entity_width, entity_height = next_tile_data.width, next_tile_data.height
-					entity_rect = Rect(0, 0, entity_width*DEFAULT_TILE_SIZE, entity_height*DEFAULT_TILE_SIZE)
-					still_entity_image = GameImage.still_animation_set(raw_entity_image,entity_rect)
-					entity_animation_set = GameImage.load_animation_set(next_tile_data, DEFAULT_TILE_SIZE)
-					
-					#TODO: could save a lot of time by checking whether the entity is animated first.
-					
-					if next_tile_data.entity_key == DEFAULT_PLATFORM:
-						p = Platform(still_entity_image, x, y)	#TODO: use still entity image here (I think)
-						entities.append(p)
-						t.block = p
 					if next_tile_data.entity_key == PLAYER_START:
 						start_coords = (True,x,y)
-					if next_tile_data.entity_key == BAT:
-						#default_bat = Monster.load_bat_animation_set() #TEMP
-						b = Monster(entity_animation_set,"bat",x,y)
-						entities.append(b)
-					if next_tile_data.entity_key == GIANT_FROG:
-						#default_frog = Monster.load_giant_frog_animation_set() #TEMP
-						f = Monster(entity_animation_set,"giant frog",x,y) #TODO: make it possible to animate giant frog, and extensibly load animations.
-						entities.append(f)
-					if next_tile_data.entity_key == DEFAULT_LANTERN:
-						l = Lantern(entity_animation_set, x, y, 2)
-						entities.append(l)
+					else:
+
+				#TODO: remember that this part may need some checks if the object created is larger than 32*32.
+					#  However, this is low priority since the level editor already handles this.
+					
+						key = next_tile_data.entity_key
+
+						raw_entity_image = next_tile_data.get_image("./LevelEditor/")
+						entity_width, entity_height = next_tile_data.width, next_tile_data.height
+						entity_rect = Rect(0, 0, entity_width*DEFAULT_TILE_SIZE, entity_height*DEFAULT_TILE_SIZE)
+						
+						if next_tile_data.is_animated():
+							entity_animation_set = GameImage.load_animation_set(next_tile_data, DEFAULT_TILE_SIZE)
+							e = EntityFactory.build_entity(entity_animation_set, key, x, y)
+							entities.append(e)
+		
+						else:
+							still_entity_image = GameImage.still_animation_set(raw_entity_image,entity_rect)
+							e = EntityFactory.build_entity(still_entity_image, key, x, y)
+							entities.append(e)
+							if isinstance(e, Platform): t.block = e	
+		
 				tiles[y/DEFAULT_TILE_SIZE].append(t)
 				x += DEFAULT_TILE_SIZE 
 			y += DEFAULT_TILE_SIZE

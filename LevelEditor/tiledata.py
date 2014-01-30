@@ -4,7 +4,6 @@ from ocempgui.draw import Image
 
 DEFAULT_TILE_SIZE = 32
 
-
 #entity keys 
 
 PLAYER_START = "player_start" 
@@ -108,6 +107,10 @@ class TileData(object):
 
 	def category(self):
 		return ENTITY_CATEGORY_MAP[self.entity_key]
+
+	def is_animated(self):
+		return (self.entity_key in ANIMATION_KEY_MAP or 
+				self.category() in CATEGORY_ANIMATION_KEY_MAP)
 
 	def animation_filepath(self,filepath_start = "./"): #TODO
 		filepath = filepath_start + "animations"
