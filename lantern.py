@@ -9,14 +9,14 @@ class Lantern(Entity):	#lantern which can help the player see
         self.lightvalue = lightvalue
         self.animated = True
 
-    @staticmethod
-    def load_lantern_animation_set():
-        lantern_rect = Rect(0,0,32,32)
+    #@staticmethod
+    #def load_lantern_animation_set():
+    #    lantern_rect = Rect(0,0,32,32)
 
-        lantern_images = GameImage.load_animation('test_lantern_1.bmp',lantern_rect,2, -1)
-        #could probably store this data even more generally, and make a "load animation set" method that takes args like these.
-        animation_set = AnimationSet(lantern_images)
-        return animation_set
+#        lantern_images = GameImage.load_animation('test_lantern_1.bmp',lantern_rect,2, -1)
+ #       #could probably store this data even more generally, and make a "load animation set" method that takes args like these.
+  #      animation_set = AnimationSet(lantern_images)
+   #     return animation_set
 
     def update(self, player):
         self.updateAnimation() 

@@ -3,12 +3,10 @@ from dungeoneditorscreen import *
 
 	#IMMEDIATE STUFF
 
-#TODO: reintroduce lanterns
-
-#TODO: figure out how to store animations/still images in one place
-	 # use lantern as example, then do the same with giant bat and giant frog
-	 #Alternately, store animations separately from still images, but still organize
-	 	#them by filepaths and keys based on direction/id.
+#TODO: change roomfactory's method of creating entities, starting with how their animations are set.
+	#  also change gameimage so that load_animation2 and load_image_file2 are used instead of their non-numbered counterparts.
+		# use prints to track down where the original methods are used.
+		# once finished, remove 2 from the method names.
 
 #TODO: Since adding differently rotated platforms is currently annoying, consider ways of rotating selected entities, 
 	#  or choosing from a 9x9 grid of possible orientations
@@ -34,9 +32,6 @@ from dungeoneditorscreen import *
 					#Might end up with an EntityData class. Each tileData would have an entitydata to represent
 						#its starting entity (*not* the data member called "block", unless the entity is a platform), set to None by default.
 		#NOTE: this is low priority since it will have little effect on game mechanics (the player does not interact with the tiles themselves)
-
-#TODO: find a way to correctly associate animation sets with tiledata, either through filepath
-	#  or by storing sprite sheets (or some other way).
 
 #TODO: figure out how image transparency will work for leveleditor images.
 	# remember that the GameImage method which loads these images has to deal with transparency

@@ -71,6 +71,7 @@ class Entity(GameImage):
     def light_distance(self):
         return 0
 
+    #might not end up using this method
     def castShadow(self):
         tiles = self.current_level.getTiles()
         start_tile = self.currenttile()
@@ -81,3 +82,4 @@ class Entity(GameImage):
                 down_shadow_tile.castShadow(tiles,132)
             if not (right_shadow_tile == None or right_shadow_tile.block != None):
                 right_shadow_tile.castShadow(tiles,168)
+

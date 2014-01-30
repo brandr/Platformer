@@ -20,19 +20,22 @@ class Player(Being):
     @staticmethod
     def load_player_animation_set():
         player_rect = Rect(0,0,32,64)
-        #could probably store this data even more generally, and make a "load animation set" method that takes args like these.
-        #could also set up some structor that allows left and right animations to be loaded from the same sheet
-        player_idle_left = GameImage.load_animation('player_idle_left.bmp', player_rect, 2, -1)
-        player_idle_right = GameImage.load_animation('player_idle_right.bmp', player_rect, 2, -1)
+        filepath = './LevelEditor/animations/player/'
+        
+        # could probably use the same system used for loading monster animations, and simply store
+            # player animation keys in tiledata with the other keys.
+        
+        player_idle_left = GameImage.load_animation(filepath, 'player_idle_left.bmp', player_rect, -1)
+        player_idle_right = GameImage.load_animation(filepath, 'player_idle_right.bmp', player_rect, -1)
 
-        player_walking_left = GameImage.load_animation('player_walking_left.bmp', player_rect, 6, -1)
-        player_walking_right = GameImage.load_animation('player_walking_right.bmp', player_rect, 6, -1)
+        player_walking_left = GameImage.load_animation(filepath, 'player_walking_left.bmp', player_rect, -1)
+        player_walking_right = GameImage.load_animation(filepath, 'player_walking_right.bmp', player_rect, -1)
 
-        player_running_left = GameImage.load_animation('player_running_left.bmp', player_rect, 6, -1,True, 5)
-        player_running_right = GameImage.load_animation('player_running_right.bmp', player_rect, 6, -1,True, 5)
+        player_running_left = GameImage.load_animation(filepath, 'player_running_left.bmp', player_rect, -1,True, 5)
+        player_running_right = GameImage.load_animation(filepath, 'player_running_right.bmp', player_rect, -1,True, 5)
 
-        player_jumping_left = GameImage.load_animation('player_jumping_left.bmp', player_rect, 6, -1, True, 12)
-        player_jumping_right = GameImage.load_animation('player_jumping_right.bmp', player_rect, 6, -1, True, 12) #TODO: change to "right" once I make the sprite.
+        player_jumping_left = GameImage.load_animation(filepath, 'player_jumping_left.bmp', player_rect, -1, True, 12)
+        player_jumping_right = GameImage.load_animation(filepath, 'player_jumping_right.bmp', player_rect, -1, True, 12)
 
         animation_set = AnimationSet(player_idle_right)
         animation_set.insertAnimation(player_idle_left,'left','idle')
@@ -104,7 +107,6 @@ class Player(Being):
         level = self.current_level
         tiles = level.getTiles()
         entities = level.getEntities()
-        #monsters = level.getMonsters()
         lanterns = level.getLanterns()
         
         GameImage.updateAnimation(self,256) 

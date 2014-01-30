@@ -9,7 +9,7 @@ BMP_FILETYPE = 33204 #not sure if this will work cross-platform. (Then again, a 
 
 #TODO: instead of showing current entity image in the pane, blit current entity image over a white square the size of max-sized image.
 
-class EntitySelectContainer(Box): #window might not be the right name anymore.
+class EntitySelectContainer(Box):
 	"""docstring for EntitySelectContainer"""
 	def __init__(self, width, height):
 		Box.__init__(self,width,height)
@@ -39,7 +39,6 @@ class EntitySelectContainer(Box): #window might not be the right name anymore.
 			return extension == ".bmp"
 
 		file_list_item = file_list.get_selected()[0]
-	#print file_list_item.filetype
 		if(not is_bmp(file_list_item._text)): 
 			self.select_entity()
 			return

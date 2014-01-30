@@ -27,6 +27,7 @@ class GameImage(pygame.sprite.Sprite):
         self.image.convert()
         self.rect = self.image.get_bounding_rect()
 
+        #TODO: make this more general so it doesn't just grab from "data."
     @staticmethod
     def loadImageFile(name,colorkey = None):
         fullname = os.path.join('data', name)
@@ -42,10 +43,11 @@ class GameImage(pygame.sprite.Sprite):
             image.set_colorkey(colorkey, RLEACCEL)
         return image
 
-    @staticmethod
-    def load_animation(filename, rect, count, colorkey=None, loop=True, frames=10): #change to 50 if necessaryfor testing
-        animation_strip = GameImage.loadImageFile(filename)
-        return SpriteStripAnimator(animation_strip,rect, count, colorkey, loop, frames)
+        #TODO: delete this method when possible.
+    #@staticmethod
+    #def load_animation(filename, rect, count, colorkey=None, loop=True, frames=10): #change to 50 if necessaryfor testing
+    #    animation_strip = GameImage.loadImageFile(filename)
+    #    return SpriteStripAnimator(animation_strip,rect, count, colorkey, loop, frames)
 
     @staticmethod
     def still_animation_set(still_image, rect = Rect(0,0,32,32), colorkey = DEF_COLORKEY):#colorkey = None):
@@ -128,5 +130,58 @@ class GameImage(pygame.sprite.Sprite):
         return brightness
 
     def fully_darken(self):
-        self.image = self.unseen_image#Surface((32, 32))
-        #self.image.fill(self.unseen_color)
+        self.image = self.unseen_image
+
+    @staticmethod
+    def load_animation_set(tile_data, tile_size):
+        image_pixel_width = tile_size*tile_data.width
+        image_pixel_height = tile_size*tile_data.height
+        image_rect = Rect(0, 0, image_pixel_width, image_pixel_height)
+
+        key = tile_data.entity_key
+
+        animation_keys = tile_data.animation_keys()
+        if animation_keys == None: return None
+
+        animation_filepath = tile_data.animation_filepath('./LevelEditor/')
+
+        default_key = animation_keys[0][0]
+        
+        default_animation_filename = key + "_" + default_key + ".bmp"
+        default_animation = GameImage.load_animation(animation_filepath, default_animation_filename, image_rect, -1)
+        animation_set = AnimationSet(default_animation)
+        
+        for n in xrange(1, len(animation_keys)):
+            anim_file_key = animation_keys[n][0]
+            anim_key = animation_keys[n][1]
+            anim_direction = animation_keys[n][2] #need to fix
+            #print anim_direction
+            animation_filename = key + "_" + anim_file_key + ".bmp"
+            next_animation = GameImage.load_animation(animation_filepath, animation_filename, image_rect, -1)
+            #TODO: get the colorkey more generally.
+            animation_set.insertAnimation(next_animation, anim_direction, anim_key)
+
+        return animation_set
+
+        #TODO: eventually have this replace load_animation, once it works.
+    @staticmethod
+    def load_animation(filepath, filename, rect, colorkey=None, loop=True, frames=10): #change frames to 50 if necessaryfor testing
+        animation_strip = GameImage.load_image_file2(filepath, filename)
+        count = animation_strip.get_width()/rect.width #assume that the animation strip is wide only, not long
+        return SpriteStripAnimator(animation_strip,rect, count, colorkey, loop, frames)
+
+        #TODO: gradually make this replace loadImageFile once it works.
+    @staticmethod
+    def load_image_file2(path, name, colorkey = None):
+        fullname = os.path.join(path, name)
+        try:
+            image = pygame.image.load(fullname)
+        except pygame.error, message:
+            print 'Cannot load image:', name
+            raise SystemExit, message
+        image = image.convert()
+        if colorkey is not None:
+            if colorkey is -1:
+                colorkey = image.get_at((0,0))
+            image.set_colorkey(colorkey, RLEACCEL)
+        return image

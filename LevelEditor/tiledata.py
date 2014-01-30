@@ -4,13 +4,89 @@ from ocempgui.draw import Image
 
 DEFAULT_TILE_SIZE = 32
 
-#TODO: use these for mapping entity keys to the data used to build entities
+
+#entity keys 
+
 PLAYER_START = "player_start" 
 
+#platforms
+PLATFORMS = "platforms"
 DEFAULT_PLATFORM = "default_platform"
 
+#lanterns
+LANTERNS = "lanterns"
+DEFAULT_LANTERN = "default_lantern"
+
+#monsters
+MONSTERS = "monsters"
 BAT = "bat"
 GIANT_FROG = "giant_frog"
+
+#category map
+ENTITY_CATEGORY_MAP = {
+	PLAYER_START:None,
+	DEFAULT_PLATFORM:PLATFORMS, 
+	DEFAULT_LANTERN:LANTERNS, 
+	BAT:MONSTERS, GIANT_FROG:MONSTERS
+}
+
+#animation key maps
+
+#directions
+
+D_LEFT = "left"
+D_RIGHT = "right"
+D_DEFAULT = "default"
+
+#animation keys
+
+DEFAULT = "default"
+IDLE = "idle"
+IDLE_LEFT = "idle_left"
+IDLE_RIGHT = "idle_right"
+
+#TODO: as we add more monsters, look for patterns in their animation sets and 
+	# generalize these data structures accordingly.
+
+# All animation keys are stored in the form (filename suffix, animation type, direction).
+	# example: IDLE_RIGHT, IDLE, D_RIGHT means:
+		#1. the filename is [entity name] + IDLE_RIGHT + ".bmp"
+		#2. this animation is used when the entity is: 
+			# a) idle, and
+			# b) when it is facing right.
+	# Repetiton is allowed. 
+		#for instance, a symmetrical monster may have (IDLE, IDLE, D_LEFT)
+			# and also (IDLE, IDLE, D_RIGHT).
+
+
+DEFAULT_LANTERN_ANIMATION_KEYS = [
+	(DEFAULT, DEFAULT, D_DEFAULT),
+]
+
+DEFAULT_MONSTER_ANIMATION_KEYS = [
+	(IDLE_LEFT, IDLE, D_DEFAULT),
+	(IDLE_LEFT,  IDLE, D_LEFT), 
+	(IDLE_RIGHT, IDLE, D_RIGHT)
+]
+
+# Note that not every monster needs an animation key set.
+	# We can use default(s) for monsters whose animation key sets
+	# are not shown here, based on their type if necessary.
+
+BAT_ANIMATION_KEYS = [
+	(IDLE, IDLE, D_DEFAULT),
+	(IDLE, IDLE, D_LEFT),
+	(IDLE, IDLE, D_RIGHT) 
+	]
+
+ANIMATION_KEY_MAP = {
+	DEFAULT_LANTERN:DEFAULT_LANTERN_ANIMATION_KEYS,
+	BAT:BAT_ANIMATION_KEYS
+}
+
+CATEGORY_ANIMATION_KEY_MAP = {
+	MONSTERS:DEFAULT_MONSTER_ANIMATION_KEYS, 
+}
 
 class TileData(object):
 
@@ -30,10 +106,24 @@ class TileData(object):
 		filepath = filepath_start+self.image_filepath
 		return Image.load_image (filepath)
 
-	#def get_animation_set(self,filepath_start = "./"): #TODO
-	#	key = self.entity_key
-	#	if key not in ANIMATION_MAP: return None
-	#	return ANIMATION_MAP[key]
+	def category(self):
+		return ENTITY_CATEGORY_MAP[self.entity_key]
+
+	def animation_filepath(self,filepath_start = "./"): #TODO
+		filepath = filepath_start + "animations"
+		key = self.entity_key
+		if key not in ENTITY_CATEGORY_MAP or key == None: 
+			return None
+		filepath += "/" + self.category() + "/" + key + "/"
+		return filepath
+
+	def animation_keys(self):
+		key = self.entity_key
+		if key in ANIMATION_KEY_MAP:
+			return ANIMATION_KEY_MAP[key]
+		if self.category() in CATEGORY_ANIMATION_KEY_MAP:
+			return CATEGORY_ANIMATION_KEY_MAP[self.category()]
+		return None
 
 	def formatted_data(self):
 		return (self.entity_key,self.image_filepath, self.width, self.height) 
