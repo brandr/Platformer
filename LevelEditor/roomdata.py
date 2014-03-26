@@ -58,9 +58,9 @@ class RoomData(object):
 	@staticmethod
 	def deformatted_room(formatted_data,filepath = "./"):	
 		x,y = formatted_data[0],formatted_data[1]
-		tile_set = TileData.deformatted_tile_set(formatted_data[2],filepath) #have to deformat tiles before returning the room_data.
-		width,height = len(tile_set[0]),len(tile_set) #might need a None exeception handler
-		room_data = RoomData(width,height,x,y)
+		tile_set = TileData.deformatted_tile_set(formatted_data[2], filepath) #have to deformat tiles before returning the room_data.
+		width,height = len(tile_set[0]), len(tile_set) #might need a None exeception handler
+		room_data = RoomData(width, height, x, y)
 		room_data.setAllTiles(tile_set)
 		return room_data
 

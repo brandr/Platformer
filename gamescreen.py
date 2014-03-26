@@ -1,3 +1,5 @@
+"""This is the screen used to play the game."""
+
 import pygame
 from pygame import *
 import numpy
@@ -12,28 +14,47 @@ DEPTH = 32
 FLAGS = 0
 
 class GameScreen:
+    """GameScreen () -> GameScreen
+
+    This is the screen used to play the game.
+    Later, it might be more useful to load the dungeon editor and the game from
+    the same screen.
+
+    Attributes: None
+    """
     def __init__(self):
         pass
 
-    def runGame(self,screen,levels):
+    def runGame(self, screen, dungeon):
+        """GS.runGame (...) -> None
 
+        Run the game using a pygame screen and a dungeon built by a DungeonFactory.
+
+        Currently keeps track of the player's controls and processes key presses in
+        order to move the player around the screen. This method is also responsible
+        for creating the player.
+
+        """
         pygame.display.set_caption("title goes here")
         timer = pygame.time.Clock()
 
-        bg = Surface((32,32))
+        bg = Surface((32, 32))
         bg.convert()
         bg.fill(BACKGROUND_COLOR)
 
-        #probably should replace this with an animationset
         player_animations = Player.load_player_animation_set()
         
-        start_level = levels.start_level()
-        player = Player(player_animations,start_level)
+        start_level = dungeon.start_level()
+        player = Player(player_animations, start_level)
         start_level.addPlayer(player)
+
+        # can probably make controls more extensible and put them in their own class.
+        # could also make a dict instead of a series of if statements
 
         up = down = left = right = running = False
         while 1:
             timer.tick(100)
+
             for e in pygame.event.get():
                 if e.type == QUIT: raise SystemExit, "QUIT"
                 if e.type == KEYDOWN and e.key == K_ESCAPE:
@@ -60,11 +81,9 @@ class GameScreen:
                     right = False
                 if e.type == KEYUP and e.key == K_LCTRL:
                     running = False
-                if e.type == USEREVENT + 1: #NOTE: this is not very extensible. it is a quick fix only
-                   player.mobilize()
+
         # draw background
             for y in range(32):
                 for x in range(32):
                     screen.blit(bg, (x * 32, y * 32))
-            #print player.current_level.level_ID
-            player.current_level.update(screen,up, down, left, right, running)
+            player.current_level.update(screen, up, down, left, right, running)

@@ -7,8 +7,8 @@ class RoomFactory(object):
 	@staticmethod
 	def dungeon_rooms(dungeon,room_data_set):
 		rooms = []
-		x1,y1 = RoomFactory.origin(room_data_set)
-		x2,y2 = RoomFactory.lower_right(room_data_set)
+		x1, y1 = RoomFactory.origin(room_data_set)
+		x2, y2 = RoomFactory.lower_right(room_data_set)
 		print "Setting up rooms..."
 		for y in range(y1, y2 + 1):	
 			rooms.append([])
@@ -24,7 +24,7 @@ class RoomFactory(object):
 		for y in xrange(len(room_data_set)):
 			for x in xrange(len(room_data_set[y])):
 				next_data = room_data_set[y][x]
-				if(room_data_set[y][x] != None):return x,y
+				if(room_data_set[y][x] != None):return x, y
 		return None
 
 	@staticmethod
@@ -32,7 +32,7 @@ class RoomFactory(object):
 		for y in range(len(room_data_set) - 1, -1, -1):
 			for x in range(len(room_data_set[y]) - 1, -1, -1):
 				next_data = room_data_set[y][x]
-				if(room_data_set[y][x] != None):return x,y
+				if(room_data_set[y][x] != None):return x, y
 		return None
 
 	@staticmethod
@@ -57,8 +57,8 @@ class RoomFactory(object):
 			tiles.append([])
 			for col in xrange(end_x):
 				next_tile_data = room_data.tile_at(col,row)
-				t = Tile(default_tile, x,y)
-				if next_tile_data != None and not isinstance(next_tile_data,BlockedTileData):
+				t = Tile(default_tile, x, y)
+				if next_tile_data != None and not isinstance(next_tile_data, BlockedTileData):
 					if next_tile_data.entity_key == PLAYER_START:
 						start_coords = (True,x,y)
 					else:
@@ -87,9 +87,9 @@ class RoomFactory(object):
 				x += DEFAULT_TILE_SIZE 
 			y += DEFAULT_TILE_SIZE
 			x = 0
-
-		room_objects = LevelObjects(None,tiles,entities)
-		created_room = Room(room_objects,dungeon,(global_x,global_y),start_coords)
+			
+		room_objects = LevelObjects(None, tiles, entities)
+		created_room = Room(room_objects, dungeon, (global_x, global_y), start_coords)
 		return created_room
 
 	@staticmethod
@@ -97,13 +97,13 @@ class RoomFactory(object):
 		tiles = []
 		entities = []
 
-		start_coords = (False,0,0)
+		start_coords = (False, 0, 0)
 		x = y = 0
 
 		tile_images = GameImage.load_image_file('./data/', 'test_tiles_1.bmp') 
-		tile_factory = TileFactory(tile_images, (2,1))
-		default_cave_tile = tile_factory.tile_at((0,0))
-		default_sky_tile = tile_factory.tile_at((1,0))
+		tile_factory = TileFactory(tile_images, (2, 1))
+		default_cave_tile = tile_factory.tile_at((0, 0))
+		default_sky_tile = tile_factory.tile_at((1, 0))
 		default_tile = default_cave_tile
 
 		end_x = ROOM_WIDTH
@@ -112,12 +112,12 @@ class RoomFactory(object):
 		for row in xrange(end_y):
 			tiles.append([])
 			for col in xrange(end_x):
-				t = Tile(default_tile, x,y)
+				t = Tile(default_tile, x, y)
 				tiles[y/DEFAULT_TILE_SIZE].append(t)
 				x += DEFAULT_TILE_SIZE 
 			y += DEFAULT_TILE_SIZE
 			x = 0
 
-		room_objects = LevelObjects(None,tiles,entities)
-		created_room = Room(room_objects,dungeon,(global_x,global_y),start_coords)
+		room_objects = LevelObjects(None, tiles, entities)
+		created_room = Room(room_objects, dungeon,(global_x, global_y), start_coords)
 		return created_room

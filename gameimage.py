@@ -6,10 +6,8 @@ from animationset import *
 BACKGROUND_COLOR = Color("#000000")
 DEF_COLORKEY = Color("#FF00FF")
 
-#consider an animation_data arg which determines # of animations and # of frames/duration in each.
-#alternately, consider taking animationSet as an arg.
 class GameImage(pygame.sprite.Sprite):
-    def __init__(self,animations):#,default_rect,colorkey = None):#,start_coords):
+    def __init__(self, animations):
         pygame.sprite.Sprite.__init__(self)
 
         self.unseen_image = Surface((32,32))
@@ -28,23 +26,23 @@ class GameImage(pygame.sprite.Sprite):
         self.rect = self.image.get_bounding_rect()
 
     def coordinates(self):
-        return (self.rect.centerx/32,self.rect.centery/32)
+        return (self.rect.left/32, self.rect.top/32)
 
     def rect_coords(self):
-        return (self.rect.left,self.rect.top)
+        return (self.rect.left, self.rect.top)
 
     def moveTo(self, coords):
-        self.moveRect(coords[0]*32,coords[1]*32,True)
+        self.moveRect(coords[0]*32, coords[1]*32, True)
 
-    def moveRect(self,x_offset,y_offset,absolute = False):
+    def moveRect(self, x_offset, y_offset, absolute = False):
         if(absolute):
-            self.rect.centerx = x_offset
-            self.rect.centery = y_offset
+            self.rect.left = x_offset
+            self.rect.top = y_offset
             return
-        self.rect.centerx += x_offset
-        self.rect.centery += y_offset
+        self.rect.left += x_offset
+        self.rect.top += y_offset
 
-    def changeAnimation(self, ID,direction):
+    def changeAnimation(self, ID, direction):
         if(self.animation_id[0] == (ID)):
             if(direction == None or self.animation_id[1] == direction):
                return
@@ -58,7 +56,6 @@ class GameImage(pygame.sprite.Sprite):
         self.direction_set = self.animation_set.set_in_direction(direction) 
 
     def updateimage(self, lightvalue = 0):
-        
         if(lightvalue != 0): 
             if(self.default_image != None):
                 self.image = self.default_image
@@ -106,7 +103,7 @@ class GameImage(pygame.sprite.Sprite):
         self.image = self.unseen_image
 
     @staticmethod
-    def still_animation_set(still_image, rect = Rect(0,0,32,32), colorkey = DEF_COLORKEY):#colorkey = None):
+    def still_animation_set(still_image, rect = Rect(0, 0, 32, 32), colorkey = DEF_COLORKEY):#colorkey = None):
         still_animation = SpriteStripAnimator(still_image,rect, 1, colorkey, False, 1)
         return AnimationSet(still_animation)
 
@@ -146,7 +143,6 @@ class GameImage(pygame.sprite.Sprite):
         count = animation_strip.get_width()/rect.width #assume that the animation strip is wide only, not long
         return SpriteStripAnimator(animation_strip,rect, count, colorkey, loop, frames)
 
-        #TODO: gradually make this replace loadImageFile once it works.
     @staticmethod
     def load_image_file(path, name, colorkey = None):
         fullname = os.path.join(path, name)
@@ -158,22 +154,6 @@ class GameImage(pygame.sprite.Sprite):
         image = image.convert()
         if colorkey is not None:
             if colorkey is -1:
-                colorkey = image.get_at((0,0))
+                colorkey = image.get_at((0, 0))
             image.set_colorkey(colorkey, RLEACCEL)
         return image
-
-    #TODO: delete this once we finish replacing it.
-    #@staticmethod
-    #def loadImageFile(name,colorkey = None):
-    #    fullname = os.path.join('data', name)
-    #    try:
-    #        image = pygame.image.load(fullname)
-    #    except pygame.error, message:
-    #        print 'Cannot load image:', name
-    #        raise SystemExit, message
-    #    image = image.convert()
-    #    if colorkey is not None:
-    #        if colorkey is -1:
-    #            colorkey = image.get_at((0,0))
-    #        image.set_colorkey(colorkey, RLEACCEL)
-    #    return image

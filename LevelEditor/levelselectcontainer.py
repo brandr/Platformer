@@ -115,18 +115,18 @@ class LevelSelectContainer(Box):
 			cell = self.level_data_table.grid[(y,0)]
 			if(cell != None): self.level_data_table.remove_child(cell)
 
-	def addLevel(self,level_data = None):
+	def addLevel(self, level_data = None):
 		if level_data == None:
 			level_name = "level "+str(self.level_count)
 			added_level_cell = LevelSelectCell(level_name)
 			self.level_data_table.add_child(self.level_count,0,added_level_cell)
 			self.level_count += 1
 			return
-		added_level_cell = LevelSelectCell(level_data.name)#,level_data.corners) #this constructor might be a good place to connect to the dungeongrid
-		self.level_data_table.add_child(self.level_count,0,added_level_cell)
+		added_level_cell = LevelSelectCell(level_data.name, level_data.sunlit)	#it might later be better just to take the whole leveldata as an arg
+		self.level_data_table.add_child(self.level_count, 0, added_level_cell)
 		self.level_count += 1
 
-	def setLevels(self,level_data_set): #used when building the dungeon from a save file.
+	def setLevels(self, level_data_set): #used when building the dungeon from a save file.
 		self.clearLevelTable()
 		dungeon_grid = self.dungeon_grid_container.dungeon_grid
 		for L in xrange(len(level_data_set)):

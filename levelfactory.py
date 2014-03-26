@@ -29,7 +29,7 @@ class LevelFactory(object):
 		#If I end up using the system where levelIDs are stored in arrays corresponding to rooms,
 			#should probably have this done for dungeon in this method.
 	def build_level(self,dungeon,level_data,origin,rooms): #could also get orgin from level data
-		return Level(dungeon,level_data,origin,rooms)
+		return Level(dungeon, level_data,origin, rooms)
 
 		#might not end up using this
 	def outdoors(self,depth,level_top):

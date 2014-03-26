@@ -3,20 +3,22 @@ from dungeoneditorscreen import *
 
 	#IMMEDIATE STUFF
 
-	#  also change gameimage so that load_animation2 and load_image_file2 are used instead of their non-numbered counterparts.
-		# use prints to track down where the original methods are used.
-		# once finished, remove 2 from the method names.
+# Nothing immediate right now.
+
+	#LEVEL EDITOR GRID STUFF
 
 #TODO: Since adding differently rotated platforms is currently annoying, consider ways of rotating selected entities, 
 	#  or choosing from a 9x9 grid of possible orientations
 	#  this may mean it will be easier to store a tiledata's associated image (or even animation), rather than the filepath.
 
-	#LEVEL EDITOR GRID STUFF
-
 #IDEA: in the level editor, consider axis labels for the level grid to number rooms/tiles by their coords.
 
 #TODO: make it possible to "paint" entities in the level editor by holding and dragging the mouse.
 	#this has proven difficult to do, so consider other shortcuts for drawing many tiles. (like drawing lines)
+
+#TODO: figure out how image transparency will work for leveleditor images.
+	# remember that the GameImage method which loads these images has to deal with transparency
+		#I forget how it does it, though.
 
 #consider making it possible  to add background tiles of varying sizes (possibly on multiple layers) in the leveleditor.
 	#could make this a separate screen and allow the user to toggle back and forth between tiles/entities.
@@ -32,10 +34,6 @@ from dungeoneditorscreen import *
 						#its starting entity (*not* the data member called "block", unless the entity is a platform), set to None by default.
 		#NOTE: this is low priority since it will have little effect on game mechanics (the player does not interact with the tiles themselves)
 
-#TODO: figure out how image transparency will work for leveleditor images.
-	# remember that the GameImage method which loads these images has to deal with transparency
-		#I forget how it does it, though.
-
 	#DUNGEON GRID CONTAINER STUFF
 
 #IDEA: visually indicate which level the player will start in. (may also affect level select container)
@@ -47,7 +45,7 @@ from dungeoneditorscreen import *
 
 	#LEVEL SELECT CONTAINER STUFF
 
-#TODO: delete level buttons
+#TODO: delete level button
 	#Nick pls
 
 #IDEA: make it clear somehow which levels are empty (no rooms) in the LevelSelectContainer (not the dungeon grid).

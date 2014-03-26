@@ -25,15 +25,15 @@ class LevelGroup(object):
 		return None
 
 		#TODO: error case where next_level is None.
-	def movePlayer(self,player,next_level,global_coords,local_coords):
+	def movePlayer(self, player, next_level, global_coords, local_coords):
 		room_coords = (local_coords[0]%ROOM_WIDTH,local_coords[1]%ROOM_HEIGHT)
-		next_coords = next_level.flipped_coords(global_coords,room_coords) #TODO: will have to change this
-		next_level.addPlayer(player,next_coords)
+		next_coords = next_level.flipped_coords(global_coords, room_coords) #TODO: will have to change this
+		next_level.addPlayer(player, next_coords)
 		
 	def level_at(self,x,y):
 		for L in self.dungeon_levels:
 			global_coords = L.origin
 			level_end = L.level_end_coords()
-			if(global_coords[0]<=x<=level_end[0] and global_coords[1]<=y<=level_end[1]):
+			if(global_coords[0] <= x <= level_end[0] and global_coords[1] <= y <= level_end[1]):
 				return L
 		return None

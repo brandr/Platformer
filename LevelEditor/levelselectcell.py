@@ -8,14 +8,14 @@ CELL_WIDTH = 242
 CELL_HEIGHT = 36 
 #not yet sure if the cell should store level data, or simply be used to create it. (I would prefer the latter.)
 class LevelSelectCell(Table):
-	def __init__(self,name):#TODO: consider ways of setting level data (not room data, though)
+	def __init__(self, name, sunlit = False):	#might want to build the cell from a levelData object
 		Table.__init__(self,1,1) 
 		self.set_minimum_size(CELL_WIDTH,CELL_HEIGHT)
 		self.name = name#TODO:consider retrieving from self.level_data instead
 		self.name_label = Label(self.name)
 		self.add_child(0,0,self.name_label)
 		self.room_cells = None
-		self.sunlit = False #TEMP
+		self.sunlit = sunlit
 		
 	def get_name(self): #TODO: consider making this getter access level data instead.
 		return self.name
@@ -80,10 +80,10 @@ class LevelSelectCell(Table):
 		relative_row = row%ROOM_HEIGHT
 		return self.room_cells[adjusted_room_row][adjusted_room_col].tile_at(relative_col,relative_row)
 
-	def updateSunlit(self,sunlit):
+	def updateSunlit(self, sunlit):
 		self.sunlit = sunlit
 	
-	def rename_level(self,level_name):
+	def rename_level(self, level_name):
 		self.name = level_name
 		self.name_label.set_text(level_name)
 

@@ -2,8 +2,8 @@ import entity
 from entity import *
 
 class Platform(Entity):
-    def __init__(self, animations,x, y):
-        Entity.__init__(self,animations)#,Rect(0, 0, 32, 32))
+    def __init__(self, animations, x, y):
+        Entity.__init__(self,animations)
         self.unseen_color = Color("#FFFFFF") #TODO: need "unseen image" instead
         self.rect = Rect(x, y, 32, 32)
 

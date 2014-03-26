@@ -8,18 +8,19 @@ import platform
 from platform import *
 
 class Player(Being):
-    def __init__(self,player_animations,start_level):
-        Being.__init__(self,player_animations)
+    def __init__(self, player_animations, start_level):
+        Being.__init__(self, player_animations)
         self.changeAnimation('idle','right')
         self.direction_id = 'right'
         self.animated = True
         self.default_image = self.animation.images[0]
         self.current_level = start_level
         self.sightdist = 2
+        self.can_jump = True
         
     @staticmethod
     def load_player_animation_set():
-        player_rect = Rect(0,0,32,64)
+        player_rect = Rect(0, 0, 32, 64)
         filepath = './LevelEditor/animations/player/'
         
         # could probably use the same system used for loading monster animations, and simply store
@@ -38,25 +39,31 @@ class Player(Being):
         player_jumping_right = GameImage.load_animation(filepath, 'player_jumping_right.bmp', player_rect, -1, True, 12)
 
         animation_set = AnimationSet(player_idle_right)
-        animation_set.insertAnimation(player_idle_left,'left','idle')
-        animation_set.insertAnimation(player_idle_right,'right','idle')
+        animation_set.insertAnimation(player_idle_left,'left', 'idle')
+        animation_set.insertAnimation(player_idle_right,'right', 'idle')
 
-        animation_set.insertAnimation(player_walking_left,'left','walking')
+        animation_set.insertAnimation(player_walking_left,'left', 'walking')
         animation_set.insertAnimation(player_walking_right,'right','walking') 
 
-        animation_set.insertAnimation(player_running_left,'left','running')
-        animation_set.insertAnimation(player_running_right,'right','running')
+        animation_set.insertAnimation(player_running_left,'left', 'running')
+        animation_set.insertAnimation(player_running_right,'right', 'running')
 
-        animation_set.insertAnimation(player_jumping_left,'left','jumping')
-        animation_set.insertAnimation(player_jumping_right,'right','jumping')
+        animation_set.insertAnimation(player_jumping_left,'left', 'jumping')
+        animation_set.insertAnimation(player_jumping_right,'right', 'jumping')
 
         #TODO: jumping, falling, and (maybe) terminal velocity
 
         return animation_set
 
     def update(self, up, down, left, right, running):
-        #TODO: move some or all of this stuff to "being", and break it up to be more extensible.
+        #TODO: move some of this stuff to "being", and break it up to be more extensible.
             #could also make a Movement class, held as a data type by player or being.
+
+        #TEST
+        #if(not self.onGround and not up):
+        #    print self. yvel
+        #TEST
+
         if(self.exitLevelCheck()): return
         if(self.bounce_count > 0):
             self.bounce()
@@ -72,29 +79,34 @@ class Player(Being):
             self.direction_id = 'right'
         if up:            # only jump if on the ground
             if self.onGround:  
-                self.yvel -= 9
-                self.changeAnimation('jumping',self.direction_id)
+                self.yvel -= 4.5
+                self.changeAnimation('jumping', self.direction_id)
                 self.animation.iter()
                 self.onGround = False
+                self.can_jump = True
+            elif self.can_jump: #and self.yvel > -12:
+                self.yvel -= 0.25
         if not self.onGround:    # only accelerate with gravity if in the air
-            self.yvel += 0.3
+            self.yvel += 0.35
             #TODO: falling animation starts once self.yvel >=0 (or maybe slightly lower/higher)
             # max falling speed
             if self.yvel > 100: self.yvel = 100
+            if not up or self.yvel > 0:
+                self.can_jump = False
             #TODO: consider a separate falling animation at terminal velocity.
         else:
             self.running = running
         if(self.running):
             self.xvel *= 1.6
             if(self.onGround):
-                self.changeAnimation('running',self.direction_id)
+                self.changeAnimation('running', self.direction_id)
         else:
             if(self.onGround):
                 if(left != right):
-                    self.changeAnimation('walking',self.direction_id)
+                    self.changeAnimation('walking', self.direction_id)
                 else:
                     self.xvel = 0
-                    self.changeAnimation('idle',self.direction_id)
+                    self.changeAnimation('idle', self.direction_id)
             else: 
                 if(left == right):
                     self.xvel = 0
@@ -109,7 +121,7 @@ class Player(Being):
         entities = level.getEntities()
         lanterns = level.getLanterns()
         
-        GameImage.updateAnimation(self,256) 
+        GameImage.updateAnimation(self, 256) 
         for e in entities:
             if(e != self):
                e.update(self)
@@ -128,44 +140,24 @@ class Player(Being):
                 far_light_sources.append(l)
         for f in far_light_sources:
         	f.update_light(tiles)
-        self.emit_light(self.sightdist,tiles,nearby_light_sources)
+        self.emit_light(self.sightdist, tiles, nearby_light_sources)
 
     def invisionrange(self, other):	#checks if the player can see a platform
-        if(self.withindist(other, self.sightdist+other.light_distance())):
+        if(self.withindist(other, self.sightdist + other.light_distance())):
             return True
         else:
             return False 
 
             #this could probably be moved up in inheritance
-    def getpoint(self,start,end,slope,x):
+    def getpoint(self, start, end, slope, x):
         p = start
         if(start[0] > end[0]): 
             p = end
         y = p[1] + slope*(x-p[0])
         return (x, y)
 
-            #this could probably be moved up in inheritance
-    def insiderect(self,p,c1,c2):
-        xrectcheck = p[0] >= c1[0] and p[0] <= c2[0] 
-        yrectcheck = p[1] >= c1[1] and p[1] <= c2[1] 
-        return xrectcheck and yrectcheck
-
-        #only difference between player and gameimage moverect is whether centerx/y or left/top are used
-        #for position. This is not very extensible, so should try to move these methods up in inheritance without breaking the program
-    def moveTo(self, coords):
-        self.moveRect(coords[0]*32,coords[1]*32,True)
-
-    def moveRect(self,x_offset,y_offset,absolute = False):
-        if(absolute):
-            self.rect.left = x_offset
-            self.rect.top = y_offset
-            return
-        self.rect.left += x_offset
-        self.rect.top += y_offset
-
 #TODO: collide could be an abstract method in the object we collide with
     def collide(self, xvel, yvel):
-
         level = self.current_level
         platforms = level.getPlatforms()
 
@@ -177,13 +169,13 @@ class Player(Being):
         if(self.bounce_count <= 0):
             self.collideMonsters(xvel,yvel)
 
+        #not sure if this method is still being used. If not, delete it.
     def collideExits(self):
         exits = self.current_level.get_exit_blocks()
         for e in exits:
             if pygame.sprite.collide_rect(self, e):
                 self.exitLevel(e)
                 return
-                #TODO: figure out how to handle exitblocks with new system
 
     def collideLanterns(self):
         level = self.current_level

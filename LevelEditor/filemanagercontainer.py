@@ -111,7 +111,7 @@ class FileManagerContainer(Box):
 	def loadDungeon(self):
 		if self.selected_slot == None: return
 		slot = self.selected_slot
-		filename = "./dungeon_map_files/dungeon"+slot
+		filename = "./dungeon_map_files/dungeon" + slot
 		deformatted_dungeon = FileManagerContainer.dungeonDataFromFile(filename)
 		self.buildDungeon(deformatted_dungeon)
 
@@ -129,8 +129,7 @@ class FileManagerContainer(Box):
 		room_data_set = dungeon_data.rooms
 		print "Resetting the editor..."
 		self.level_select_container.editor_screen.resetEditor()
-		#print "Loading rooms..."
-		self.dungeon_grid_container.setRooms(room_data_set) #NOTE: this part is currently the most time-consuming.
+		self.dungeon_grid_container.setRooms(room_data_set) 
 		print "Loading levels..."
 		self.level_select_container.setLevels(level_data_set) 
 		print "Dungeon built."

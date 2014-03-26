@@ -1,7 +1,9 @@
 
     #KNOWN BUGS
 
-#player can end up in a "None" level (and crash game) when leaving a level
+# Bats can fly outside the level and disappear.
+
+# player can end up in a "None" level (and crash game) when leaving a level.
     #this can occur with certain combinations of sprinting/jumping while leaving the level.
     #so far it seems to only happen when leaving the level horizontally while jumping and
         #sprinting through a gap of the same height as the player.
@@ -9,85 +11,101 @@
 
     #IMMEDIATE STUFF
 
-#NOTE: see dungeoneditorlauncher.py for dungeon editor TODOs, which are currently the most immediate.
+#NOTE: see dungeoneditorlauncher.py for dungeon editor-specific TODOs.
 
-#when building the dungeon with Factories, figure out how each created entity will have its default image,
-    #animation set, associated data, etc created.
-        #TileData will have to provide keys and/or dictionaries for this information.
-        #It may be helpful to make an EntityFactory class.
+# Make docstrings for each class
 
-#fix movement/rect related stuff, and put all relevant methods in gameImage, to be called by subclasses.
-    #there seems to be some inconsistency about which parts of rects are moved (left,top,centerx,centery,etc)
-#fix imports
-#reintroduce outdoor levels (data should be part of levelData)
-#consider how background tiles, platform tiles, etc might be reorganized
-    #EXAMPLE: could have a tileset 
-#consider removing level_ID, but first try to think of possible uses for it.
+    remaining classes to docstring:
+
+    being
+    camera
+    dungeonfactory
+    entity
+    entityfactory
+
+    (delete entityimage.pyc)
+
+    exitblock
+    gameimage
+    lantern
+    level
+    levelfactory
+    levelgroup      (NOTE: rename this to "dungeon")
+    levelobjects
+
+    (delete levelselectcell.py)
+
+    monster
+    platform
+    platformfactory
+    player
+
+    (delete pygame2exe.py and pythontest.py)
+
+    room
+    roomfactory
+    spritesheet
+    spritestripanimator (I think someone else wrote it)
+    tile
+    tilefactory
+
+    (Also do this for all LevelEditor classes p)
+
+# fix movement/rect related stuff, and put all relevant methods in gameImage, to be called by subclasses.
+    # This is partially, maybe completely done, but make sure before removing this TODO.
+# fix imports to be efficient/useful
+# consider removing level_ID, but first try to think of possible uses for it.
+# figure out how to handle monsters in complete/partial darkness
+    # I put an idea in Being class
+    # Keep in mind that the being may occupy multiple tiles
 
     #LESS IMMEDIATE STUFF
 
-#TODO: delete level button
-    #once this is working, I will have to figure out how level deletion translates to the dungeon grid.
-        #either the deleted level's rooms should become empty, or they should simply become ununused but not empty.
-#store/organize sprites a little better.
-    #keep in mind that we need an extensible way to load sprites, so if they are in different directories
-        #we need to plan out how we'll access them.
-#build the enemies extensibly. Make temporary classes/methods if necessary, but plan to replace them later
-    #have the bat start hanging from the ceiling and maybe give it "dropping"
-        #animation followed by the flying animation
-    #change the bat's attack patterns so that it periodically flaps around the player before diving, bounces off, 
-        #moves away, and then dives again.
-        #(some randomness may make this pattern look more natural)
-    #make lighting less laggy for large amounts of light
-        #one way might be to only udpate tiles within rectangular areas around light sources.
-    #consider possible combat systems (damage, HP, etc)
+# implement sloping platforms (see link for ideas)
+    # since I don't know how pygame's collision method works, try simply making sloping
+        # platform sprites and test running up and down on them.
+    # http://higherorderfun.com/blog/2012/05/20/the-guide-to-implementing-2d-platformers/
+    # also implement one-way platforms, ladders, etc
+# Make a launcher that makes it possible to select which dungeon to load
+    # It may help to change the dungeoneditor to let the user give different dungeons different saved names.
+    # A filelist would be useful for this.
+# Make the frameworks that will allow text, dialogs, events, etc.
+    # Remember that some things should be skippable while others should not.
+# build the enemies extensibly. Make temporary classes/methods if necessary, but plan to replace them later
+    # have the bat start hanging from the ceiling and maybe give it "dropping"
+        # animation followed by the flying animation
+    # change the bat's attack patterns so that it periodically flaps around the player before diving, bounces off, 
+        # moves away, and then dives again.
+        # (some randomness may make this pattern look more natural)
+    # make lighting less laggy for large amounts of light
+        # one way might be to only udpate tiles within rectangular areas around light sources.
+    # consider possible combat systems (damage, HP, etc)
+# make jumping feel more natural
 
     #SPRITE STUFF
 
-#TODO: organize sprite system better
-    #IDEA: make a data structure involving double arrays which allows:
-        #1. loading the level
-        #2. loading the level editor
-        #3. keeping track of animations, tile spritesheets, entity sprites, entities, etc
 #TODO: consider having tiles/textures be procedurally generated
-       #based on hardcoded platform locations/level data and a library of tiles
-       #alternately, use the map editor and a tileFactory to load in tiles from images which represent levels
-#TODO: at some point in the program after pygame.display is intiliazed, load all the sprites and store them
-        #in a neat, extensible, easily accessible manner. (consider a spritefactory which will probably be
-        #related to tilefactory)
+       # based on hardcoded platform locations/level data and a library of tiles
+       # alternately, use the map editor and a tileFactory to load in tiles from images which represent levels
+            # using only entities.
 
         #ENEMY/AI STUFF
-#TODO: implement more enemies.
+
+#TODO: implement more enemies. Try to give them very different behavior to force mystelf to expand the AI system.
 #TODO: when adding AI, try to be creative and extensible, as though this were a roguelike.
 #IDEA: could give some monsters strong knockback by increasing the bounce they deliver.
 #NOTE: enemies remain in the exact same state they were left in when the player leaves a level. should decide if this is good or bad.
 
-       #LEVEL STUFF
-#IDEA: consider an intermediary, constant-sized square area between tile and level. (ala super metroid)
-    #player scrolling would not be affected by this area, but would still be affected by level.
-    #since this area's size would not vary, it could be useful for dealing with global coords and level connections.
-#TODO: consider a level editor
-#TODO: handle the case for the player going offscreen where there is no next level.
-#TODO: figure out a long-term plan for storing multiple levels.
-#IDEA: instead of specifically creating exit blocks beteween level, simply call
-        #the same methods to move the player when he hits the edge of the screen,
-        #and treat the edge as a block if there is nowhere to go.
-#TODO: consider reading in all levels from a single input, with a set level size
-        #and exit blocks placed based in open spaces between levels rather than
-        #directly placing them (implement that part first)
-#TODO: consider making level-linking system more extensible, choosing player's 
-        #local coords based on global coords measured on the same scale. 
-        #(this might allow for differently-sized levels)
-#IDEA: make the level editor "zoomable" so that the entire dungeon can be viewed and
-    # levels can be added/moved, but it is also possible to select, expand and edit a specific level.
-
         #PLATFORM STUFF
+
 #TODO: make the "platform" system more complex, possibly with inheritance/factory
         #consider platforms that  the player can jump up through and/or fall through  by tapping down
 #TODO: conider making half-steps and/or slopes that can be walked up
 
-        #MISC STUFF
+        # MISC STUFF
+
 #TODO: make it possible for the player to open up a map screen.
         # (it may help to first rough out a very general design for "screens", "menus", and "controls"
 #TODO: make invisible caverns which can be revealed somehow. (test in sunlight first)
 #TODO: give exit blocks super terrifying sprites. (they can't be seen normally so it will be a fun surprise if there's a glitch or something)
+#TODO: think up lots of cool easter eggs (though this might be more of a long-term thing)

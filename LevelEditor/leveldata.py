@@ -2,7 +2,7 @@
 
 class LevelData(object):
 	"""docstring for LevelData"""
-	def __init__(self,name,coords1,coords2,sunlit = False):
+	def __init__(self, name, coords1, coords2, sunlit = False):
 		self.name = name
 		self.corners = (coords1,coords2)
 		self.sunlit = sunlit #TODO: as level data gets more complicated, make this part of a more general set of tags.
@@ -18,7 +18,7 @@ class LevelData(object):
 		return room_set
 
 	def formatted_data(self): #used for saving to files
-		return (self.name,self.corners[0],self.corners[1],self.sunlit)
+		return (self.name, self.corners[0], self.corners[1], self.sunlit)
 
 	def setSunlit(self,sunlit):
 		self.sunlit = sunlit
@@ -32,4 +32,4 @@ class LevelData(object):
 
 	@staticmethod
 	def deformatted_level(formatted_data): #used for loading from files
-		return LevelData(formatted_data[0],formatted_data[1],formatted_data[2],formatted_data[3])
+		return LevelData(formatted_data[0], formatted_data[1], formatted_data[2], formatted_data[3])
