@@ -2,8 +2,8 @@
 
 import pygame
 from pygame import *
-import numpy
-from numpy import *
+#import numpy
+#from numpy import *
 import player
 from player import *
 import levelgroup
