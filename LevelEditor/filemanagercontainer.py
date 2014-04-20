@@ -116,7 +116,7 @@ class FileManagerContainer(Box):
 		self.buildDungeon(deformatted_dungeon)
 
 	@staticmethod
-	def dungeonDataFromFile(filename,filepath = "./"):
+	def dungeonDataFromFile(filename, filepath = "./"):
 		dungeon_file = open(filename,'rb') #'rb' means "read binary"
 		dungeon_data = json.load(dungeon_file) #this part reads the data from file
 		deformatted_dungeon = DungeonData.deformatted_dungeon(dungeon_data,filepath)

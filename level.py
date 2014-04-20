@@ -57,7 +57,7 @@ class Level(object):
 
 		#TEMP METHOD
 	def setTilesOutdoors(self):
-		default_sky_tile = tile_images = GameImage.load_image_file('./data/', 'test_sky_tile_1.bmp') #GameImage.loadImageFile('test_sky_tile_1.bmp') 
+		default_sky_tile = GameImage.load_image_file('./data/', 'test_sky_tile_1.bmp') #GameImage.loadImageFile('test_sky_tile_1.bmp') 
 		dimensions =  self.get_dimensions()
 		tiles = self.getTiles()
 		for y in xrange(dimensions[1]):
