@@ -102,10 +102,10 @@ class TileData(object):
 		self.width = image.get_width()/DEFAULT_TILE_SIZE
 		self.height = image.get_height()/DEFAULT_TILE_SIZE
 
-	def get_image(self, filepath_start = "./"):	#TODO: consider allowing filepath beginning here.
-		filepath = filepath_start + self.image_filepath
-		return TileData.load_image ("./images/" + self.entity_key + ".bmp") #TEMP
-
+	def get_image(self, filepath_start = "./"):	#TODO: get the correct filepath here.
+		filename = "./images/" + self.image_filepath.split("/")[-1]
+		return TileData.load_image(filename) #TEMP. necessary to run executable file.
+	
 	@staticmethod
 	def load_image (filename, alpha = False, colorkey = None):
 		"""
@@ -119,7 +119,6 @@ class TileData(object):
 		return surface.convert ()
 
 	def category(self):
-		#print "ENTITY KEY: " + self.entity_key
 		return ENTITY_CATEGORY_MAP[self.entity_key]
 
 	def is_animated(self):

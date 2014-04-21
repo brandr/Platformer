@@ -1,6 +1,10 @@
 
     #KNOWN BUGS
 
+# weird jankiness happens if the player collides with a non-sloping platform and a sloping platform at the same time.
+
+# giant frogs only occupy one tile. (this might have been fixed in the version nick has.)
+
 # Bats can fly outside the level and disappear.
 
 # player can end up in a "None" level (and crash game) when leaving a level.
