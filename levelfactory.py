@@ -15,9 +15,9 @@ class LevelFactory(object):
 
 	#new  dungeon_rooms method
 	def dungeon_rooms(self,dungeon,room_data_set):
-		return RoomFactory.dungeon_rooms(dungeon,room_data_set)
+		return RoomFactory.dungeon_rooms(dungeon, room_data_set)
 
-	def dungeon_levels(self,dungeon,rooms,level_data_set):
+	def dungeon_levels(self, dungeon, rooms, level_data_set):
 		levels = []
 		for d in level_data_set:
 			level_rooms = d.room_set(rooms)
@@ -29,10 +29,10 @@ class LevelFactory(object):
 		#If I end up using the system where levelIDs are stored in arrays corresponding to rooms,
 			#should probably have this done for dungeon in this method.
 	def build_level(self,dungeon,level_data,origin,rooms): #could also get orgin from level data
-		return Level(dungeon, level_data,origin, rooms)
+		return Level(dungeon, level_data, origin, rooms)
 
 		#might not end up using this
-	def outdoors(self,depth,level_top):
+	def outdoors(self, depth, level_top):
 		if(depth > 0): return False
 		width = len(level_top)
 		blocked = 0

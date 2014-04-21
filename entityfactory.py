@@ -2,8 +2,8 @@ from platformfactory import *
 from lantern import *
 from exitblock import *
 from monster import *
-import sys
-sys.path.insert(0, './LevelEditor')
+#import sys
+#sys.path.insert(0, '.\LevelEditor')
 from roomdata import *
 
 ENTITY_CONSTRUCTOR_MAP = {

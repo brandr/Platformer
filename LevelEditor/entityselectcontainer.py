@@ -45,17 +45,18 @@ class EntitySelectContainer(Box):
 
 		self.select_entity(file_list._directory,file_list_item._text)
 
-	def select_entity(self,directory = None,file_key = None):
+	def select_entity(self, directory = None,file_key = None):
 		#TODO: expand current entity label to indicate both the entity itself and the sprite.
 		if file_key == None: #not key in SELECTABLE_ENTITY_MAP:
 			self.current_entity = None
 			self.updateCurrentEntityImage()
 			self.current_entity_label.set_text("Current Entity Sprite: None")
 			return
-		filepath = "/"+directory+"/"+file_key
+		filepath = "/" + directory + "/" + file_key
 		tile_key = (directory.split('/'))[-1]
-		self.current_entity = TileData(tile_key,filepath)
-		self.current_entity_label.set_text("Current Entity Sprite: "+file_key) 
+		tile_key = (tile_key.split('\\'))[-1]
+		self.current_entity = TileData(tile_key, filepath)
+		self.current_entity_label.set_text("Current Entity Sprite: " + file_key) 
 		self.updateCurrentEntityImage()
 
 	def updateCurrentEntityImage(self):

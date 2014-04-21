@@ -44,7 +44,7 @@ class RoomFactory(object):
 		start_coords = (False,0,0)
 		x = y = 0
 
-		#TODO: will eventually store tile images somewhere besides "data"
+		#TODO: fix this part next
 		tile_images = GameImage.load_image_file('./data/', 'test_tiles_1.bmp') 
 		tile_factory = TileFactory(tile_images, (2,1))
 		default_cave_tile = tile_factory.tile_at((0,0))

@@ -49,7 +49,7 @@
     tile
     tilefactory
 
-    (Also do this for all LevelEditor classes p)
+    (Also do this for all LevelEditor classes)
 
 # fix movement/rect related stuff, and put all relevant methods in gameImage, to be called by subclasses.
     # This is partially, maybe completely done, but make sure before removing this TODO.

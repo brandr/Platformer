@@ -1,13 +1,8 @@
 """This is the screen used to play the game."""
 
-import pygame
 from pygame import *
-#import numpy
-#from numpy import *
-import player
 from player import *
-import levelgroup
-from levelgroup import *
+from dungeon import *
 
 DISPLAY = (WIN_WIDTH, WIN_HEIGHT)
 DEPTH = 32

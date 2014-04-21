@@ -24,7 +24,7 @@ class Player(Being):
         filepath = './LevelEditor/animations/player/'
         
         # could probably use the same system used for loading monster animations, and simply store
-            # player animation keys in tiledata with the other keys.
+        # player animation keys in tiledata with the other keys.
         
         player_idle_left = GameImage.load_animation(filepath, 'player_idle_left.bmp', player_rect, -1)
         player_idle_right = GameImage.load_animation(filepath, 'player_idle_right.bmp', player_rect, -1)
@@ -52,6 +52,7 @@ class Player(Being):
         animation_set.insertAnimation(player_jumping_right,'right', 'jumping')
 
         #TODO: jumping, falling, and (maybe) terminal velocity
+        #TODO: attacking, other sprite animations
 
         return animation_set
 
@@ -79,19 +80,20 @@ class Player(Being):
             self.direction_id = 'right'
         if up:            # only jump if on the ground
             if self.onGround:  
-                self.yvel -= 4.5
+                self.yvel -= 8.0
                 self.changeAnimation('jumping', self.direction_id)
                 self.animation.iter()
                 self.onGround = False
                 self.can_jump = True
-            elif self.can_jump: #and self.yvel > -12:
-                self.yvel -= 0.25
+            #elif self.can_jump: #and self.yvel > -12:
+            #    self.yvel -= 0.25
         if not self.onGround:    # only accelerate with gravity if in the air
             self.yvel += 0.35
             #TODO: falling animation starts once self.yvel >=0 (or maybe slightly lower/higher)
             # max falling speed
             if self.yvel > 100: self.yvel = 100
             if not up or self.yvel > 0:
+                self.yvel = max(self.yvel, 0)
                 self.can_jump = False
             #TODO: consider a separate falling animation at terminal velocity.
         else:

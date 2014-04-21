@@ -18,7 +18,7 @@ class GameImage(pygame.sprite.Sprite):
         self.animation = self.animation_set.default_animation()
         
         self.direction_id = 'default'
-        self.animation_id = ('default','default')
+        self.animation_id = ('default', 'default')
 
         self.default_image = copy.copy(self.animation.images[0]) #this might be an inefficient/awkward place to use copy in the long run.
         self.image = self.default_image
@@ -139,7 +139,8 @@ class GameImage(pygame.sprite.Sprite):
 
     @staticmethod
     def load_animation(filepath, filename, rect, colorkey = None, loop = True, frames = 10): #change frames to 50 if necessaryfor testing
-        animation_strip = GameImage.load_image_file(filepath, filename)
+        #animation_strip = GameImage.load_image_file(filepath, filename)
+        animation_strip = GameImage.load_image_file("./animations", filename) #TEMP
         count = animation_strip.get_width()/rect.width #assume that the animation strip is wide only, not long
         return SpriteStripAnimator(animation_strip,rect, count, colorkey, loop, frames)
 

@@ -1,6 +1,6 @@
 from pygame import *
 import pygame, pygame.locals
-from ocempgui.draw import Image
+#from ocempgui.draw import Image
 
 DEFAULT_TILE_SIZE = 32
 
@@ -90,20 +90,33 @@ CATEGORY_ANIMATION_KEY_MAP = {
 class TileData(object):
 
 	"""docstring for TileData"""
-	def __init__(self, key, filepath,filepath_start = "./"):
+	def __init__(self, key, filepath, filepath_start = "./"):
 		self.entity_key = key #could also set some values using this
 		self.image_filepath = filepath
 		self.width, self.height = 1,1
 		self.setDimensions(filepath_start)
 
-	def setDimensions(self,filepath_start):
+	def setDimensions(self, filepath_start):
 		image = self.get_image(filepath_start)
 		self.width = image.get_width()/DEFAULT_TILE_SIZE
 		self.height = image.get_height()/DEFAULT_TILE_SIZE
 
-	def get_image(self,filepath_start = "./"):	#TODO: consider allowing filepath beginning here.
-		filepath = filepath_start+self.image_filepath
-		return Image.load_image (filepath)
+	def get_image(self, filepath_start = "./"):	#TODO: consider allowing filepath beginning here.
+		filepath = filepath_start + self.image_filepath
+		#return TileData.load_image ("./images/" + self.entity_key + ".bmp") #TEMP
+		return TileData.load_image (filepath)
+
+	@staticmethod
+	def load_image (filename, alpha = False, colorkey = None):
+		"""
+		NOTE: copied from ocempgui.
+		"""
+		surface = image.load (filename)
+		if colorkey:
+			surface.set_colorkey (colorkey)
+		if alpha or surface.get_alpha ():
+			return surface.convert_alpha ()
+		return surface.convert ()
 
 	def category(self):
 		return ENTITY_CATEGORY_MAP[self.entity_key]
@@ -132,7 +145,7 @@ class TileData(object):
 		return (self.entity_key,self.image_filepath, self.width, self.height) 
 
 	@staticmethod
-	def deformatted_tile_set(formatted_data,filepath = "./"):
+	def deformatted_tile_set(formatted_data, filepath = "./"):
 		tiles = []
 		for y in xrange (len(formatted_data)):
 			tiles.append([])
@@ -143,14 +156,15 @@ class TileData(object):
 				next_data = None
 				next_tile = formatted_data[y][x]
 				if next_tile != None:
-					TileData.addTiles(tiles,next_tile,x,y,filepath)
+					TileData.addTiles(tiles,next_tile, x, y, filepath)
 		return tiles
 
 	@staticmethod
-	def addTiles(tiles,formatted_data,x_pos,y_pos,filepath = "./"):
+	def addTiles(tiles, formatted_data, x_pos, y_pos, filepath = "./"):
 		width = formatted_data[2]
 		height = formatted_data[3]
-		origin_tile = TileData.deformatted_tile(formatted_data,filepath)
+		origin_tile = TileData.deformatted_tile(formatted_data, filepath)
+		print filepath
 		tiles[y_pos][x_pos] = origin_tile
 		for x in range(x_pos + 1, x_pos + width):
 			tiles[y_pos][x] = BlockedTileData(origin_tile,x_pos,y_pos)
@@ -159,12 +173,12 @@ class TileData(object):
 				tiles[y][x] = BlockedTileData(origin_tile,x_pos,y_pos)
 
 	@staticmethod
-	def deformatted_tile(formatted_data,filepath = "./"):	#this will need to change as this class's constructor does.
-		return TileData(formatted_data[0],formatted_data[1],filepath)
+	def deformatted_tile(formatted_data, filepath = "./"):	#this will need to change as this class's constructor does.
+		return TileData(formatted_data[0], formatted_data[1], filepath)
 
 
 class BlockedTileData(TileData): #this is a space in a room's tiles blocked out by some object that takes up more than one tile.
-	def __init__(self,origin_tile,x,y):
+	def __init__(self, origin_tile, x, y):
 		self.origin_tile = origin_tile
 		self.origin_x, self.origin_y = x,y
 

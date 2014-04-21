@@ -5,6 +5,7 @@ the data gets more complicated."""
 import gamescreen
 from gamescreen import *
 from dungeonfactory import *
+from ocempgui import *
 
 def runGame():
     """
@@ -19,7 +20,7 @@ def runGame():
     screen = pygame.display.set_mode(DISPLAY, FLAGS, DEPTH)
     factory = DungeonFactory() #might need args like filename, filepath, etc later
     print "Building dungeon..."
-    dungeon = factory.build_dungeon("./LevelEditor/dungeon_map_files/dungeon0")
+    dungeon = factory.build_dungeon("./dungeon_map_files/dungeon0")
     print "Dungeon built."
     mainScreen = GameScreen()
     mainScreen.runGame(screen, dungeon)
