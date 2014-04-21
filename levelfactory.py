@@ -14,7 +14,7 @@ class LevelFactory(object):
 	#maybe this should go in roomfactory instead
 
 	#new  dungeon_rooms method
-	def dungeon_rooms(self,dungeon,room_data_set):
+	def dungeon_rooms(self, dungeon, room_data_set):
 		return RoomFactory.dungeon_rooms(dungeon, room_data_set)
 
 	def dungeon_levels(self, dungeon, rooms, level_data_set):
@@ -28,7 +28,7 @@ class LevelFactory(object):
 
 		#If I end up using the system where levelIDs are stored in arrays corresponding to rooms,
 			#should probably have this done for dungeon in this method.
-	def build_level(self,dungeon,level_data,origin,rooms): #could also get orgin from level data
+	def build_level(self, dungeon, level_data, origin, rooms): #could also get orgin from level data
 		return Level(dungeon, level_data, origin, rooms)
 
 		#might not end up using this

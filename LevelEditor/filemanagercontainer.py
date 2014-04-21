@@ -92,12 +92,14 @@ class FileManagerContainer(Box):
 
 	def saveDungeon(self):
 		if self.selected_slot == None: return
+		print "Saving dungeon..."
 		slot = self.selected_slot
-		filename = "./dungeon_map_files/dungeon"+slot
+		filename = "./dungeon_map_files/dungeon" + slot
 		dungeon_file = open(filename,'wb') #'wb' means "write binary"
 		dungeon_data = self.dungeon_save_data()
 		save_data = dungeon_data.formatted_data()
 		json.dump(save_data, dungeon_file)
+		print "Dungeon saved."
 
 	def dungeon_save_data(self): #return a DungeonData object used for reading/writing files
 		#TODO: (make sure to deal with ununsed rooms/levels properly when building the DungeonData)

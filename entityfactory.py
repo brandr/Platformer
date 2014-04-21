@@ -8,6 +8,7 @@ from roomdata import *
 
 ENTITY_CONSTRUCTOR_MAP = {
 	DEFAULT_PLATFORM:Platform,
+	SLOPING_PLATFORM:Platform,
 	DEFAULT_LANTERN:Lantern,
 	BAT:Monster,
 	GIANT_FROG:Monster
@@ -30,7 +31,12 @@ class EntityFactory(object):
 	def initMonster(monster, name):
 		monster.name = name
 
+	@staticmethod
+	def initSlopingPlatform(platform, arg):
+		platform.is_sloped = True
+
 ENTITY_BUILD_MAP = {
+	SLOPING_PLATFORM:EntityFactory.initSlopingPlatform,
 	BAT:EntityFactory.initMonster,
 	GIANT_FROG:EntityFactory.initMonster
 }

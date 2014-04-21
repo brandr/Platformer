@@ -8,7 +8,7 @@ class SpriteStripAnimator(object):
     __add__() method for joining strips which comes in handy when a
     strip wraps to the next row.
     """
-    def __init__(self, sprites, rect, count, colorkey=None, loop=True, frames=10):
+    def __init__(self, sprites, rect, count, colorkey = None, loop = True, frames = 10):
         """construct a SpriteStripAnim
         
         filename, rect, count, and colorkey are the same arguments used

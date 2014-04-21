@@ -19,6 +19,7 @@
 
     being
     camera
+    dungeon
     dungeonfactory
     entity
     entityfactory
@@ -30,7 +31,6 @@
     lantern
     level
     levelfactory
-    levelgroup      (NOTE: rename this to "dungeon")
     levelobjects
 
     (delete levelselectcell.py)
@@ -54,6 +54,8 @@
 # fix movement/rect related stuff, and put all relevant methods in gameImage, to be called by subclasses.
     # This is partially, maybe completely done, but make sure before removing this TODO.
 # fix imports to be efficient/useful
+# reduce lag when player is in a cave (monsters may affect the lag)
+# reduce lag in dungeon editor, particularly for the level editor.
 # consider removing level_ID, but first try to think of possible uses for it.
 # figure out how to handle monsters in complete/partial darkness
     # I put an idea in Being class
@@ -62,7 +64,7 @@
     #LESS IMMEDIATE STUFF
 
 # implement sloping platforms (see link for ideas)
-    # since I don't know how pygame's collision method works, try simply making sloping
+    # since I don't know how pygame's collision method works, first try simply making sloping
         # platform sprites and test running up and down on them.
     # http://higherorderfun.com/blog/2012/05/20/the-guide-to-implementing-2d-platformers/
     # also implement one-way platforms, ladders, etc

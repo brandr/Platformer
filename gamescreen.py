@@ -77,8 +77,8 @@ class GameScreen:
                 if e.type == KEYUP and e.key == K_LCTRL:
                     running = False
 
-        # draw background
-            for y in range(32):
-                for x in range(32):
-                    screen.blit(bg, (x * 32, y * 32))
+        # draw background. apparently, this does nothing.
+            #for y in range(32):
+            #    for x in range(32):
+            #        screen.blit(bg, (x * 32, y * 32))
             player.current_level.update(screen, up, down, left, right, running)

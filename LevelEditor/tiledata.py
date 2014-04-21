@@ -11,6 +11,7 @@ PLAYER_START = "player_start"
 #platforms
 PLATFORMS = "platforms"
 DEFAULT_PLATFORM = "default_platform"
+SLOPING_PLATFORM = "sloping_platform"
 
 #lanterns
 LANTERNS = "lanterns"
@@ -24,7 +25,7 @@ GIANT_FROG = "giant_frog"
 #category map
 ENTITY_CATEGORY_MAP = {
 	PLAYER_START:None,
-	DEFAULT_PLATFORM:PLATFORMS, 
+	DEFAULT_PLATFORM:PLATFORMS, SLOPING_PLATFORM:PLATFORMS,
 	DEFAULT_LANTERN:LANTERNS, 
 	BAT:MONSTERS, GIANT_FROG:MONSTERS
 }
@@ -164,7 +165,6 @@ class TileData(object):
 		width = formatted_data[2]
 		height = formatted_data[3]
 		origin_tile = TileData.deformatted_tile(formatted_data, filepath)
-		print filepath
 		tiles[y_pos][x_pos] = origin_tile
 		for x in range(x_pos + 1, x_pos + width):
 			tiles[y_pos][x] = BlockedTileData(origin_tile,x_pos,y_pos)

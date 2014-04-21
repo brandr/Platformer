@@ -60,7 +60,7 @@ class RoomFactory(object):
 				t = Tile(default_tile, x, y)
 				if next_tile_data != None and not isinstance(next_tile_data, BlockedTileData):
 					if next_tile_data.entity_key == PLAYER_START:
-						start_coords = (True,x,y)
+						start_coords = (True, x, y)
 					else:
 
 				#TODO: remember that this part may need some checks if the object created is larger than 32*32.

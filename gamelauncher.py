@@ -5,7 +5,7 @@ the data gets more complicated."""
 import gamescreen
 from gamescreen import *
 from dungeonfactory import *
-from ocempgui import *
+#from ocempgui import *
 
 def runGame():
     """

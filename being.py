@@ -3,8 +3,8 @@ a block or monster. A being is an entity that does not occupy a specific tile
 (like a block/platform does). Beings can be stationary, though they almost always move.
 """
 
-import entity
 from entity import *
+from platform import *
 
 class Being(Entity):
     """ Being ( animations ) -> Being
@@ -94,17 +94,41 @@ class Being(Entity):
         it will become flush with that platform no matter what its velocity is, and be unable 
         to move in the direction of that platform. (i.e., through the platform.)
         """
-        if pygame.sprite.collide_rect(self, collide_object):
+        if pygame.sprite.collide_mask(self, collide_object): #TODO: case for sloping objects
+            if isinstance(collide_object, Platform) and collide_object.is_sloped:
+                self.collideWithSlope(xvel, yvel, collide_object)
+                return
+            if xvel > 0:
+                self.rect.right = collide_object.rect.left
+            if xvel < 0:
+                self.rect.left = collide_object.rect.right
+            if yvel > 0:
+                self.rect.bottom = collide_object.rect.top
+                self.onGround = True
+                self.yvel = 0
+            if yvel < 0:
+                self.rect.top = collide_object.rect.bottom
+
+    def collideWithSlope(self, xvel, yvel, slope): #NOTE: this only works for slopes on the ground, not on the ceiling.
+        if yvel == 0:
+            while pygame.sprite.collide_mask(self, slope):
+                self.rect.bottom -= 1
+                #if xvel > 0:
+                #    self.rect.right -= 1
+                #if xvel < 0:
+                #    self.rect.left += 1
+        else:
+            while pygame.sprite.collide_mask(self, slope):
                 if xvel > 0:
-                    self.rect.right = collide_object.rect.left
+                    self.rect.right -= 1
                 if xvel < 0:
-                    self.rect.left = collide_object.rect.right
+                    self.rect.left += 1
                 if yvel > 0:
-                    self.rect.bottom = collide_object.rect.top
+                    self.rect.bottom -= 1
                     self.onGround = True
                     self.yvel = 0
                 if yvel < 0:
-                    self.rect.top = collide_object.rect.bottom
+                    self.rect.top += 1
 
     def moveTowards(self, destination):
         """ moveTowards (GameImage) -> None

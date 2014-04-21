@@ -162,10 +162,9 @@ class Player(Being):
     def collide(self, xvel, yvel):
         level = self.current_level
         platforms = level.getPlatforms()
-
         for p in platforms:
-            if pygame.sprite.collide_rect(self, p):
-                Being.collideWith(self, xvel,yvel,p)
+            if pygame.sprite.collide_mask(self, p):
+                Being.collideWith(self, xvel, yvel, p)
         self.collideExits()
         self.collideLanterns()
         if(self.bounce_count <= 0):

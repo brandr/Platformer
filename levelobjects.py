@@ -7,8 +7,8 @@ import lantern
 from lantern import *
 import exitblock
 from exitblock import *
-import sys
-sys.path.insert(0, './LevelEditor')
+#import sys
+#sys.path.insert(0, './LevelEditor')
 from roomdata import *
 
 class LevelObjects(object):
@@ -50,6 +50,7 @@ class LevelObjects(object):
 		x_offset = room_coords[0] - level.origin[0]
 		y_offset = room_coords[1] - level.origin[1]
 		for e in level_objects.entities:
+			#if e == None: continue #TEMP
 			self.entities.append(e)
 			entity_x_offset = ROOM_WIDTH*x_offset
 			entity_y_offset = ROOM_HEIGHT*y_offset
@@ -60,7 +61,7 @@ class LevelObjects(object):
 			for t in row:
 				self.addTile(t, x_offset, y_offset)
 
-	def addEntity(self,entity):
+	def addEntity(self, entity):
 		self.entities.append(entity)
 		entity.current_level = self.level
 

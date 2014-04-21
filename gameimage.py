@@ -24,6 +24,7 @@ class GameImage(pygame.sprite.Sprite):
         self.image = self.default_image
         self.image.convert()
         self.rect = self.image.get_bounding_rect()
+        self.mask = pygame.mask.from_surface(self.image)
 
     def coordinates(self):
         return (self.rect.left/32, self.rect.top/32)
@@ -104,11 +105,11 @@ class GameImage(pygame.sprite.Sprite):
 
     @staticmethod
     def still_animation_set(still_image, rect = Rect(0, 0, 32, 32), colorkey = DEF_COLORKEY):#colorkey = None):
-        still_animation = SpriteStripAnimator(still_image,rect, 1, colorkey, False, 1)
+        still_animation = SpriteStripAnimator(still_image, rect, 1, colorkey, False, 1)
         return AnimationSet(still_animation)
 
     @staticmethod
-    def load_animation_set(tile_data, tile_size):
+    def load_animation_set(tile_data, tile_size, colorkey = -1):
         image_pixel_width = tile_size*tile_data.width
         image_pixel_height = tile_size*tile_data.height
         image_rect = Rect(0, 0, image_pixel_width, image_pixel_height)
@@ -123,7 +124,7 @@ class GameImage(pygame.sprite.Sprite):
         default_key = animation_keys[0][0]
         
         default_animation_filename = key + "_" + default_key + ".bmp"
-        default_animation = GameImage.load_animation(animation_filepath, default_animation_filename, image_rect, -1)
+        default_animation = GameImage.load_animation(animation_filepath, default_animation_filename, image_rect, colorkey)
         animation_set = AnimationSet(default_animation)
         
         for n in xrange(1, len(animation_keys)):
@@ -131,7 +132,7 @@ class GameImage(pygame.sprite.Sprite):
             anim_key = animation_keys[n][1]
             anim_direction = animation_keys[n][2] 
             animation_filename = key + "_" + anim_file_key + ".bmp"
-            next_animation = GameImage.load_animation(animation_filepath, animation_filename, image_rect, -1)
+            next_animation = GameImage.load_animation(animation_filepath, animation_filename, image_rect, colorkey)
             #TODO: get the colorkey more generally (this may come up if we use animated blocks or square enemies).
             animation_set.insertAnimation(next_animation, anim_direction, anim_key)
 

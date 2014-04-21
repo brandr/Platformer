@@ -13,7 +13,7 @@ class Tile(GameImage):
         self.block = None
         self.mapped = False
 
-    def changeImage(self,image = None):
+    def changeImage(self, image = None):
         if(image != None):
             self.default_image = image
             self.image = image
@@ -30,7 +30,7 @@ class Tile(GameImage):
         if(self.block != None): 
             self.image = Surface((32, 32))
             self.block.updateimage(lightvalue)
-            return
+        #    return
         GameImage.updateimage(self, lightvalue)
 
 
