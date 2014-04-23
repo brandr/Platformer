@@ -91,16 +91,22 @@ CATEGORY_ANIMATION_KEY_MAP = {
 class TileData(object):
 
 	"""docstring for TileData"""
-	def __init__(self, key, filepath,filepath_start = "./"):
+	def __init__(self, key, filepath, filepath_start = "./"):
 		self.entity_key = key #could also set some values using this
 		self.image_filepath = filepath
 		self.width, self.height = 1,1
 		self.setDimensions(filepath_start)
 
-	def setDimensions(self,filepath_start):
+	def setDimensions(self, filepath_start):
 		image = self.get_image(filepath_start)
 		self.width = image.get_width()/DEFAULT_TILE_SIZE
 		self.height = image.get_height()/DEFAULT_TILE_SIZE
+		if(self.entity_key == "giant_frog"):
+			print "FILEPATH: " + str(filepath_start)
+			print "KEY: " + str(self.entity_key)
+			print "WIDTH: " + str(self.width)
+			print "HEIGHT: " + str(self.height)
+			print ""
 
 	def get_image(self, filepath_start = "./"):	#TODO: get the correct filepath here.
 		filename = "./images/" + self.image_filepath.split("/")[-1]
@@ -142,10 +148,10 @@ class TileData(object):
 		return None
 
 	def formatted_data(self):
-		return (self.entity_key,self.image_filepath, self.width, self.height) 
+		return (self.entity_key, self.image_filepath, self.width, self.height) 
 
 	@staticmethod
-	def deformatted_tile_set(formatted_data,filepath = "./"):
+	def deformatted_tile_set(formatted_data, filepath = "./"):
 		tiles = []
 		for y in xrange (len(formatted_data)):
 			tiles.append([])
@@ -160,7 +166,7 @@ class TileData(object):
 		return tiles
 
 	@staticmethod
-	def addTiles(tiles,formatted_data,x_pos,y_pos,filepath = "./"):
+	def addTiles(tiles,formatted_data, x_pos, y_pos, filepath = "./"):
 		width = formatted_data[2]
 		height = formatted_data[3]
 		origin_tile = TileData.deformatted_tile(formatted_data,filepath)
@@ -172,12 +178,12 @@ class TileData(object):
 				tiles[y][x] = BlockedTileData(origin_tile,x_pos,y_pos)
 
 	@staticmethod
-	def deformatted_tile(formatted_data,filepath = "./"):	#this will need to change as this class's constructor does.
+	def deformatted_tile(formatted_data, filepath = "./"):	#this will need to change as this class's constructor does.
 		return TileData(formatted_data[0],formatted_data[1],filepath)
 
 
 class BlockedTileData(TileData): #this is a space in a room's tiles blocked out by some object that takes up more than one tile.
-	def __init__(self,origin_tile,x,y):
+	def __init__(self, origin_tile, x, y):
 		self.origin_tile = origin_tile
 		self.origin_x, self.origin_y = x,y
 

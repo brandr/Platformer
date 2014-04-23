@@ -7,6 +7,7 @@ class Level(object):
 	#it copies all objects from the rooms into itself, and processes these objects as the game is running.
 	#only the player's current level should be active at any given time
 	def __init__(self, dungeon, level_data, origin, rooms):
+		self.screen = None
 		self.dungeon = dungeon 		#the LevelGroup that the level is part of
 		self.level_ID = level_data.name #a currently unused value which identifies the level uniquely
 		self.origin = origin 	#upper-left corner of the level (in terms of global coords, so each coordinate pair corresponds to a room)
@@ -14,8 +15,10 @@ class Level(object):
 		self.start_coords = None #coords where the player appears upon entering the level (set by addRooms)
 		self.addRooms(rooms)
 		tiles = self.getTiles()
-		total_level_width = len(tiles[0])*32
-		total_level_height = len(tiles)*32
+		self.width = len(tiles[0])
+		self.height = len(tiles)
+		total_level_width = self.width*32
+		total_level_height = self.height*32
 		self.level_camera = Camera(total_level_width, total_level_height) #might not be the best way to make the camera
 		self.outdoors = level_data.sunlit
 
@@ -182,10 +185,10 @@ class Level(object):
 		global_coords = self.global_coords(adjusted_coords)
 		if(self.next_level_exists(global_coords, direction)):
 			next_level = self.level_in_direction(global_coords[0], global_coords[1], direction)
-			self.dungeon.movePlayer(player, next_level, global_coords, adjusted_coords)
+			self.dungeon.movePlayer(self.screen, player, next_level, global_coords, adjusted_coords)
 		#TODO: error case
 
-	def addPlayer(self,player,coords = None):
+	def addPlayer(self, player, coords = None):
 		player.current_level = self
 		self.level_objects.addPlayer(player)
 		if(coords == None):	
@@ -193,31 +196,29 @@ class Level(object):
 			return
 		player.moveTo(coords)
 		self.level_camera.update(player)
-		player.update(False, False, False, False, False)
+		player.update(self.getTiles(), False, False, False, False, False)
 		pygame.display.update()
 
 #TODO: could put up,down,left,right and running into a single object which describes the player's current state
-	def update(self, screen, up, down, left, right, running):	
+	def update(self, up, down, left, right, running):	
 		player = self.getPlayer()
+		all_tiles = self.getTiles()
+		start_x = max(0, self.level_camera.state.left/32)
+		end_x = min(self.level_camera.state.right/32, self.width)
+		start_y = max(0, self.level_camera.state.top/32)
+		end_y = min(self.level_camera.state.bottom/32, self.height)
+		tiles = all_tiles[start_y:end_y][start_x:end_x]
 		if(player != None):
 			self.level_camera.update(player)
-			player.update(up, down, left, right, running)
+			player.update(all_tiles, up, down, left, right, running)
 			platforms = self.getPlatforms()
-
-			#test_black = Surface((32,32))
-			test_tile = self.getTiles()[-1][-1]
-			#test_tile.changeImage(test_tile.default_image)
-			#print  test_tile.default_image == test_black
-			for p in platforms: #not sure this is necessary
-				p.update(player)
-			tiles = self.getTiles()
+			#for p in platforms: #not sure this is necessary. may use it later.
+			#	p.update(player)	
 			for row in tiles:
 				for t in row:
-					screen.blit(t.image, self.level_camera.apply(t))
-					#if t == test_tile: #and t.image == t.unseen_image:	#TEMP FOR TESTING 
-					#	print test_tile.block
+					self.screen.blit(t.image, self.level_camera.apply(t))
 			for e in self.getEntities():
-				screen.blit(e.image, self.level_camera.apply(e))
+				self.screen.blit(e.image, self.level_camera.apply(e))
 			pygame.display.update()
 
 	def level_end_coords(self):
@@ -235,6 +236,10 @@ class Level(object):
 	def remove(self,entity):
 		self.level_objects.remove(entity)
 		if(self.outdoors): self.calibrateLighting()
+
+	def getTilesOnScreen(self):
+		all_tiles = self.getTiles()
+		return self.level_camera.on_screen_tiles(all_tiles)
 
 	def removePlayer(self):
 		self.level_objects.removePlayer()

@@ -64,7 +64,6 @@ class GameImage(pygame.sprite.Sprite):
         else: 
             if(self.mapped):
                 self.fully_darken()
-                return
 
     def updateAnimation(self, lightvalue = 0):
         if(self.animated):
@@ -81,7 +80,7 @@ class GameImage(pygame.sprite.Sprite):
     #    self.unseen_color = unseen_color
 
     @staticmethod
-    def setLightLevel(image,light_value):
+    def setLightLevel(image, light_value):
         light_value = 255
         dark = pygame.Surface(image.get_size(), 32)
         dark.set_alpha(light_value, pygame.RLEACCEL)

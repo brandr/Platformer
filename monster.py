@@ -27,7 +27,6 @@ class Monster(Being):
         self.updateAnimation()
         #TODO: check if the monster can see the player. (using sightdist)
         #TODO: check if the monster is hostile the player.
-
         #TODO: figure out a better way to assosciate the monster with its udpate action (probably a dict.)
         if self.name == "bat": #TEMPORARY
             self.batUpdate(player)
@@ -45,7 +44,7 @@ class Monster(Being):
         self.gravityUpdate()
         self.faceTowards(player.currenttile())
         if self.onGround:
-            self.changeAnimation('idle',self.direction_id)
+            self.changeAnimation('idle', self.direction_id)
             self.xvel = 0
             #TODO: make the frog try to land on the player.
                 # figure out the frog's distance from the player, and calculate the necessary xvel.

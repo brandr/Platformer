@@ -53,8 +53,7 @@ class Entity(GameImage):
     #TODO: this method seems obsolete.
     def currenttile(self):
         tiles = self.current_level.getTiles()
-        coords = (self.rect.left/32, self.rect.top/32)
-        #coords = ((self.rect.topleft[0] + 16)/32,(self.rect.topright[1] + 16)/32)
+        coords = self.coordinates()  
         return Tile.tileat(coords, tiles)
 
     def emit_light(self, dist, tiles, otherlights = None):
@@ -65,7 +64,7 @@ class Entity(GameImage):
     def darken_surf(self, amount):
         pass
 
-    def calculate_brightness(self,coords):
+    def calculate_brightness(self, coords):
         return 0
 
     def light_distance(self):
@@ -79,7 +78,7 @@ class Entity(GameImage):
             down_shadow_tile = start_tile.relativetile((0,1),tiles)
             right_shadow_tile = start_tile.relativetile((1,0),tiles)
             if not (down_shadow_tile == None or down_shadow_tile.block != None):
-                down_shadow_tile.castShadow(tiles,132)
+                down_shadow_tile.castShadow(tiles, 132)
             if not (right_shadow_tile == None or right_shadow_tile.block != None):
-                right_shadow_tile.castShadow(tiles,168)
+                right_shadow_tile.castShadow(tiles, 168)
 

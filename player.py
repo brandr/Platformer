@@ -56,14 +56,9 @@ class Player(Being):
 
         return animation_set
 
-    def update(self, up, down, left, right, running):
+    def update(self, tiles, up, down, left, right, running):
         #TODO: move some of this stuff to "being", and break it up to be more extensible.
             #could also make a Movement class, held as a data type by player or being.
-
-        #TEST
-        #if(not self.onGround and not up):
-        #    print self. yvel
-        #TEST
 
         if(self.exitLevelCheck()): return
         if(self.bounce_count > 0):
@@ -114,25 +109,26 @@ class Player(Being):
                     self.xvel = 0
 
         Being.updatePosition(self)
-        self.updateView()
+        self.updateView(tiles)
      
      #this gets laggy when there is too much light. try to fix it. (might have to fix other methods instead)
-    def updateView(self): #note: this is only to be used in "cave" settings. for areas that are outdoors, use something else.
+    def updateView(self, all_tiles): #note: this is only to be used in "cave" settings. for areas that are outdoors, use something else.
         level = self.current_level
-        tiles = level.getTiles()
         entities = level.getEntities()
         lanterns = level.getLanterns()
-        
+
+        coords = self.coordinates()
+        start_x = max(0, coords[0] - self.sightdist - 2)
+        end_x = min(len(all_tiles[0]), coords[0] + self.sightdist + 2)
+        start_y = max(0, coords[1] - self.sightdist - 2)
+        end_y = min(len(all_tiles), coords[1] + self.sightdist + 2)
+
         GameImage.updateAnimation(self, 256) 
         for e in entities:
             if(e != self):
                e.update(self)
         if(self.current_level.outdoors):
             return
-        for row in tiles:    #IDEA: if the program becomes very slow, could limit tiles/lanterns to only the ones on camera. 
-            for t in row:    #(might need to add 1 to each border though)
-                if t.mapped:
-                    t.updateimage()
         nearby_light_sources = []
         far_light_sources = []
         for l in lanterns:
@@ -140,9 +136,13 @@ class Player(Being):
                 nearby_light_sources.append(l)
             else:
                 far_light_sources.append(l)
+        for row in all_tiles[start_y:end_y]:    #IDEA: if the program becomes very slow, could limit tiles/lanterns to only the ones on camera. 
+            for t in row[start_x:end_x]:    #(might need to add 1 to each border though)
+                if t.mapped:
+                    t.updateimage()
         for f in far_light_sources:
-        	f.update_light(tiles)
-        self.emit_light(self.sightdist, tiles, nearby_light_sources)
+        	f.update_light(all_tiles)
+        self.emit_light(self.sightdist, all_tiles, nearby_light_sources)
 
     def invisionrange(self, other):	#checks if the player can see a platform
         if(self.withindist(other, self.sightdist + other.light_distance())):
@@ -168,7 +168,7 @@ class Player(Being):
         self.collideExits()
         self.collideLanterns()
         if(self.bounce_count <= 0):
-            self.collideMonsters(xvel,yvel)
+            self.collideMonsters(xvel, yvel)
 
         #not sure if this method is still being used. If not, delete it.
     def collideExits(self):

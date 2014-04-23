@@ -67,11 +67,7 @@
 
     #LESS IMMEDIATE STUFF
 
-# implement sloping platforms (see link for ideas)
-    # since I don't know how pygame's collision method works, first try simply making sloping
-        # platform sprites and test running up and down on them.
-    # http://higherorderfun.com/blog/2012/05/20/the-guide-to-implementing-2d-platformers/
-    # also implement one-way platforms, ladders, etc
+# implement one-way platforms, ladders, doors, etc
 # Make a launcher that makes it possible to select which dungeon to load
     # It may help to change the dungeoneditor to let the user give different dungeons different saved names.
     # A filelist would be useful for this.
@@ -86,27 +82,24 @@
     # make lighting less laggy for large amounts of light
         # one way might be to only udpate tiles within rectangular areas around light sources.
     # consider possible combat systems (damage, HP, etc)
-# make jumping feel more natural
 
     #SPRITE STUFF
 
-#TODO: consider having tiles/textures be procedurally generated
-       # based on hardcoded platform locations/level data and a library of tiles
-       # alternately, use the map editor and a tileFactory to load in tiles from images which represent levels
-            # using only entities.
+#TODO: consider having tiles/textures be procedurally generated based on hardcoded platform locations/level data and a library of tiles.
+       # Alternately, use the map editor and a tileFactory to load in tiles from images which represent levels using only entities.
 
         #ENEMY/AI STUFF
 
-#TODO: implement more enemies. Try to give them very different behavior to force mystelf to expand the AI system.
-#TODO: when adding AI, try to be creative and extensible, as though this were a roguelike.
-#IDEA: could give some monsters strong knockback by increasing the bounce they deliver.
-#NOTE: enemies remain in the exact same state they were left in when the player leaves a level. should decide if this is good or bad.
+#TODO: implement more enemies. Try to give them very different behavior to force myself to expand the AI system.
+    # when adding AI, try to be creative and extensible, as though this were a roguelike.
+    #IDEA: could give some monsters strong knockback by increasing the bounce they deliver.
+# NOTE: enemies remain in the exact same state they were left in when the player leaves a level. should decide if this is good or bad.
 
         #PLATFORM STUFF
 
 #TODO: make the "platform" system more complex, possibly with inheritance/factory
         #consider platforms that  the player can jump up through and/or fall through  by tapping down
-#TODO: conider making half-steps and/or slopes that can be walked up
+#TODO: conider making stairs that can be walked up like slopes
 
         # MISC STUFF
 

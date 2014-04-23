@@ -8,7 +8,7 @@ class TileFactory(object):
 	#this setup might be useful for reading in an entire level of tiles, which in turn is read in from an image.
 	def __init__(self, tile_sheet_image, dimensions):
 		self.tile_images = []
-		default_rect = Rect(0,0,32,32)
+		default_rect = Rect(0, 0, 32, 32)
 		tile_sheet = SpriteSheet(tile_sheet_image, default_rect)
 		current_rect = default_rect
 		for y in range(0, dimensions[1]): #TODO: make it possible to move rect down for y > 1

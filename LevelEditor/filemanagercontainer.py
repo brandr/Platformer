@@ -3,6 +3,8 @@ from ocempgui.widgets.Constants import *
 from ocempgui.widgets.components import *
 
 import json
+from json import *
+from os import path
 
 from dungeondata import *
 
@@ -99,6 +101,14 @@ class FileManagerContainer(Box):
 		dungeon_data = self.dungeon_save_data()
 		save_data = dungeon_data.formatted_data()
 		json.dump(save_data, dungeon_file)
+		
+		dev_filepath = "C:\Users\Robert\Documents\platformer\Platformer\dungeon_map_files"
+		if(path.exists(dev_filepath)):
+			dev_filename = dev_filepath + "\dungeon" + slot
+			print "Saving dungeon for the developers..."
+			dev_dungeon_file = open(dev_filename,'wb') #'wb' means "write binary"
+			json.dump(save_data, dev_dungeon_file)
+
 		print "Dungeon saved."
 
 	def dungeon_save_data(self): #return a DungeonData object used for reading/writing files

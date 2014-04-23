@@ -40,6 +40,7 @@ class GameScreen:
         player_animations = Player.load_player_animation_set()
         
         start_level = dungeon.start_level()
+        start_level.screen = screen
         player = Player(player_animations, start_level)
         start_level.addPlayer(player)
 
@@ -48,7 +49,7 @@ class GameScreen:
 
         up = down = left = right = running = False
         while 1:
-            timer.tick(100)
+            timer.tick(110)
 
             for e in pygame.event.get():
                 if e.type == QUIT: raise SystemExit, "QUIT"
@@ -77,8 +78,8 @@ class GameScreen:
                 if e.type == KEYUP and e.key == K_LCTRL:
                     running = False
 
-        # draw background. apparently, this does nothing.
-            #for y in range(32):
-            #    for x in range(32):
-            #        screen.blit(bg, (x * 32, y * 32))
-            player.current_level.update(screen, up, down, left, right, running)
+        #draw background. apparently, this does nothing.
+            for y in range(32):
+                for x in range(32):
+                    screen.blit(bg, (x * 32, y * 32))
+            player.current_level.update(up, down, left, right, running)

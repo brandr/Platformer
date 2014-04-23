@@ -126,7 +126,7 @@ class TileData(object):
 		return (self.entity_key in ANIMATION_KEY_MAP or 
 				self.category() in CATEGORY_ANIMATION_KEY_MAP)
 
-	def animation_filepath(self,filepath_start = "./"): #TODO
+	def animation_filepath(self, filepath_start = "./"): #TODO
 		filepath = filepath_start + "animations"
 		key = self.entity_key
 		if key not in ENTITY_CATEGORY_MAP or key == None: 

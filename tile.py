@@ -30,15 +30,14 @@ class Tile(GameImage):
         if(self.block != None): 
             self.image = Surface((32, 32))
             self.block.updateimage(lightvalue)
-        #    return
+            if not self.block.is_sloped:        #TODO: if people are bothered by the effect, make it so sloping platforms are not transparent in caves.
+                return
         GameImage.updateimage(self, lightvalue)
 
-
-    def darkenTo(self,lightvalue):
-        GameImage.darkenTo(self,lightvalue)
+    def darkenTo(self, lightvalue):
+        GameImage.darkenTo(self, lightvalue)
         if(self.block != None): 
             self.block.darkenTo(0)
-            #self.block.darkenTo(lightvalue)
 
     def fullyDarken(self):
         GameImage.fully_darken(self)
@@ -58,24 +57,19 @@ class Tile(GameImage):
                 nexttile.spreadlight(dist - 1, tiles, 1, (d[0], d[1]), False, None, otherlights)
 
     def spreadlight(self, dist, tiles, iteration = 0, direction = None, lineflag = False, brightness = None, otherlights = []):#might be more efficienct  ways to do this
-        def get_brightness(): return ((0.9*dist + 1)/(max(dist + iteration, 1)))*256
-        
         self.map()
         if brightness == None:
-            brightness = get_brightness()
+            brightness = ((0.9*dist + 1)/(max(dist + iteration, 1)))*256#get_brightness()
         maxbrightness = brightness
         if otherlights != None:
             for o in otherlights:
                 if o.withindist(self, o.light_distance()):
                     checkbrightness = o.calculate_brightness(self.coordinates(), tiles)
                     maxbrightness = max(checkbrightness, brightness)
-        
-        # if brightness != None and self == tiles[-1][-1]: print maxbrightness #TEMP
         self.updateimage(maxbrightness)  #update the current image based on light level
-
-
         if dist <= 0:
             return               #once the light reaches its max distance, stop
+
         if self.block != None:
             d1 = (-1*direction[1], direction[0])
             d2 = (direction[1], -1*direction[0])
@@ -108,7 +102,6 @@ class Tile(GameImage):
  
     def relativetile(self, coords, tiles):
         startcoords = self.coordinates()
-
         tilecoords = (startcoords[0] + coords[0], startcoords[1] + coords[1])
         if Tile.validcoords(tilecoords, tiles):
             return Tile.tileat((tilecoords[0], tilecoords[1]), tiles)
