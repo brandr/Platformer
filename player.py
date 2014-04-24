@@ -17,6 +17,7 @@ class Player(Being):
         self.current_level = start_level
         self.sightdist = 2
         self.can_jump = True
+        self.on_ladder = False #TEMP
         
     @staticmethod
     def load_player_animation_set():
@@ -64,24 +65,45 @@ class Player(Being):
         if(self.bounce_count > 0):
             self.bounce()
             return
+
         self.xvel = 0
         if down:
             pass
+
         if left and not right:
-            self.xvel = -4
+            if self.on_ladder:
+                self.xvel = -2
+            else:
+                self.xvel = -4
             self.direction_id = 'left'
+
         if right and not left:
-            self.xvel = 4
+            if self.on_ladder:
+                self.xvel = 2
+            else:
+                self.xvel = 4
             self.direction_id = 'right'
-        if up:            # only jump if on the ground
-            if self.onGround:  
+
+        if self.on_ladder:  #TEMP
+            self.onGround = True
+            self.yvel = 0
+
+        if up and not down:            # only jump if on the ground
+            if self.on_ladder:         # TEMP. need more sophisticated checks as we implement more movement situations.
+                self.yvel = -2
+                #TODO: ladder climing animation goes here
+
+            elif self.onGround:  
                 self.yvel -= 8.0
                 self.changeAnimation('jumping', self.direction_id)
                 self.animation.iter()
                 self.onGround = False
                 self.can_jump = True
-            #elif self.can_jump: #and self.yvel > -12:
-            #    self.yvel -= 0.25
+                
+        if down and not up: 
+            if self.on_ladder: #TEMP
+                self.yvel = 2
+
         if not self.onGround:    # only accelerate with gravity if in the air
             self.yvel += 0.35
             #TODO: falling animation starts once self.yvel >=0 (or maybe slightly lower/higher)
@@ -155,20 +177,28 @@ class Player(Being):
         p = start
         if(start[0] > end[0]): 
             p = end
-        y = p[1] + slope*(x-p[0])
+        y = p[1] + slope*(x - op[0])
         return (x, y)
 
 #TODO: collide could be an abstract method in the object we collide with
     def collide(self, xvel, yvel):
         level = self.current_level
-        platforms = level.getPlatforms()
+        platforms = level.getPlatforms() #TODO: remember that it might be possible to pass through some platforms in some directions.
         for p in platforms:
             if pygame.sprite.collide_mask(self, p):
                 Being.collideWith(self, xvel, yvel, p)
+        self.collideLadders() #TEMP
         self.collideExits()
         self.collideLanterns()
         if(self.bounce_count <= 0):
             self.collideMonsters(xvel, yvel)
+
+    def collideLadders(self): #TEMP. if other blocks alter player motion (which they probably will), should handle this more generally.
+        self.on_ladder = False  # could also consider having this check in the ladder class, not the player class (to keep player class shorter)
+        ladders = self.current_level.getLadders()
+        for l in ladders:
+            if pygame.sprite.collide_rect(self, l):
+                self.on_ladder = True
 
         #not sure if this method is still being used. If not, delete it.
     def collideExits(self):

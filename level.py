@@ -1,5 +1,5 @@
-import room
 from room import *
+from roomfactory import *
 from tilefactory import * #TEMPORARY IMPORT
 
 class Level(object):
@@ -255,6 +255,9 @@ class Level(object):
 		
 	def getPlatforms(self):
 		return self.level_objects.get_entities(Platform)
+
+	def getLadders(self):
+		return self.level_objects.get_entities(Ladder)
 		
 	def getMonsters(self):
 		return self.level_objects.get_entities(Monster)

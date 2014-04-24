@@ -81,7 +81,7 @@ class RoomFactory(object):
 							still_entity_image = GameImage.still_animation_set(raw_entity_image,entity_rect)
 							e = EntityFactory.build_entity(still_entity_image, key, x, y)
 							entities.append(e)
-							if isinstance(e, Platform): t.block = e	
+							if isinstance(e, Block): t.block = e	
 		
 				tiles[y/DEFAULT_TILE_SIZE].append(t)
 				x += DEFAULT_TILE_SIZE 

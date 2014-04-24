@@ -1,4 +1,6 @@
 from platformfactory import *
+from ladder import *
+from sign import *
 from lantern import *
 from exitblock import *
 from monster import *
@@ -7,7 +9,13 @@ from roomdata import *
 ENTITY_CONSTRUCTOR_MAP = {
 	DEFAULT_PLATFORM:Platform,
 	SLOPING_PLATFORM:Platform,
+
+	DEFAULT_LADDER:Ladder,
+
+	DEFAULT_SIGN:Sign,
+
 	DEFAULT_LANTERN:Lantern,
+	
 	BAT:Monster,
 	GIANT_FROG:Monster
 }
@@ -32,6 +40,7 @@ class EntityFactory(object):
 	@staticmethod
 	def initSlopingPlatform(platform, arg):
 		platform.is_sloped = True
+		platform.is_sloped = False
 
 ENTITY_BUILD_MAP = {
 	SLOPING_PLATFORM:EntityFactory.initSlopingPlatform,

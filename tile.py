@@ -30,7 +30,7 @@ class Tile(GameImage):
         if(self.block != None): 
             self.image = Surface((32, 32))
             self.block.updateimage(lightvalue)
-            if not self.block.is_sloped:        #TODO: if people are bothered by the effect, make it so sloping platforms are not transparent in caves.
+            if self.block.is_square:        #TODO: if people are bothered by the effect, make it so non-square block are not transparent in caves.
                 return
         GameImage.updateimage(self, lightvalue)
 
@@ -59,7 +59,7 @@ class Tile(GameImage):
     def spreadlight(self, dist, tiles, iteration = 0, direction = None, lineflag = False, brightness = None, otherlights = []):#might be more efficienct  ways to do this
         self.map()
         if brightness == None:
-            brightness = ((0.9*dist + 1)/(max(dist + iteration, 1)))*256#get_brightness()
+            brightness = ((0.9*dist + 1)/(max(dist + iteration, 1)))*256
         maxbrightness = brightness
         if otherlights != None:
             for o in otherlights:

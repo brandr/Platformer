@@ -55,24 +55,24 @@
 
     (Also do this for all LevelEditor classes)
 
+# Make the frameworks that will allow text, dialogs, events, etc.
+    # Remember that some things should be skippable while others should not.
+# make it possible for the player to open up a map screen.
+        # (it may help to first rough out a very general design for "screens", "menus", and "controls"
+# restructure player (and possibly entity) movement, possibly by using a dict to map situations/input to actions.
+    - DEFINITELY draw a flowchart
+    - consider making ice blocks (or some other example besides ladders) to test whether this system is really extensible.
+# implement one-way platforms, doors, etc
 # fix movement/rect related stuff, and put all relevant methods in gameImage, to be called by subclasses.
     # This is partially, maybe completely done, but make sure before removing this TODO.
 # fix imports to be efficient/useful
-# reduce lag when player is in a cave (monsters may affect the lag)
-# reduce lag in dungeon editor, particularly for the level editor.
-# consider removing level_ID, but first try to think of possible uses for it.
-# figure out how to handle monsters in complete/partial darkness
-    # I put an idea in Being class
-    # Keep in mind that the being may occupy multiple tiles
 
     #LESS IMMEDIATE STUFF
 
-# implement one-way platforms, ladders, doors, etc
+# consider making it so the player does not jump repeatedly if the jump button is held down.
 # Make a launcher that makes it possible to select which dungeon to load
     # It may help to change the dungeoneditor to let the user give different dungeons different saved names.
     # A filelist would be useful for this.
-# Make the frameworks that will allow text, dialogs, events, etc.
-    # Remember that some things should be skippable while others should not.
 # build the enemies extensibly. Make temporary classes/methods if necessary, but plan to replace them later
     # have the bat start hanging from the ceiling and maybe give it "dropping"
         # animation followed by the flying animation
@@ -82,6 +82,13 @@
     # make lighting less laggy for large amounts of light
         # one way might be to only udpate tiles within rectangular areas around light sources.
     # consider possible combat systems (damage, HP, etc)
+# reduce lag when player is in a cave 
+    -monsters may affect the lag, though it mostly seems to come from the spreadLight method in Tile.
+# reduce lag in dungeon editor, particularly for the level editor.
+# consider removing level_ID, but first try to think of possible uses for it.
+# figure out how to handle monsters in complete/partial darkness
+    # I put an idea in Being class
+    # Keep in mind that the being may occupy multiple tiles
 
     #SPRITE STUFF
 
@@ -98,13 +105,10 @@
         #PLATFORM STUFF
 
 #TODO: make the "platform" system more complex, possibly with inheritance/factory
-        #consider platforms that  the player can jump up through and/or fall through  by tapping down
-#TODO: conider making stairs that can be walked up like slopes
+# consider platforms that  the player can jump up through and/or fall through  by tapping down
 
         # MISC STUFF
 
-#TODO: make it possible for the player to open up a map screen.
-        # (it may help to first rough out a very general design for "screens", "menus", and "controls"
 #TODO: make invisible caverns which can be revealed somehow. (test in sunlight first)
 #TODO: give exit blocks super terrifying sprites. (they can't be seen normally so it will be a fun surprise if there's a glitch or something)
 #TODO: think up lots of cool easter eggs (though this might be more of a long-term thing)

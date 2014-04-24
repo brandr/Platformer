@@ -13,6 +13,14 @@ PLATFORMS = "platforms"
 DEFAULT_PLATFORM = "default_platform"
 SLOPING_PLATFORM = "sloping_platform"
 
+#ladders
+LADDERS = "ladders"
+DEFAULT_LADDER = "default_ladder"
+
+#signs
+SIGNS = "signs"
+DEFAULT_SIGN = "default_sign"
+
 #lanterns
 LANTERNS = "lanterns"
 DEFAULT_LANTERN = "default_lantern"
@@ -26,6 +34,8 @@ GIANT_FROG = "giant_frog"
 ENTITY_CATEGORY_MAP = {
 	PLAYER_START:None,
 	DEFAULT_PLATFORM:PLATFORMS, SLOPING_PLATFORM:PLATFORMS,
+	DEFAULT_LADDER:LADDERS,
+	DEFAULT_SIGN:DEFAULT_SIGN,
 	DEFAULT_LANTERN:LANTERNS, 
 	BAT:MONSTERS, GIANT_FROG:MONSTERS
 }
@@ -101,12 +111,6 @@ class TileData(object):
 		image = self.get_image(filepath_start)
 		self.width = image.get_width()/DEFAULT_TILE_SIZE
 		self.height = image.get_height()/DEFAULT_TILE_SIZE
-		if(self.entity_key == "giant_frog"):
-			print "FILEPATH: " + str(filepath_start)
-			print "KEY: " + str(self.entity_key)
-			print "WIDTH: " + str(self.width)
-			print "HEIGHT: " + str(self.height)
-			print ""
 
 	def get_image(self, filepath_start = "./"):	#TODO: get the correct filepath here.
 		filename = "./images/" + self.image_filepath.split("/")[-1]
