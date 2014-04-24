@@ -57,7 +57,7 @@ class Player(Being):
 
         return animation_set
 
-    def update(self, tiles, up, down, left, right, running):
+    def update(self, tiles, up, down, left, right, space, running):
         #TODO: move some of this stuff to "being", and break it up to be more extensible.
             #could also make a Movement class, held as a data type by player or being.
 
@@ -66,22 +66,19 @@ class Player(Being):
             self.bounce()
             return
 
+        if up and self.up_action_check():
+            return
+
         self.xvel = 0
         if down:
             pass
 
         if left and not right:
-            if self.on_ladder:
-                self.xvel = -2
-            else:
-                self.xvel = -4
+            self.xvel = -4
             self.direction_id = 'left'
 
         if right and not left:
-            if self.on_ladder:
-                self.xvel = 2
-            else:
-                self.xvel = 4
+            self.xvel = 4
             self.direction_id = 'right'
 
         if self.on_ladder:  #TEMP
@@ -93,23 +90,23 @@ class Player(Being):
                 self.yvel = -2
                 #TODO: ladder climing animation goes here
 
-            elif self.onGround:  
+        if down and not up: 
+            if self.on_ladder: #TEMP
+                self.yvel = 2
+
+        if space and self.onGround and not self.on_ladder: 
                 self.yvel -= 8.0
                 self.changeAnimation('jumping', self.direction_id)
                 self.animation.iter()
                 self.onGround = False
                 self.can_jump = True
-                
-        if down and not up: 
-            if self.on_ladder: #TEMP
-                self.yvel = 2
 
         if not self.onGround:    # only accelerate with gravity if in the air
             self.yvel += 0.35
             #TODO: falling animation starts once self.yvel >=0 (or maybe slightly lower/higher)
             # max falling speed
             if self.yvel > 100: self.yvel = 100
-            if not up or self.yvel > 0:
+            if not space or self.yvel > 0:
                 self.yvel = max(self.yvel, 0)
                 self.can_jump = False
             #TODO: consider a separate falling animation at terminal velocity.
@@ -132,6 +129,19 @@ class Player(Being):
 
         Being.updatePosition(self)
         self.updateView(tiles)
+
+    def up_action_check(self):
+        #TODO: check more generally if anything in the player's current tile in up-interactable.
+        signs = self.current_level.getSigns()
+        for s in signs:
+            if pygame.sprite.collide_rect(self, s):
+                self.read_sign(s)
+
+    def read_sign(self, sign):
+        sign.execute_event(self.current_level)
+        #print sign.text 
+        # TODO: when the sign text pops up, the control scheme should probably change. (X to continue rather than movement)
+        # also need a pane to pop up at the top displaying the sign's text. Will probably need an image for this in paint.
      
      #this gets laggy when there is too much light. try to fix it. (might have to fix other methods instead)
     def updateView(self, all_tiles): #note: this is only to be used in "cave" settings. for areas that are outdoors, use something else.

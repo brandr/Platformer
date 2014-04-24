@@ -25,6 +25,7 @@ class Level(object):
 		if(self.outdoors): self.setTilesOutdoors() #TEMP
 		
 		self.calibrateLighting()
+		self.updating = True
 
 		#toString test methods
 	def to_string(self): #will only be used for testing, I  think
@@ -144,7 +145,7 @@ class Level(object):
 		return self.dungeon.level_at(x_coord,y_coord)
 
 		#find the direction of the level a tile is in, assuming that it is outside this level's borders.
-	def direction_of(self,coords):
+	def direction_of(self, coords):
 		dimensions = self.get_dimensions()
 		if(coords[0] <= 1): return (-1, 0)
 		if(coords[0] >= dimensions[0] - 1): return (1, 0)
@@ -159,7 +160,7 @@ class Level(object):
 		y_offset = position[1]/ROOM_HEIGHT
 		return (min_x+x_offset, min_y+y_offset)
 
-	def flipped_coords(self,global_coords,local_coords):
+	def flipped_coords(self, global_coords, local_coords):
 		dimensions = self.get_dimensions()
 		origin_x = self.origin[0]
 
@@ -199,8 +200,14 @@ class Level(object):
 		player.update(self.getTiles(), False, False, False, False, False)
 		pygame.display.update()
 
+	def lock(self):
+		self.updating = False
+
 #TODO: could put up,down,left,right and running into a single object which describes the player's current state
-	def update(self, up, down, left, right, running):	
+	def update(self, up, down, left, right, space, running):	
+		if not self.updating: #TEMP
+			pygame.display.update()
+			return
 		player = self.getPlayer()
 		all_tiles = self.getTiles()
 		start_x = max(0, self.level_camera.state.left/32)
@@ -210,7 +217,10 @@ class Level(object):
 		tiles = all_tiles[start_y:end_y][start_x:end_x]
 		if(player != None):
 			self.level_camera.update(player)
-			player.update(all_tiles, up, down, left, right, running)
+			player.update(all_tiles, up, down, left, right, space, running)
+			if not self.updating: #TEMP
+				pygame.display.update()
+				return
 			platforms = self.getPlatforms()
 			#for p in platforms: #not sure this is necessary. may use it later.
 			#	p.update(player)	
@@ -258,6 +268,9 @@ class Level(object):
 
 	def getLadders(self):
 		return self.level_objects.get_entities(Ladder)
+
+	def getSigns(self):
+		return self.level_objects.get_entities(Sign)
 		
 	def getMonsters(self):
 		return self.level_objects.get_entities(Monster)

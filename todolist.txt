@@ -55,6 +55,7 @@
 
     (Also do this for all LevelEditor classes)
 
+# Figure out a screen system with multiple layers so that dialog boxes can be shown over entities, entites over background tiles, etc.
 # Make the frameworks that will allow text, dialogs, events, etc.
     # Remember that some things should be skippable while others should not.
 # make it possible for the player to open up a map screen.
@@ -69,6 +70,7 @@
 
     #LESS IMMEDIATE STUFF
 
+# make lanterns run out with distanc
 # consider making it so the player does not jump repeatedly if the jump button is held down.
 # Make a launcher that makes it possible to select which dungeon to load
     # It may help to change the dungeoneditor to let the user give different dungeons different saved names.

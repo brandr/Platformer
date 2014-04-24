@@ -1,5 +1,6 @@
-import os, pygame
+import os#, pygame
 from pygame import *
+from gameevent import *
 import animationset
 from animationset import *
 

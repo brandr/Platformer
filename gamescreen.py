@@ -47,10 +47,9 @@ class GameScreen:
         # can probably make controls more extensible and put them in their own class.
         # could also make a dict instead of a series of if statements
 
-        up = down = left = right = running = False
+        up = down = left = right = space = running = False #NOTE: rename running when I redesign the control system.
         while 1:
             timer.tick(110)
-
             for e in pygame.event.get():
                 if e.type == QUIT: raise SystemExit, "QUIT"
                 if e.type == KEYDOWN and e.key == K_ESCAPE:
@@ -66,6 +65,8 @@ class GameScreen:
                     right = True
                 if e.type == KEYDOWN and e.key == K_LCTRL:
                     running = True
+                if e.type == KEYDOWN and e.key == K_SPACE:
+                    space = True
 
                 if e.type == KEYUP and e.key == K_UP:
                     up = False
@@ -77,9 +78,11 @@ class GameScreen:
                     right = False
                 if e.type == KEYUP and e.key == K_LCTRL:
                     running = False
+                if e.type == KEYUP and e.key == K_SPACE:
+                    space = False
 
-        #draw background. apparently, this does nothing.
-            for y in range(32):
-                for x in range(32):
-                    screen.blit(bg, (x * 32, y * 32))
-            player.current_level.update(up, down, left, right, running)
+        #draw background.
+            #for y in range(32):
+            #    for x in range(32):
+            #        screen.blit(bg, (x * 32, y * 32))
+            player.current_level.update(up, down, left, right, space, running)
