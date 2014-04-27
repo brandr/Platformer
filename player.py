@@ -18,6 +18,7 @@ class Player(Being):
         self.sightdist = 2
         self.can_jump = True
         self.on_ladder = False #TEMP
+        self.left, self.right, self.down, self.up, self.space, self.control = False, False, False, False, False, False
         
     @staticmethod
     def load_player_animation_set():
@@ -57,14 +58,19 @@ class Player(Being):
 
         return animation_set
 
-    def update(self, tiles, up, down, left, right, space, running):
+    def deactivate(self):
+        self.up, self.down, self.left, self.right, self.space, self.control = False, False, False, False, False, False
+
+    def update(self, tiles):
         #TODO: move some of this stuff to "being", and break it up to be more extensible.
             #could also make a Movement class, held as a data type by player or being.
 
         if(self.exitLevelCheck()): return
         if(self.bounce_count > 0):
             self.bounce()
-            return
+        
+
+        up, down, left, right, space, running = self.up, self.down, self.left, self.right, self.space, self.control
 
         if up and self.up_action_check():
             return

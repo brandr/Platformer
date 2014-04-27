@@ -8,6 +8,11 @@ class Level(object):
 	#only the player's current level should be active at any given time
 	def __init__(self, dungeon, level_data, origin, rooms):
 		self.screen = None
+		self.screen_manager = None
+		self.effect_layer = None
+		self.effect_offset = (0, 0)
+		self.has_effects = False
+
 		self.dungeon = dungeon 		#the LevelGroup that the level is part of
 		self.level_ID = level_data.name #a currently unused value which identifies the level uniquely
 		self.origin = origin 	#upper-left corner of the level (in terms of global coords, so each coordinate pair corresponds to a room)
@@ -25,7 +30,13 @@ class Level(object):
 		if(self.outdoors): self.setTilesOutdoors() #TEMP
 		
 		self.calibrateLighting()
-		self.updating = True
+		#self.updating = True
+
+	def initialize_screen(self, screen_manager, game_screen):
+		self.screen_manager = screen_manager
+		self.screen = game_screen.screen_image
+		self.effect_layer = Surface((self.screen.get_width(), self.screen.get_height()))
+		self.effect_layer.set_alpha(0)
 
 		#toString test methods
 	def to_string(self): #will only be used for testing, I  think
@@ -197,17 +208,32 @@ class Level(object):
 			return
 		player.moveTo(coords)
 		self.level_camera.update(player)
-		player.update(self.getTiles(), False, False, False, False, False)
+		player.update(self.getTiles())
 		pygame.display.update()
 
-	def lock(self):
-		self.updating = False
+	def begin_event(self, event):
+		self.getPlayer().deactivate()
+		self.screen_manager.current_screen.control_manager.switch_to_event_controls(event, self.getPlayer())
+
+	def set_effect(self, effect_image, offset):
+		self.effect_layer = effect_image
+		self.effect_offset = offset
+		self.has_effects = True
+
+	def clear_effects(self):
+		self.effect_layer = None
+		self.effect_offset = (0, 0)
+		self.has_effects = False
+
+	def display_dialog(self, dialog):
+		dialog.init_text_image()
+		self.set_effect(dialog.text_image, dialog.offset)
 
 #TODO: could put up,down,left,right and running into a single object which describes the player's current state
 	def update(self, up, down, left, right, space, running):	
-		if not self.updating: #TEMP
-			pygame.display.update()
-			return
+		#if not self.updating: #TEMP
+		#	pygame.display.update()
+		#	return
 		player = self.getPlayer()
 		all_tiles = self.getTiles()
 		start_x = max(0, self.level_camera.state.left/32)
@@ -217,10 +243,7 @@ class Level(object):
 		tiles = all_tiles[start_y:end_y][start_x:end_x]
 		if(player != None):
 			self.level_camera.update(player)
-			player.update(all_tiles, up, down, left, right, space, running)
-			if not self.updating: #TEMP
-				pygame.display.update()
-				return
+			player.update(all_tiles)
 			platforms = self.getPlatforms()
 			#for p in platforms: #not sure this is necessary. may use it later.
 			#	p.update(player)	
@@ -229,12 +252,18 @@ class Level(object):
 					self.screen.blit(t.image, self.level_camera.apply(t))
 			for e in self.getEntities():
 				self.screen.blit(e.image, self.level_camera.apply(e))
+			if(self.has_effects):
+				self.update_effects()
 			pygame.display.update()
+
+	def update_effects(self):
+		self.screen.blit(self.effect_layer, self.effect_offset)
 
 	def level_end_coords(self):
 		tiles = self.getTiles()
 		width  = len(tiles[0]) - 1
 		height = len(tiles) - 1
+		len(tiles) - 1
 		return (self.origin[0] + (width/ROOM_WIDTH),self.origin[1] + (height/ROOM_HEIGHT))
 
 	def get_dimensions(self):
