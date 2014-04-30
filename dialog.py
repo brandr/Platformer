@@ -2,11 +2,13 @@
 """
 
 from pygame import font, Color, Surface
+from effect import *
 
 BLACK = Color("#000000") #TEMP
 
-class Dialog:
+class Dialog(Effect):
 	def __init__(self, text = "", font_color = BLACK): #TODO: consider an arg just for the font.
+		Effect.__init__(self, Dialog.draw_image)
 		self.text = text
 		self.font_color = font_color
 		self.text_image = None
@@ -19,6 +21,10 @@ class Dialog:
 		text_image.convert()
 		self.text_image = text_image
 
+	def draw_image(self):
+		self.init_text_image()
+		return self.text_image
+
 	#def display(self, level):
 	#	screen = level.screen
 	#	text_font = font.Font(None, 30)	#TEMP
@@ -30,4 +36,4 @@ class Dialog:
 
 #TODO: finish making signs.
 #TODO: set up screen layer system. 
-#TODO: set up controls system based on roguelike.
+#TODO: set up controls system based on roguelikeself

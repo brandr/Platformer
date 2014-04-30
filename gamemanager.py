@@ -1,9 +1,9 @@
 """ A manager which controls the flow of gameplay, including switching between screens and controls.
 """
 
-#from gamescreen import *
 from screenmanager import *
 from dungeonfactory import *
+from cutscene import *
 
 class GameManager:
 	"""GameManager () -> GameManager
@@ -50,8 +50,11 @@ class GameManager:
 		control_manager = ControlManager(game_controls)
 		main_screen = MainGameScreen(control_manager, player) 
 		screen_manager = ScreenManager(master_screen, main_screen, player)
-
 		start_level.initialize_screen(screen_manager, main_screen)
+
+		actors = [player]
+		test_cutscene = Cutscene(actors)
+		player.current_level.begin_cutscene(test_cutscene)
 
 		while 1:
 			timer.tick(90)

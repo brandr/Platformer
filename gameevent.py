@@ -4,19 +4,21 @@
 from dialog import *
 
 class GameEvent:
-	def __init__(self, dialogs = []): #TEMP
-		self.dialogs = dialogs
+	def __init__(self, actions = []): #TEMP
+		self.actions = actions
 		self.current_dialog = None
 
 	def execute(self, level):
 		level.begin_event(self)
-		if self.dialogs:
-			self.current_dialog = self.dialogs[0]
+		if self.actions:
+			self.current_dialog = self.actions[0] #TEMP: should remain agnostic to dialog/other actions.
 		level.display_dialog(self.current_dialog)
 
 	def continue_event(self):
-		return False #TEMP
+		return False #TEMP. should advance to next action in actions.
 
-	#def display_dialog(self, screen, dialog):
-	#	dialog.display(screen)
-		
+	def update(self):
+		pass #TODO (or maybe have subclasses inherit)
+
+	def is_complete(self):
+		return False #TEMP

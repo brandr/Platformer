@@ -31,6 +31,7 @@ class ControlManager:
 		self.current_controls = controls #not sure if this will work
 
 	def switch_to_main_controls(self, player):
+		player.deactivate()
 		main_controls = MainGameControls(player)
 		self.switch_controls(main_controls)
 

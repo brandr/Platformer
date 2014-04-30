@@ -55,14 +55,29 @@
 
     (Also do this for all LevelEditor classes)
 
-# Figure out a screen system with multiple layers so that dialog boxes can be shown over entities, entites over background tiles, etc.
-# Make the frameworks that will allow text, dialogs, events, etc.
-    # Remember that some things should be skippable while others should not.
+# make the cutscene black bars fade in/out sometimes (use the "instant" arg)
+
+# make little boxes with borders for dialogue.
+
+# Make cutscenes and events more general. Try to implement some more examples, like non-player characters with actions and scrolling dialogue.
+# Think of a structure that will allow different events to happen at the same time in a cutscene 
+    - i.e., entity A starts walking, entity B starts while A is still walking
+    - this might work if actions are not ended when new actions start, meaning ending an action is an action in itself.
+
+# Finish the frameworks that will allow text, dialogs, events, etc.
+    - Remember that some things should be skippable while others should not.
+    - Test a number of different cutscene types for testing and implement them using the same general system.
+
 # make it possible for the player to open up a map screen.
-        # (it may help to first rough out a very general design for "screens", "menus", and "controls"
+    - Work with the general design for "screens", "menus", and "controls"
+
+# IDEA to reduce lag: make level blit directly onto a pygame screen and simply change this screen when necessary using the screemanager.
+    - Currently, the level blits onto an image which is then blitted onto a main screen, which is twice as much blitting as we really need.
+
 # restructure player (and possibly entity) movement, possibly by using a dict to map situations/input to actions.
     - DEFINITELY draw a flowchart
     - consider making ice blocks (or some other example besides ladders) to test whether this system is really extensible.
+
 # implement one-way platforms, doors, etc
 # fix movement/rect related stuff, and put all relevant methods in gameImage, to be called by subclasses.
     # This is partially, maybe completely done, but make sure before removing this TODO.

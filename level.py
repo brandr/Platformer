@@ -1,6 +1,7 @@
 from room import *
 from roomfactory import *
 from tilefactory import * #TEMPORARY IMPORT
+from effect import *
 
 class Level(object):
 	#a level is built from a rectangular set of rooms.
@@ -9,9 +10,9 @@ class Level(object):
 	def __init__(self, dungeon, level_data, origin, rooms):
 		self.screen = None
 		self.screen_manager = None
-		self.effect_layer = None
-		self.effect_offset = (0, 0)
+		self.effect_layer = []
 		self.has_effects = False
+		self.current_event = None
 
 		self.dungeon = dungeon 		#the LevelGroup that the level is part of
 		self.level_ID = level_data.name #a currently unused value which identifies the level uniquely
@@ -30,13 +31,10 @@ class Level(object):
 		if(self.outdoors): self.setTilesOutdoors() #TEMP
 		
 		self.calibrateLighting()
-		#self.updating = True
 
 	def initialize_screen(self, screen_manager, game_screen):
 		self.screen_manager = screen_manager
 		self.screen = game_screen.screen_image
-		self.effect_layer = Surface((self.screen.get_width(), self.screen.get_height()))
-		self.effect_layer.set_alpha(0)
 
 		#toString test methods
 	def to_string(self): #will only be used for testing, I  think
@@ -169,7 +167,7 @@ class Level(object):
 		min_y = self.origin[1]
 		x_offset = position[0]/ROOM_WIDTH
 		y_offset = position[1]/ROOM_HEIGHT
-		return (min_x+x_offset, min_y+y_offset)
+		return (min_x + x_offset, min_y + y_offset)
 
 	def flipped_coords(self, global_coords, local_coords):
 		dimensions = self.get_dimensions()
@@ -211,29 +209,51 @@ class Level(object):
 		player.update(self.getTiles())
 		pygame.display.update()
 
+	def begin_cutscene(self, cutscene, instant = True):
+		self.current_event = cutscene
+		self.draw_cutscene_bars(instant)
+		self.getPlayer().deactivate()
+		self.screen_manager.current_screen.control_manager.switch_to_event_controls(cutscene, self.getPlayer())
+		cutscene.begin()
+
+	def draw_cutscene_bars(self, instant = True, seconds = 1.5):
+		bar_width = self.screen.get_width()
+		bar_height = self.screen.get_height()/10
+		top_bar = Effect(Effect.draw_black_rectangle, (bar_width, bar_height), (0, 0))
+		bottom_bar = Effect(Effect.draw_black_rectangle, (bar_width, bar_height), (0, self.screen.get_height() - bar_height))
+		self.add_effect(top_bar)
+		self.add_effect(bottom_bar)
+
 	def begin_event(self, event):
+		self.current_event = event
 		self.getPlayer().deactivate()
 		self.screen_manager.current_screen.control_manager.switch_to_event_controls(event, self.getPlayer())
 
-	def set_effect(self, effect_image, offset):
-		self.effect_layer = effect_image
-		self.effect_offset = offset
+	def end_current_event(self):
+		self.current_event = None
+		self.clear_effects()
+		self.screen_manager.current_screen.control_manager.switch_to_main_controls(self.getPlayer())
+
+	def add_effect(self, effect):
+		effect_image = effect.draw_image()
+		self.effect_layer.append(effect)
 		self.has_effects = True
 
 	def clear_effects(self):
-		self.effect_layer = None
+		self.effect_layer = []
 		self.effect_offset = (0, 0)
 		self.has_effects = False
 
 	def display_dialog(self, dialog):
-		dialog.init_text_image()
-		self.set_effect(dialog.text_image, dialog.offset)
+		#dialog.init_text_image()
+		self.add_effect(dialog)
 
 #TODO: could put up,down,left,right and running into a single object which describes the player's current state
 	def update(self, up, down, left, right, space, running):	
-		#if not self.updating: #TEMP
-		#	pygame.display.update()
-		#	return
+		if(self.current_event):
+			self.current_event.update()
+			if(self.current_event.is_complete()):
+				self.end_current_event()
 		player = self.getPlayer()
 		all_tiles = self.getTiles()
 		start_x = max(0, self.level_camera.state.left/32)
@@ -257,7 +277,8 @@ class Level(object):
 			pygame.display.update()
 
 	def update_effects(self):
-		self.screen.blit(self.effect_layer, self.effect_offset)
+		for e in self.effect_layer:
+			self.screen.blit(e.draw_image(), e.offset)
 
 	def level_end_coords(self):
 		tiles = self.getTiles()
@@ -272,7 +293,7 @@ class Level(object):
 		height = len(tiles)
 		return (width, height)
 
-	def remove(self,entity):
+	def remove(self, entity):
 		self.level_objects.remove(entity)
 		if(self.outdoors): self.calibrateLighting()
 
