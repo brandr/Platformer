@@ -31,12 +31,6 @@ class GameManager:
 		dungeon = factory.build_dungeon("./dungeon_map_files/dungeon0")
 		print "Dungeon built."
 		
-		#old version for reference
-		
-		#mainScreen.runGame(master_screen, dungeon)
-
-		#TODO: make what is below here work for the platformer.
-
 		pygame.display.set_caption("title goes here")
 		timer = pygame.time.Clock()
 
@@ -52,8 +46,11 @@ class GameManager:
 		screen_manager = ScreenManager(master_screen, main_screen, player)
 		start_level.initialize_screen(screen_manager, main_screen)
 
-		actors = [player]
-		test_cutscene = Cutscene(actors)
+		#TEMP for testing cutscenes
+		player_right_method = GameManager.temp_player_right
+		player_right_action = GameAction(player_right_method, 60, None, player)
+		actions = [player_right_action] #TODO: action for player moving right
+		test_cutscene = Cutscene(actions)
 		player.current_level.begin_cutscene(test_cutscene)
 
 		while 1:
@@ -64,6 +61,10 @@ class GameManager:
 			screen_manager.update_current_screen()
 			self.draw_screen(screen_manager)
 			pygame.display.update()
+
+	@staticmethod	#TEMP FOR TESTING
+	def temp_player_right(arg, player):
+		player.right = True
 
 	def draw_screen(self, screen_manager):
 		screen_manager.draw_screen()

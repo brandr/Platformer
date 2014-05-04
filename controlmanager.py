@@ -35,6 +35,6 @@ class ControlManager:
 		main_controls = MainGameControls(player)
 		self.switch_controls(main_controls)
 
-	def switch_to_event_controls(self, event, player):
+	def switch_to_event_controls(self, event, player): #TODO: make it so pressing x doesn't cancel cutscenes
 		event_controls = EventControls(event, player)
 		self.switch_controls(event_controls)

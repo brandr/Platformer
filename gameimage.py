@@ -4,6 +4,9 @@ from gameevent import *
 import animationset
 from animationset import *
 
+WIN_WIDTH = 800
+WIN_HEIGHT = 640
+
 BACKGROUND_COLOR = Color("#000000")
 DEF_COLORKEY = Color("#FF00FF")
 

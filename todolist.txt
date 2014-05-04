@@ -53,20 +53,45 @@
     tile
     tilefactory
 
+    (some classes are not listed here)
     (Also do this for all LevelEditor classes)
 
-# make the cutscene black bars fade in/out sometimes (use the "instant" arg)
+IMMEDIATE STUFF: signs, cutscenes, events, dialog
 
-# make little boxes with borders for dialogue.
+-------------------------------------------------------------
 
-# Make cutscenes and events more general. Try to implement some more examples, like non-player characters with actions and scrolling dialogue.
+# make an NPC for the player to talk to. (use kenstar from girlchan in paradise)
+    - make sure to set dialog scrolling on for NPC dialogue (unless it's a minor character, maybe?)
+    - don't need to focus too much on general NPC mechanics for now-- make things very abstract so they can be used later, though.
+    - do this in an added level.
+    - also make a dialogue portrait and a system to access them from file.
+
+# implement yes/no options (selected with arrow keys) for dialogs
+
+# Make signs get their text (and number of panes of text, etc) through a more general process
+
+# figure out how to give the existing dialog boxes borders, maybe even make them loaded images instead.
+    - could make a nice little "sign" image with a wooden grain
+    - make it more visually clear that signs are waiting for a button input. (maybe a blinking icon?)
+
+# figure out how to handle dialogue panes with multiple lines of text.
+
+# Try to implement some more examples of cutscenes, like non-player characters with actions and scrolling dialogue.
+    - use dialogue from girlchan in paradise as a test. It'll make it more fun.
+    - Have Yusuke talking to Kenstar
+
 # Think of a structure that will allow different events to happen at the same time in a cutscene 
     - i.e., entity A starts walking, entity B starts while A is still walking
     - this might work if actions are not ended when new actions start, meaning ending an action is an action in itself.
+    - IDEA: different actions that make up a cutscene are linked to "next" actions, which execute when they are over.
 
-# Finish the frameworks that will allow text, dialogs, events, etc.
+# Finish the frameworks that will allow text, dialogs, events, cutscenes, etc.
     - Remember that some things should be skippable while others should not.
     - Test a number of different cutscene types for testing and implement them using the same general system.
+
+    -------------------------------------------------------------
+
+IMMEDIATE STUFF: screens, menus, movement
 
 # make it possible for the player to open up a map screen.
     - Work with the general design for "screens", "menus", and "controls"

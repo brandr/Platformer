@@ -209,18 +209,18 @@ class Level(object):
 		player.update(self.getTiles())
 		pygame.display.update()
 
-	def begin_cutscene(self, cutscene, instant = True):
+	def begin_cutscene(self, cutscene, instant = False):
 		self.current_event = cutscene
 		self.draw_cutscene_bars(instant)
 		self.getPlayer().deactivate()
-		self.screen_manager.current_screen.control_manager.switch_to_event_controls(cutscene, self.getPlayer())
+		self.screen_manager.current_screen.control_manager.switch_to_event_controls(cutscene, self.getPlayer()) #TODO: make sure the cutscene can't be cancelled with X like signs.
 		cutscene.begin()
 
-	def draw_cutscene_bars(self, instant = True, seconds = 1.5):
+	def draw_cutscene_bars(self, instant = True, seconds = 1.5): #TODO: use second arg here, I think (if not, remove them)
 		bar_width = self.screen.get_width()
 		bar_height = self.screen.get_height()/10
-		top_bar = Effect(Effect.draw_black_rectangle, (bar_width, bar_height), (0, 0))
-		bottom_bar = Effect(Effect.draw_black_rectangle, (bar_width, bar_height), (0, self.screen.get_height() - bar_height))
+		top_bar = Effect(Effect.draw_black_rectangle_top, (bar_width, bar_height), (0, 0), not instant)
+		bottom_bar = Effect(Effect.draw_black_rectangle_bottom, (bar_width, bar_height), (0, self.screen.get_height() - bar_height), not instant)
 		self.add_effect(top_bar)
 		self.add_effect(bottom_bar)
 
@@ -231,21 +231,28 @@ class Level(object):
 
 	def end_current_event(self):
 		self.current_event = None
-		self.clear_effects()
+		self.end_effects()
 		self.screen_manager.current_screen.control_manager.switch_to_main_controls(self.getPlayer())
 
 	def add_effect(self, effect):
-		effect_image = effect.draw_image()
 		self.effect_layer.append(effect)
 		self.has_effects = True
 
+	def remove_effect(self, effect):
+		if effect in self.effect_layer:
+			self.effect_layer.remove(effect)
+			if not self.effect_layer:
+				self.has_effects = False
+
+	def end_effects(self):
+		for e in reversed(self.effect_layer):
+			e.end(self)
+
 	def clear_effects(self):
 		self.effect_layer = []
-		self.effect_offset = (0, 0)
 		self.has_effects = False
 
 	def display_dialog(self, dialog):
-		#dialog.init_text_image()
 		self.add_effect(dialog)
 
 #TODO: could put up,down,left,right and running into a single object which describes the player's current state
@@ -278,7 +285,8 @@ class Level(object):
 
 	def update_effects(self):
 		for e in self.effect_layer:
-			self.screen.blit(e.draw_image(), e.offset)
+			next_effect, offset = e.draw_image(self)
+			self.screen.blit(next_effect, (e.offset[0] + offset[0], e.offset[1] + offset[1]))
 
 	def level_end_coords(self):
 		tiles = self.getTiles()
