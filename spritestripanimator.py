@@ -1,4 +1,3 @@
-import spritesheet
 from spritesheet import *
  
 class SpriteStripAnimator(object):

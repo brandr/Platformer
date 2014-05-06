@@ -1,9 +1,5 @@
-import gameimage
-from gameimage import *
-import tile
+#from gameimage import *
 from tile import *
-import math
-from math import *
 
 class Entity(GameImage):
     def __init__(self, animations):
@@ -11,6 +7,7 @@ class Entity(GameImage):
         self.color = BACKGROUND_COLOR
         self.unseen_color = Color("#FFFFFF")
         self.mapped = False
+        self.up_interactable = False
         self.current_level = None
 
     def dist_from(self,other):

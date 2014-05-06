@@ -1,4 +1,3 @@
-import being
 from being import *
 
 # A monster is more specific than a being in that it moves around and has AI.
@@ -8,12 +7,10 @@ from being import *
 
 class Monster(Being):
     def __init__(self, animations, x, y):#name, x, y): 
-        Being.__init__(self,animations)
+        Being.__init__(self,animations, x, y)
         # self.name = name	#not yet sure how useful a monster name will be. It seems reasonable enough though.
         self.name = None
         self.animated = True
-        self.rect.centerx += x
-        self.rect.centery += y
         self.sightdist = 6
         self.max_speed = 6
         self.direction_val = -1 # -1 for left, 1 for right

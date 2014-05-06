@@ -6,10 +6,8 @@ import sys
 
 sys.path.append("C:")
 pygame_files = ["C:\Python27\Lib\site-packages\pygame\SDL_ttf.dll", "C:\Python27\lib\site-packages\pygame\libogg-0.dll"]
+
 dungeon_data_files = ["C:\Users\Robert\Documents\platformer\Platformer\LevelEditor\dungeon_map_files\dungeon0"]
-
-#misc_data_files = ["C:\Users\Robert\Documents\platformer\Platformer\data\\test_tiles_1.bmp"] #consider adding all "data" files using all_files_in_dir.
-
 my_data_files = [("pygame_files", pygame_files), ("dungeon_map_files", dungeon_data_files)]
 level_editor_dir = "C:\Users\Robert\Documents\platformer\Platformer\LevelEditor\\"
 
@@ -53,6 +51,9 @@ setup(
    options = {
       "numpy" : {
          "includes" : ["_umath_linalg.pyd", "fftpack_lite.pyd"],
+         },
+      "dialog" : {
+         "includes" : ["pygame.font"],
          },
       #"filemanagercontainer" : {
       #   "includes" : ["ocempgui.widgets"],

@@ -42,10 +42,10 @@ class pygame2exe(py2exe.build_exe.py2exe): #This hack make sure that pygame defa
 class BuildExe:
     def __init__(self):
         #Name of starting .py
-        self.script = "MyApps.py"
+        self.script = "gamelauncher.py"
  
         #Name of program
-        self.project_name = "MyApps"
+        self.project_name = "Platformer"
  
         #Project url
         self.project_url = "about:none"
@@ -54,10 +54,10 @@ class BuildExe:
         self.project_version = "0.0"
  
         #License of the program
-        self.license = "MyApps License"
+        self.license = "Rubbetr License"
  
         #Auhor of program
-        self.author_name = "Me"
+        self.author_name = "Robert"
         self.author_email = "example@example.com"
         self.copyright = "Copyright (c) 2009 Me."
  
@@ -118,6 +118,19 @@ class BuildExe:
                         srcdir,
                         [os.path.basename(f) for f in glob.glob(self.opj(srcdir, '*'))])
         return file_list
+
+    def all_files_in_dir(self, new_dir_name, file_dir):
+        all_files = []
+        for files in os.listdir(file_dir):
+            f1 = file_dir + files
+            if os.path.isfile(f1): # skip directories
+                f2 = new_dir_name, [f1]
+                all_files.append(f2)
+            else:
+                next_files = self.all_files_in_dir(new_dir_name, f1 + "\\")
+                for i in next_files:
+                    all_files.append(i)
+        return all_files
  
     def run(self):
         if os.path.isdir(self.dist_dir): #Erase previous destination dir
@@ -129,12 +142,30 @@ class BuildExe:
             self.icon_file = os.path.join(path, 'pygame.ico')
  
         #List all data files to add
-        extra_datas = []
-        for data in self.extra_datas:
-            if os.path.isdir(data):
-                extra_datas.extend(self.find_data_files(data, '*'))
-            else:
-                extra_datas.append(('.', [data]))
+        dungeon_data_files = ["C:\Users\Robert\Documents\platformer\Platformer\LevelEditor\dungeon_map_files\dungeon0"]
+        dungeon_datas = ("dungeon_map_files", dungeon_data_files)
+
+        extra_datas = [dungeon_datas]
+        main_images_dir = "C:\Users\Robert\Documents\platformer\Platformer\LevelEditor\images\\"
+        image_files = self.all_files_in_dir("images", main_images_dir)
+        for i in image_files:
+            extra_datas.append(i)
+
+        main_animations_dir = "C:\Users\Robert\Documents\platformer\Platformer\LevelEditor\\animations\\"
+        animation_files = self.all_files_in_dir("animations", main_animations_dir)
+        for a in animation_files:
+            extra_datas.append(a)
+
+        main_data_dir = "C:\Users\Robert\Documents\platformer\Platformer\data\\"
+        data_files = self.all_files_in_dir("data", main_data_dir)
+        for d in data_files:
+            extra_datas.append(d)
+        #extra_datas = ["C:\Users\Robert\Documents\platformer\Platformer\LevelEditor\dungeon_map_files\dungeon0"]
+        #for data in self.extra_datas:
+        #    if os.path.isdir(data):
+        #        extra_datas.extend(self.find_data_files(data, '*'))
+        #    else:
+        #        extra_datas.append(('.', [data]))
         
         setup(
             cmdclass = {'py2exe': pygame2exe},

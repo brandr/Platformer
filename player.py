@@ -1,10 +1,6 @@
-import being
 from being import *
-import lantern
 from lantern import *
-import exitblock
 from exitblock import *
-import platform
 from platform import *
 
 class Player(Being):
@@ -138,13 +134,14 @@ class Player(Being):
 
     def up_action_check(self):
         #TODO: check more generally if anything in the player's current tile in up-interactable.
-        signs = self.current_level.getSigns()
-        for s in signs:
-            if pygame.sprite.collide_rect(self, s):
-                self.read_sign(s)
+        #signs = self.current_level.getSigns()
+        ups = self.current_level.up_interactable_objects()
+        for u in ups:
+            if pygame.sprite.collide_rect(self, u):
+                self.up_interact(u)
 
-    def read_sign(self, sign):
-        sign.execute_event(self.current_level)
+    def up_interact(self, interactable):
+        interactable.execute_event(self.current_level)
         #print sign.text 
         # TODO: when the sign text pops up, the control scheme should probably change. (X to continue rather than movement)
         # also need a pane to pop up at the top displaying the sign's text. Will probably need an image for this in paint.
@@ -152,7 +149,8 @@ class Player(Being):
      #this gets laggy when there is too much light. try to fix it. (might have to fix other methods instead)
     def updateView(self, all_tiles): #note: this is only to be used in "cave" settings. for areas that are outdoors, use something else.
         level = self.current_level
-        entities = level.getEntities()
+        #entities = level.getEntities()
+        player_interactables = level.player_interactables()
         lanterns = level.getLanterns()
 
         coords = self.coordinates()
@@ -162,9 +160,8 @@ class Player(Being):
         end_y = min(len(all_tiles), coords[1] + self.sightdist + 2)
 
         GameImage.updateAnimation(self, 256) 
-        for e in entities:
-            if(e != self):
-               e.update(self)
+        for e in player_interactables:
+            e.update(self)
         if(self.current_level.outdoors):
             return
         nearby_light_sources = []

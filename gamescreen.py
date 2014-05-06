@@ -2,7 +2,6 @@
 
 #TODO: divide what is in this screen into gamescreen (abstract) and maingamescreen (specfic)
 
-from pygame import *
 from controlmanager import *
 from player import *
 from dungeon import *

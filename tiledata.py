@@ -1,11 +1,12 @@
-from pygame import *
+from pygame import image
 import pygame, pygame.locals
-#from ocempgui.draw import Image
+
+
+# TODO: temporarily add kenstar
 
 DEFAULT_TILE_SIZE = 32
 
 #entity keys 
-
 PLAYER_START = "player_start" 
 
 #platforms
@@ -30,6 +31,15 @@ MONSTERS = "monsters"
 BAT = "bat"
 GIANT_FROG = "giant_frog"
 
+#NPCS
+NPCS = "NPCs"
+
+#---------TEMPORARY------------------
+
+KENSTAR = "kenstar"
+
+#---------TEMPORARY-------------------
+
 #category map
 ENTITY_CATEGORY_MAP = {
 	PLAYER_START:None,
@@ -37,7 +47,9 @@ ENTITY_CATEGORY_MAP = {
 	DEFAULT_LADDER:LADDERS,
 	DEFAULT_SIGN:DEFAULT_SIGN,
 	DEFAULT_LANTERN:LANTERNS, 
-	BAT:MONSTERS, GIANT_FROG:MONSTERS
+	BAT:MONSTERS, GIANT_FROG:MONSTERS,
+	#TEMP
+	KENSTAR:NPCS
 }
 
 #animation key maps
@@ -79,6 +91,12 @@ DEFAULT_MONSTER_ANIMATION_KEYS = [
 	(IDLE_RIGHT, IDLE, D_RIGHT)
 ]
 
+DEFAULT_NPC_ANIMATION_KEYS = [
+	(IDLE_LEFT, IDLE, D_DEFAULT),
+	(IDLE_LEFT,  IDLE, D_LEFT), 
+	(IDLE_RIGHT, IDLE, D_RIGHT)
+]
+
 # Note that not every monster needs an animation key set.
 	# We can use default(s) for monsters whose animation key sets
 	# are not shown here, based on their type if necessary.
@@ -96,6 +114,7 @@ ANIMATION_KEY_MAP = {
 
 CATEGORY_ANIMATION_KEY_MAP = {
 	MONSTERS:DEFAULT_MONSTER_ANIMATION_KEYS, 
+	NPCS:DEFAULT_NPC_ANIMATION_KEYS
 }
 
 class TileData(object):
@@ -121,7 +140,7 @@ class TileData(object):
 		"""
 		NOTE: copied from ocempgui.
 		"""
-		surface = image.load (filename)
+		surface = image.load(filename)
 		if colorkey:
 			surface.set_colorkey (colorkey)
 		if alpha or surface.get_alpha ():
@@ -166,24 +185,24 @@ class TileData(object):
 				next_data = None
 				next_tile = formatted_data[y][x]
 				if next_tile != None:
-					TileData.addTiles(tiles,next_tile,x,y,filepath)
+					TileData.addTiles(tiles, next_tile, x, y, filepath)
 		return tiles
 
 	@staticmethod
 	def addTiles(tiles,formatted_data, x_pos, y_pos, filepath = "./"):
 		width = formatted_data[2]
 		height = formatted_data[3]
-		origin_tile = TileData.deformatted_tile(formatted_data,filepath)
+		origin_tile = TileData.deformatted_tile(formatted_data, filepath)
 		tiles[y_pos][x_pos] = origin_tile
 		for x in range(x_pos + 1, x_pos + width):
-			tiles[y_pos][x] = BlockedTileData(origin_tile,x_pos,y_pos)
-		for y in range(y_pos + 1,y_pos + height):
+			tiles[y_pos][x] = BlockedTileData(origin_tile, x_pos, y_pos)
+		for y in range(y_pos + 1, y_pos + height):
 			for x in range(x_pos, x_pos + width):
-				tiles[y][x] = BlockedTileData(origin_tile,x_pos,y_pos)
+				tiles[y][x] = BlockedTileData(origin_tile, x_pos, y_pos)
 
 	@staticmethod
 	def deformatted_tile(formatted_data, filepath = "./"):	#this will need to change as this class's constructor does.
-		return TileData(formatted_data[0],formatted_data[1],filepath)
+		return TileData(formatted_data[0], formatted_data[1], filepath)
 
 
 class BlockedTileData(TileData): #this is a space in a room's tiles blocked out by some object that takes up more than one tile.
@@ -193,4 +212,3 @@ class BlockedTileData(TileData): #this is a space in a room's tiles blocked out 
 
 	def formatted_data(self):
 		return None
-

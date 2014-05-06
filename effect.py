@@ -1,7 +1,8 @@
 """ A visual effect that appears in the game, like a dialog box or black cutscene bars.
 """
 
-from pygame import *
+#from pygame import Surface, Rect
+from tile import *
 
 class Effect:
 	""" Effect( ... ) -> Effect

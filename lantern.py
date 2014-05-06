@@ -1,4 +1,3 @@
-import entity
 from entity import *
 
 class Lantern(Entity):	#lantern which can help the player see

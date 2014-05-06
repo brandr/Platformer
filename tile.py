@@ -1,8 +1,6 @@
 import pygame
 from pygame import Rect, Color, Surface
-import math
 from math import *
-import gameimage
 from gameimage import *
 
 class Tile(GameImage):

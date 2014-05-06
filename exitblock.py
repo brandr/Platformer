@@ -1,10 +1,9 @@
-import entity
-from entity import *
+from block import *
 
-class ExitBlock(Entity): #block which exits the level and takes the player elsewhere
+class ExitBlock(Block): #block which exits the level and takes the player elsewhere
 	def __init__(self, animations,x, y):
-		Entity.__init__(self,animations)#Rect(x, y, 32, 32))
-		self.rect = Rect(x, y, 32, 32)
+		Block.__init__(self, animations, x, y)#Rect(x, y, 32, 32))
+		#self.rect = Rect(x, y, 32, 32)
 
 	def update(self, player): 
 		pass

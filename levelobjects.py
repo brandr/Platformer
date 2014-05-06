@@ -1,17 +1,8 @@
-#all entities in a level (including player, )
-import platform
-from platform import *
-import monster
-from monster import *
-import lantern
-from lantern import *
-import exitblock
-from exitblock import *
 from roomdata import *
 
 class LevelObjects(object):
 	
-	def __init__(self, level, tiles = None,entities = None):
+	def __init__(self, level, tiles = None, entities = None):
 		self.level = level
 		self.tiles = tiles
 		self.entities = entities
@@ -25,7 +16,7 @@ class LevelObjects(object):
 
 	def addPlayer(self, player):
 		self.player = player
-		self.entities.append(player)#add(player)
+		self.entities.append(player)
 
 	def remove(self, entity):
 		self.entities.remove(entity)

@@ -1,6 +1,5 @@
 from room import *
-from roomfactory import *
-from tilefactory import * #TEMPORARY IMPORT
+from entityfactory import *
 from effect import *
 
 class Level(object):
@@ -195,7 +194,7 @@ class Level(object):
 		global_coords = self.global_coords(adjusted_coords)
 		if(self.next_level_exists(global_coords, direction)):
 			next_level = self.level_in_direction(global_coords[0], global_coords[1], direction)
-			self.dungeon.movePlayer(self.screen, player, next_level, global_coords, adjusted_coords)
+			self.dungeon.movePlayer(self.screen_manager, self.screen, player, next_level, global_coords, adjusted_coords)
 		#TODO: error case
 
 	def addPlayer(self, player, coords = None):
@@ -300,6 +299,20 @@ class Level(object):
 		width  = len(tiles[0])
 		height = len(tiles)
 		return (width, height)
+
+	def player_interactables(self):
+		interactables = []
+		for m in self.getMonsters():
+			interactables.append(m)
+		return interactables
+		#TODO: other objects that should update based on the player
+
+	def up_interactable_objects(self):
+		ups = []
+		for e in self.getEntities():
+			if e.up_interactable:
+				ups.append(e)
+		return ups
 
 	def remove(self, entity):
 		self.level_objects.remove(entity)

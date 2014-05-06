@@ -31,9 +31,12 @@ class Being(Entity):
     change direction while it's bouncing.
     """
 
-    def __init__(self, animations):
+    def __init__(self, animations, x = None, y = None):
         Entity.__init__(self, animations)
         self.direction_id = None
+        if x and y:
+            self.rect.centerx += x
+            self.rect.centery += y
         self.xvel = 0
         self.yvel = 0
         self.onGround = False
@@ -42,6 +45,9 @@ class Being(Entity):
         self.max_speed = 10 # doesn't apply to player yet, but could
         self.bounce_count = 0
         #TODO: if methods/data from monster/player are universal, move them to this class.
+
+    def update(self, player):
+        self.updateAnimation()
 
     def updateAnimation(self, light_value = None): #
         """ updateAnimation ( int ) -> None
@@ -94,7 +100,7 @@ class Being(Entity):
         it will become flush with that platform no matter what its velocity is, and be unable 
         to move in the direction of that platform. (i.e., through the platform.)
         """
-        if pygame.sprite.collide_mask(self, collide_object): #TODO: case for sloping objects
+        if pygame.sprite.collide_mask(self, collide_object): 
             if isinstance(collide_object, Platform) and collide_object.is_sloped:
                 self.collideWithSlope(xvel, yvel, collide_object)
                 return
@@ -113,10 +119,6 @@ class Being(Entity):
         if yvel == 0:
             while pygame.sprite.collide_mask(self, slope):
                 self.rect.bottom -= 1
-                #if xvel > 0:
-                #    self.rect.right -= 1
-                #if xvel < 0:
-                #    self.rect.left += 1
         else:
             while pygame.sprite.collide_mask(self, slope):
                 if xvel > 0:

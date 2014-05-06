@@ -1,6 +1,3 @@
-import pygame
-from pygame import *
-import gameimage
 from gameimage import *
 
 class TileFactory(object):

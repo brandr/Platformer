@@ -25,9 +25,10 @@ class Dungeon(object):
 		return None
 
 		#TODO: error case where next_level is None.
-	def movePlayer(self, screen, player, next_level, global_coords, local_coords):
+	def movePlayer(self, screen_manager, screen, player, next_level, global_coords, local_coords):
 		room_coords = (local_coords[0]%ROOM_WIDTH,local_coords[1]%ROOM_HEIGHT)
 		next_coords = next_level.flipped_coords(global_coords, room_coords) #TODO: will have to change this
+		next_level.screen_manager = screen_manager
 		next_level.screen = screen
 		next_level.addPlayer(player, next_coords)
 		

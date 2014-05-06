@@ -2,6 +2,7 @@
 """
 
 from pygame import font, Color, Surface
+#from pygame.font import *
 from effect import *
 
 BLACK = Color("#000000") #TEMP
@@ -16,26 +17,20 @@ class Dialog(Effect):
 		self.next_actions = []
 		self.index = 0
 		self.draw_pane = None
-		#TODO: implement scrolling text starting somewhere around here using the scrolling arg
-		# if scrolling, simply use incrementing index, same as the cutscene bars,
-		# and have the index value (multiplied by some value) represent the number of letters
-		# shown. If the player holds x, this the letters load faster. (should be done by increasing index faster)
 		if source in PANE_MAP:
 			self.draw_pane = PANE_MAP[source]
 		self.text = text
 		self.dimensions = dimensions
 		self.scrolling = scrolling
 		self.font_color = font_color
-		#self.text_image = None
 		self.offset = (12, 12) #TEMP
 
 	def draw_text_image(self):
 		current_text = self.text[0:int(self.index/SCROLL_CONSTANT)] #TODO: get a number of letters dependent on index
-		text_font = font.Font(None, 30)	#TEMP
+		text_font = font.Font("./fonts/FreeSansBold.ttf", 20)	#TEMP
 		text_image = text_font.render(current_text, 1, self.font_color)
 		text_image.convert()
 		return text_image
-		#self.text_image = text_image
 
 	def draw_image(self, level):
 		pane_image = self.draw_pane(self)
@@ -55,7 +50,7 @@ class Dialog(Effect):
 		self.next_actions.append(action)
 
 	def continue_action(self, event, level):
-		if(self.index <= len(self.text)):
+		if(self.index/SCROLL_CONSTANT <= len(self.text)):
 			self.index = int(SCROLL_CONSTANT * len(self.text))
 			return True
 		event.remove_action(self)

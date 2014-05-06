@@ -1,7 +1,6 @@
 """Uses spritestripanimator (not made by me) to animate images.
 """
 
-import spritestripanimator
 from spritestripanimator import *
 
 class AnimationSet(object):

@@ -2,7 +2,8 @@
 	processing.
 """
 
-from pygame import *
+import pygame
+from pygame.locals import *
 
 class Controls:
 	""" Controls( ... ) -> Controls

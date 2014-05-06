@@ -1,12 +1,6 @@
-import pygame
-from pygame import *
-import camera
 from camera import *
-import levelobjects
 from levelobjects import *
-import gameimage
 from gameimage import *
-
 
 
 class Room(object):

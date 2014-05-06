@@ -1,7 +1,7 @@
 import os#, pygame
-from pygame import *
+#from pygame import *
+#import pygame
 from gameevent import *
-import animationset
 from animationset import *
 
 WIN_WIDTH = 800
