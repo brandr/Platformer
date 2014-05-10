@@ -54,11 +54,11 @@ class BuildExe:
         self.project_version = "0.0"
  
         #License of the program
-        self.license = "Rubbetr License"
+        self.license = "Rubbert License"
  
         #Auhor of program
         self.author_name = "Robert"
-        self.author_email = "example@example.com"
+        self.author_email = "jue@brbr.com"
         self.copyright = "Copyright (c) 2009 Me."
  
         #Description
@@ -155,6 +155,11 @@ class BuildExe:
         animation_files = self.all_files_in_dir("animations", main_animations_dir)
         for a in animation_files:
             extra_datas.append(a)
+
+        main_portraits_dir = "C:\Users\Robert\Documents\platformer\Platformer\LevelEditor\\portraits\\"
+        portrait_files = self.all_files_in_dir("portraits", main_portraits_dir)
+        for p in portrait_files:
+            extra_datas.append(p)
 
         main_data_dir = "C:\Users\Robert\Documents\platformer\Platformer\data\\"
         data_files = self.all_files_in_dir("data", main_data_dir)

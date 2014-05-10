@@ -21,7 +21,7 @@ class Sign(Block): #TODO: figure out how to set text, # of panes, whether text i
 		if self.text_set:
 			dialog_set = []
 			for t in self.text_set:
-				dialog = Dialog(SIGN, t, (DIALOG_BOX_WIDTH, DIALOG_BOX_HEIGHT), self.scrolling)
+				dialog = Dialog(SIGN, t, None, (DIALOG_BOX_WIDTH, DIALOG_BOX_HEIGHT), self.scrolling)
 				dialog_set.append(dialog)
 			for i in range(0, len(dialog_set) - 1):
 				dialog_set[i].add_next_action(dialog_set[i + 1])

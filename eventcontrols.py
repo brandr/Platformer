@@ -26,7 +26,21 @@ class EventControls(Controls):
 		self.player.current_level.clear_effects()
 		self.control_manager.switch_to_main_controls(self.player)
 
+	def up_arrow_action(self, key, toggle):
+		if(toggle):
+			self.event.process_key(UP)
+
+	def down_arrow_action(self, key, toggle):
+		if(toggle):
+			self.event.process_key(DOWN) #self.level or self.evevt?
+
+UP, DOWN = "up", "down"
+
 prompt_continue_event = EventControls.prompt_continue_event
+up_arrow_action = EventControls.up_arrow_action
+down_arrow_action = EventControls.down_arrow_action
 EVENT_CONTROL_MAP = {
-	K_x:prompt_continue_event
+	K_x:prompt_continue_event,
+	K_UP:up_arrow_action,
+	K_DOWN:down_arrow_action
 }

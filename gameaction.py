@@ -12,6 +12,9 @@ class GameAction:
 		self.actor = actor
 		self.arg = arg
 
+	def process_key(self, key):
+		pass
+
 	def add_next_action(self, action):
 		self.next_actions.append(action)
 

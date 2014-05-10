@@ -304,6 +304,8 @@ class Level(object):
 		interactables = []
 		for m in self.getMonsters():
 			interactables.append(m)
+		for n in self.getNPCs():
+			interactables.append(n)
 		return interactables
 		#TODO: other objects that should update based on the player
 
@@ -345,6 +347,9 @@ class Level(object):
 		
 	def getMonsters(self):
 		return self.level_objects.get_entities(Monster)
+
+	def getNPCs(self):
+		return self.level_objects.get_entities(NonPlayerCharacter)
 
 	def getLanterns(self):
 		return self.level_objects.get_entities(Lantern)

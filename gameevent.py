@@ -11,15 +11,15 @@ class GameEvent:
 		self.current_actions = start_actions
 		self.level = None
 
+	def process_key(self, key):
+		for a in self.current_actions:
+			a.process_key(key)
+
 	def execute(self, level):
 		self.level = level
 		level.begin_event(self)
 		for a in self.current_actions:
 			a.execute(level)
-		#TODO: if self.actions, execute all starting actions 
-		#if self.actions:
-		#	self.current_action = self.actions[0] #TODO: actually begin the action
-		#level.display_dialog(self.current_dialog)
 
 	def continue_event(self):
 		if self.current_actions:

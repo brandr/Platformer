@@ -43,6 +43,10 @@ class EntityFactory(object):
 		monster.name = name
 
 	@staticmethod
+	def inintNPC(npc, name):
+		npc.name = name
+
+	@staticmethod
 	def initSlopingPlatform(platform, arg):
 		platform.is_sloped = True
 		platform.is_square = False
@@ -50,5 +54,6 @@ class EntityFactory(object):
 ENTITY_BUILD_MAP = {
 	SLOPING_PLATFORM:EntityFactory.initSlopingPlatform,
 	BAT:EntityFactory.initMonster,
-	GIANT_FROG:EntityFactory.initMonster
+	GIANT_FROG:EntityFactory.initMonster,
+	KENSTAR:EntityFactory.inintNPC
 }
