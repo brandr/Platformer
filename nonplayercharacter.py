@@ -14,28 +14,19 @@ class NonPlayerCharacter(Being):
 		self.up_interactable = True
 		self.scrolling = True #might want to make more elaborate scrolling later
 		self.name = None
-
-		self.right = False #TEMP
+		self.active = True
+		self.direction_id = 'left'
+		self.changeAnimation('idle','left')
 
 		#TEMPORARY FOR TESTING
+		self.right = False #TEMP
 
-		self.start_dialog = None
+		
 
-		one_pane_dialog_tree = (
-									[
-										("Whaaaaaaaaaaat is this place?? \n" + "It looks like some kind of... demo.", NEUTRAL)
-									], None
-								)
-
-		two_pane_dialog_tree = (
-									[
-										("Whaaaaaaaaaaat is this place?? \n" + "It looks like some kind of... demo.", NEUTRAL),
-										("Do you know the way out of here?", NEUTRAL)
-									], None
-								)
 
 		#TODO: redesign this structure so that lists of dialogs can be paired not only to dialog choices or None, but also to miscellaneous actions
 		# use string keys or something
+		TIRED_DIALOG = "tired_dialog"
 		branching_dialog_tree = (
 									[
 										("Whaaaaaaaaaaat is this place??", NEUTRAL),
@@ -63,12 +54,22 @@ class NonPlayerCharacter(Being):
 																ACTION_SET,
 																[ 
 																	(	#TODO: make the action work
-																		NonPlayerCharacter.temp_npc_right_method, 20, None 
+																		NonPlayerCharacter.temp_npc_right_method, 30, None 
 																	),
 																	(
 																		NonPlayerCharacter.temp_stop_method, 0, None 
 																	)
-																]
+																],
+																(
+																	ADD_DIALOG_SET,
+																	[
+																		("That's enough walking for one day.", NEUTRAL)
+																	], 
+																	(
+																		SETUP_NEXT_DIALOG,
+																		TIRED_DIALOG
+																	)
+																), None
 															)
 														),
 														("No",
@@ -87,31 +88,21 @@ class NonPlayerCharacter(Being):
 										]
 									)
 							)
+		
+		tired_dialog_tree = (
+			[
+				("Boy, I sure am tired.", NEUTRAL)
+			], None
+		)
 
-		linear_action_tree = (
-								[
-									("Whaaaaaaaaaaat is this place?? \n" + "It looks like some kind of... demo.", NEUTRAL),
-									("I'd bettter go look for Yusuke...", NEUTRAL),
-									("...and by that, I mean walk slightly to the right.", NEUTRAL)
-								], 	
-								( #TODO: create a framework for "next action" that works for choice dialogs and other actions alike
-								  #TODO: change the framework so that multiple actions can be executed in turn (this will be useful for
-								  # making a character stop after walking a certain distance)
+		temp_dialog_tree_map = {
+			TIRED_DIALOG:tired_dialog_tree
+		}
+		#TEMP FOR TESTING
 
-									ACTION_SET,
-									[ 
-										(
-											NonPlayerCharacter.temp_npc_right_method, 20, None 
-										),
-										(
-											NonPlayerCharacter.temp_stop_method, 0, None 
-										)
-									]
-									#GameAction(NonPlayerCharacter.temp_npc_right_method, 60, None, self)
-								)
-							)
-
-		self.dialog_tree = branching_dialog_tree #branching_dialog_tree
+		self.dialog_tree = branching_dialog_tree
+		self.dialog_tree_map = temp_dialog_tree_map
+	
 		#TODO: make it so talking to a character multiple times can (but doesn't always) yield different results.
 		# think of some example structures before implementing this
 		# for instance, should there be a "default" response that the character resolves into?
@@ -120,21 +111,39 @@ class NonPlayerCharacter(Being):
 	def get_name(self):
 		return self.name
 
-	def get_source(self): #get_source is used to make dialog trees work properly.
+	def get_source(self): # get_source is used to make dialog trees work properly.
 		return self
 
 	def update(self, player):
+		self.changeAnimation('idle', self.direction_id)
+		if self.active:
+			self.NPC_update(player)
 		#TEMP	
 		if(self.right):
 			self.xvel = 4
 			self.direction_id = 'right'	
-			self.changeAnimation('idle', self.direction_id)
 		else:
 			self.xvel = 0
 		#TEMP	
 
 		Being.update(self, player)
 		Being.updatePosition(self)
+
+	def NPC_update(self, player):
+		self.face_towards(player)
+
+	def face_towards(self, target):
+		if(target != None):
+			x_dist = target.coordinates()[0] - self.currenttile().coordinates()[0]
+			if x_dist == 0: return
+			self.direction_val = x_dist/abs(x_dist)
+			if self.direction_val == -1:
+				self.direction_id = 'left'
+			if self.direction_val == 1:
+				self.direction_id = 'right'
+
+	def set_active(self, active):
+		self.active = active
 
 	def temp_stop_method(self, arg = None):
 		self.left, self.right, self.up, self.down = False, False, False, False	
@@ -143,12 +152,11 @@ class NonPlayerCharacter(Being):
 		self.right = True
 
 	def init_dialogs(self, dialog_tree):
-		full_dialog_set = None
 		start_dialog_set = self.build_dialog_set(dialog_tree[0])
 		start_action_data = dialog_tree[1]
 		if(start_action_data):
-			full_dialog_set = self.init_dialog_set(start_dialog_set, start_action_data)	
-		self.first_dialog = full_dialog_set[0]
+			start_dialog_set = self.init_dialog_set(start_dialog_set, start_action_data)	
+		self.first_dialog = start_dialog_set[0]
 
 	def init_dialog_set(self, dialog_set, action_data):
 		action_key = action_data[0]
@@ -164,6 +172,15 @@ class NonPlayerCharacter(Being):
 		dialog_set[-1].add_next_action(start_dialog_choice)
 		return dialog_set
 
+	def add_dialog_set(self, start_dialog_set, add_dialog_data):
+		next_dialog_data = add_dialog_data[1]
+		next_dialog_set = self.build_dialog_set(next_dialog_data)
+		next_action_data = add_dialog_data[2]
+		if(next_action_data):
+			next_dialog_set = self.init_dialog_set(next_dialog_set, next_action_data)
+		start_dialog_set[-1].add_next_action(next_dialog_set[0])
+		return start_dialog_set
+
 	def build_action_set(self, dialog_set, action_data):
 		action_data_set = action_data[1]
 		action_set = []
@@ -173,7 +190,19 @@ class NonPlayerCharacter(Being):
 		for i in range(0, len(action_data_set) - 1):
 			action_set[i].add_next_action(action_set[i + 1])
 		dialog_set[-1].add_next_action(action_set[0])
+		next_action_data = action_data[2]  #this part is untested and may cause bugs.
+		if next_action_data:
+			dialog_set = self.init_dialog_set(action_set, next_action_data)
 		return dialog_set
+
+	def setup_next_dialog(self, dialog_set, action_data):	#no need to check for next action because this is done at the very end only.
+		dialog_key = action_data[1]
+		action = GameAction(NonPlayerCharacter.change_current_dialog, 0, self, dialog_key)
+		dialog_set[-1].add_next_action(action)
+		return dialog_set
+
+	def change_current_dialog(self, dialog_key):
+		self.dialog_tree = self.dialog_tree_map[dialog_key] #might want error checking here
 
 	def build_dialog_set(self, dialog_data):
 		dialog_set = []
@@ -188,7 +217,7 @@ class NonPlayerCharacter(Being):
 	def execute_event(self, level):
 		self.init_dialogs(self.dialog_tree)
 		event = GameEvent([self.first_dialog])
-		event.execute(level) #NOTE: be careful about the tabbing of this line!
+		event.execute(level)
 
 	def build_portrait_filename(self, key):
 		if self.name == None:
@@ -202,9 +231,13 @@ NPCS_WITH_PORTRAITS = ["Kenstar"] #TODO: if this NPC's name is in this list, the
 
 #KENSTAR_PORTRAIT_SET = {} #TODO: instead of mapping individual key words to portrait filenames, build the filenames out of their individual components
 
+ACTION_SET = "action_set"	
+ADD_DIALOG_SET = "add_dialog_set"
 DIALOG_CHOICE = "dialog_choice"
-ACTION_SET = "action_set"	#consider other data types
+SETUP_NEXT_DIALOG = "setup_next_dialog"
 BUILD_METHOD_MAP = {
+	ACTION_SET:NonPlayerCharacter.build_action_set,
+	ADD_DIALOG_SET:NonPlayerCharacter.add_dialog_set,
 	DIALOG_CHOICE:NonPlayerCharacter.build_dialog_choice_set, 
-	ACTION_SET:NonPlayerCharacter.build_action_set
+	SETUP_NEXT_DIALOG:NonPlayerCharacter.setup_next_dialog
 	}

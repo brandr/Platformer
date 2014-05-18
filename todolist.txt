@@ -75,12 +75,6 @@ when the level is created
 
 IMMEDIATE STUFF: dialog
 
-# make it so talking to the same character multiple times can yield different results.
-    - This means a new set of dialog tree data.
-    - Figure out how to switch to the next set of data properly and extensibly.
-
-# fix the SIGN arg that I use to determine the image for the dialog pane, or just make it so all dialog panes are the same (which I would prefer not to do)
-
 # make NPCs walk around slightly (if a certain attribute is set to true)
     - maybe make them turn to face the player? Could have various possible behaviors
 
@@ -92,6 +86,9 @@ IMMEDIATE STUFF: dialog
 # Make signs/NPCS get their text (and number of panes of text, etc) through a more general process
 
 # make portraits prettier (look at cave story, consult people, consider resizing, etc.)
+
+# fix the SIGN arg that I use to determine the image for the dialog pane, or just make it so all dialog panes are the same (which I would prefer not to do)
+    - this will change the NPC class, the dialog class (I think), and probaly the dialogchoice one (and maybe some others)
 
 # figure out how to give the existing dialog boxes borders, maybe even make them loaded images instead.
     - could make a nice little "sign" image with a wooden grain

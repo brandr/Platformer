@@ -89,7 +89,7 @@ class Dialog(Effect):
 	def execute(self, level):
 		level.display_dialog(self)
 
-	def update(self, event):
+	def update(self, event, level):
 		self.index += 1
 
 	@staticmethod

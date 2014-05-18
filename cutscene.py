@@ -16,7 +16,7 @@ class Cutscene(GameEvent):
 			a.execute(self.level) #TODO: activate all start actions.
 		#self.actions[0].right = True #TEMP. Make this more general, and also make it possible for the cutscene to progress/end.
 
-	def update(self):
+	def update(self, level):
 		for a in self.current_actions:
 			a.update(self)
 	

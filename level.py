@@ -208,10 +208,19 @@ class Level(object):
 		player.update(self.getTiles())
 		pygame.display.update()
 
+	def activate_actors(self):
+		for n in self.getNPCs():
+			n.set_active(True)
+
+	def deactivate_actors(self):
+		self.getPlayer().deactivate()	
+		for n in self.getNPCs():
+			n.set_active(False)
+
 	def begin_cutscene(self, cutscene, instant = False):
 		self.current_event = cutscene
 		self.draw_cutscene_bars(instant)
-		self.getPlayer().deactivate()
+		self.deactivate_actors()
 		self.screen_manager.current_screen.control_manager.switch_to_event_controls(cutscene, self.getPlayer()) #TODO: make sure the cutscene can't be cancelled with X like signs.
 		cutscene.begin()
 
@@ -225,12 +234,13 @@ class Level(object):
 
 	def begin_event(self, event):
 		self.current_event = event
-		self.getPlayer().deactivate()
+		self.deactivate_actors()
 		self.screen_manager.current_screen.control_manager.switch_to_event_controls(event, self.getPlayer())
 
 	def end_current_event(self):
 		self.current_event = None
 		self.end_effects()
+		self.activate_actors()
 		self.screen_manager.current_screen.control_manager.switch_to_main_controls(self.getPlayer())
 
 	def add_effect(self, effect):
@@ -257,12 +267,12 @@ class Level(object):
 #TODO: could put up,down,left,right and running into a single object which describes the player's current state
 	def update(self, up, down, left, right, space, running):	
 		if(self.current_event):
-			self.current_event.update()
+			self.current_event.update(self)
 			if(self.current_event.is_complete()):
 				self.end_current_event()
 		player = self.getPlayer()
 		all_tiles = self.getTiles()
-		start_x = max(0, self.level_camera.state.left/32)
+		start_x = max(0, self.level_camera.state.left/32)			#TODO: get rid of these 32s and replace with some constant.
 		end_x = min(self.level_camera.state.right/32, self.width)
 		start_y = max(0, self.level_camera.state.top/32)
 		end_y = min(self.level_camera.state.bottom/32, self.height)

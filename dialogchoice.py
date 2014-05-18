@@ -38,6 +38,15 @@ class DialogChoice(Dialog):
 		dialog_set[-1].add_next_action(start_dialog_choice)
 		return dialog_set
 
+	def add_dialog_set(self, start_dialog_set, add_dialog_data):
+		next_dialog_data = add_dialog_data[1]
+		next_dialog_set = self.build_dialog_branch(next_dialog_data)
+		next_action_data = add_dialog_data[2]
+		if(next_action_data):
+			next_dialog_set = self.get_source().init_dialog_set(next_dialog_set, next_action_data)
+		start_dialog_set[-1].add_next_action(next_dialog_set[0])
+		return start_dialog_set
+
 	def build_action_set(self, dialog_set, action_data):
 		action_data_set = action_data[1]
 		action_set = []
@@ -47,13 +56,22 @@ class DialogChoice(Dialog):
 		for i in range(0, len(action_data_set) - 1):
 			action_set[i].add_next_action(action_set[i + 1])
 		dialog_set[-1].add_next_action(action_set[0])
+		next_action_data = action_data[2]  #this part is untested and may cause bugs.
+		if next_action_data:
+			action_key = next_action_data[0]
+			build_method = BUILD_METHOD_MAP[action_key]
+			dialog_set = build_method(self, action_set, next_action_data)
+		return dialog_set
+
+	def setup_next_dialog(self, dialog_set, action_data):
+		source = self.get_source()
+		dialog_key = action_data[1]
+		action = GameAction(source.__class__.change_current_dialog, 0, source, dialog_key)
+		dialog_set[-1].add_next_action(action)
 		return dialog_set
 
 	def current_choice(self):
 		return self.choice_data_list[self.select_index]
-
-		# EXAMPLE of choice_data:
-		#yn_choices = [("Yes", yes_text_set, None), ("No", no_text_set, None)] 
 
 	def process_key(self, key):
 		if(self.index/SCROLL_CONSTANT >= len(self.text)):
@@ -70,11 +88,8 @@ class DialogChoice(Dialog):
 			#TODO: draw arrow pointing to currently selected option (currently just a black square)
 		return text_image
 
-	#def execute_event(self, level):
-	#	print "HERE"
-
-	def update(self, arg = None):
-		Dialog.update(self, arg)
+	def update(self, event, level):
+		Dialog.update(self, event, level)
 		if(self.index/SCROLL_CONSTANT >= len(self.text)):
 			self.choosing = True
 		
@@ -87,21 +102,13 @@ class DialogChoice(Dialog):
 		choice = self.current_choice()
 		dialog_branch = self.build_dialog_branch(choice[1])
 		next_action_data = choice[2] 
-		# TODO: build next action the same way an NPC does
-		#action_key = action_data[0]
-		#build_method = BUILD_METHOD_MAP[action_key]
-		#return build_method(self, dialog_set, action_data)
-		#TODO
 		if(next_action_data):
 			action_key = next_action_data[0]
 			build_method = BUILD_METHOD_MAP[action_key]
 			dialog_branch = build_method(self, dialog_branch, next_action_data)
-		#TODO
-	#		dialog_branch[-1].add_next_action(next_action)
 		event.add_action(dialog_branch[0])
 		dialog_branch[0].execute(level)
 		return True
-		#TODO: make this work if there are next actions other than None (including additional choices)
 
 	def build_dialog_branch(self, dialog_data):
 		dialog_set = []
@@ -119,15 +126,15 @@ class DialogChoice(Dialog):
 			return None
 		return "portrait_" + name + "_" + key + ".bmp"
 
-	#def continue_action(self, event, level):
-	#	print "HERE"
-	#	Dialog.continue_action(self, event, level)
-
 #constants are the same as for NPCs. (might not want this redundancy if things get much more complicated)
 
+ACTION_SET = "action_set"	
+ADD_DIALOG_SET = "add_dialog_set"
 DIALOG_CHOICE = "dialog_choice"
-ACTION_SET = "action_set"	#consider other data types
+SETUP_NEXT_DIALOG = "setup_next_dialog"
 BUILD_METHOD_MAP = {
+	ACTION_SET:DialogChoice.build_action_set,
+	ADD_DIALOG_SET:DialogChoice.add_dialog_set,
 	DIALOG_CHOICE:DialogChoice.build_dialog_choice_set, 
-	ACTION_SET:DialogChoice.build_action_set
+	SETUP_NEXT_DIALOG:DialogChoice.setup_next_dialog
 	}

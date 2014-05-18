@@ -38,9 +38,9 @@ class GameEvent:
 	def remove_action(self, event):
 		self.current_actions.remove(event)
 
-	def update(self):
+	def update(self, level):
 		for a in self.current_actions:
-			a.update(self)
+			a.update(self, level)
 		#pass
 			#TODO (or maybe have subclasses inherit). Should probably update all current actions, which will
 			# add new actions to this event if necessary. Finished actions are removed.
