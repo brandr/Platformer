@@ -15,6 +15,8 @@ class NonPlayerCharacter(Being):
 		self.scrolling = True #might want to make more elaborate scrolling later
 		self.name = None
 
+		self.right = False #TEMP
+
 		#TEMPORARY FOR TESTING
 
 		self.start_dialog = None
@@ -24,6 +26,7 @@ class NonPlayerCharacter(Being):
 										("Whaaaaaaaaaaat is this place?? \n" + "It looks like some kind of... demo.", NEUTRAL)
 									], None
 								)
+
 		two_pane_dialog_tree = (
 									[
 										("Whaaaaaaaaaaat is this place?? \n" + "It looks like some kind of... demo.", NEUTRAL),
@@ -33,18 +36,48 @@ class NonPlayerCharacter(Being):
 
 		#TODO: redesign this structure so that lists of dialogs can be paired not only to dialog choices or None, but also to miscellaneous actions
 		# use string keys or something
-		self.dialog_tree = (
+		branching_dialog_tree = (
 									[
 										("Whaaaaaaaaaaat is this place??", NEUTRAL),
 										("It looks like some kind of... demo.", NEUTRAL)
 									],
 									(
+										DIALOG_CHOICE,
 										("Do you know the way out of here?", NEUTRAL),
 										[ 
 											("Yes", 
 												[
-													("I don't believe you!", NEUTRAL)
-												], None
+													("Whoa, really?", NEUTRAL)
+												],
+												(
+													DIALOG_CHOICE,
+													("Is it to the right?", NEUTRAL),
+													[
+														("Yes",
+															[
+																("Well, then, I'd better get going!", NEUTRAL),
+																("...and by that, I mean walk slightly to the right.", NEUTRAL)		
+															],
+
+															(
+																ACTION_SET,
+																[ 
+																	(	#TODO: make the action work
+																		NonPlayerCharacter.temp_npc_right_method, 20, None 
+																	),
+																	(
+																		NonPlayerCharacter.temp_stop_method, 0, None 
+																	)
+																]
+															)
+														),
+														("No",
+															[
+																("I don't belive you! I came from that direction!", NEUTRAL)
+															], None
+														)
+													]
+												)
 											),
 											("No", 
 												[
@@ -55,21 +88,92 @@ class NonPlayerCharacter(Being):
 									)
 							)
 
-		#self.init_dialogs(dialog_tree)
+		linear_action_tree = (
+								[
+									("Whaaaaaaaaaaat is this place?? \n" + "It looks like some kind of... demo.", NEUTRAL),
+									("I'd bettter go look for Yusuke...", NEUTRAL),
+									("...and by that, I mean walk slightly to the right.", NEUTRAL)
+								], 	
+								( #TODO: create a framework for "next action" that works for choice dialogs and other actions alike
+								  #TODO: change the framework so that multiple actions can be executed in turn (this will be useful for
+								  # making a character stop after walking a certain distance)
+
+									ACTION_SET,
+									[ 
+										(
+											NonPlayerCharacter.temp_npc_right_method, 20, None 
+										),
+										(
+											NonPlayerCharacter.temp_stop_method, 0, None 
+										)
+									]
+									#GameAction(NonPlayerCharacter.temp_npc_right_method, 60, None, self)
+								)
+							)
+
+		self.dialog_tree = branching_dialog_tree #branching_dialog_tree
+		#TODO: make it so talking to a character multiple times can (but doesn't always) yield different results.
+		# think of some example structures before implementing this
+		# for instance, should there be a "default" response that the character resolves into?
+		# How should y/n interactions affect the "next" dialog tree?
+
+	def get_name(self):
+		return self.name
+
+	def get_source(self): #get_source is used to make dialog trees work properly.
+		return self
+
+	def update(self, player):
+		#TEMP	
+		if(self.right):
+			self.xvel = 4
+			self.direction_id = 'right'	
+			self.changeAnimation('idle', self.direction_id)
+		else:
+			self.xvel = 0
+		#TEMP	
+
+		Being.update(self, player)
+		Being.updatePosition(self)
+
+	def temp_stop_method(self, arg = None):
+		self.left, self.right, self.up, self.down = False, False, False, False	
+
+	def temp_npc_right_method(self, arg = None): #TEMP for testing
+		self.right = True
 
 	def init_dialogs(self, dialog_tree):
+		full_dialog_set = None
 		start_dialog_set = self.build_dialog_set(dialog_tree[0])
-		start_choice_data = dialog_tree[1]
-		if(start_choice_data):	#TODO: case for next action that is not just the end of the conversation. (maybe use constant keys?)
-			start_choice_text_data = start_choice_data[0]
-			start_choice_list = start_choice_data[1]
-			portrait_filename = self.build_portrait_filename(start_choice_text_data[1])
-			start_dialog_choice = DialogChoice(self, SIGN, start_choice_list, start_choice_text_data[0], portrait_filename, (DIALOG_BOX_WIDTH, DIALOG_BOX_HEIGHT), self.scrolling)
-			start_dialog_set[-1].add_next_action(start_dialog_choice)
-			#TODO: recursion? (or handle the rest of what needs to be done is the DialogCHoice class)
-		#else:
-		#	pass #TODO
-		self.first_dialog = start_dialog_set[0]
+		start_action_data = dialog_tree[1]
+		if(start_action_data):
+			full_dialog_set = self.init_dialog_set(start_dialog_set, start_action_data)	
+		self.first_dialog = full_dialog_set[0]
+
+	def init_dialog_set(self, dialog_set, action_data):
+		action_key = action_data[0]
+		build_method = BUILD_METHOD_MAP[action_key]
+		return build_method(self, dialog_set, action_data)
+
+	def build_dialog_choice_set(self, dialog_set, action_data):
+		start_choice_text_data = action_data[1]
+		start_choice_list = action_data[2]
+		portrait_filename = self.build_portrait_filename(start_choice_text_data[1])
+		start_dialog_choice = DialogChoice(self, SIGN, start_choice_list, start_choice_text_data[0], portrait_filename, (DIALOG_BOX_WIDTH, DIALOG_BOX_HEIGHT), self.scrolling)
+		#TODO: fix the SIGN part (probably by getting some key associated with NPCs)
+		dialog_set[-1].add_next_action(start_dialog_choice)
+		return dialog_set
+
+	def build_action_set(self, dialog_set, action_data):
+		action_data_set = action_data[1]
+		action_set = []
+		for a in action_data_set:
+			action = GameAction(a[0], a[1], self, a[2])
+			action_set.append(action)
+		for i in range(0, len(action_data_set) - 1):
+			action_set[i].add_next_action(action_set[i + 1])
+		dialog_set[-1].add_next_action(action_set[0])
+		return dialog_set
 
 	def build_dialog_set(self, dialog_data):
 		dialog_set = []
@@ -82,17 +186,6 @@ class NonPlayerCharacter(Being):
 		return dialog_set
 
 	def execute_event(self, level):
-		# TODO: Probably allow non-linear dialogue by implementing a "DialogTree" class with nodes that hold the data needed to create
-		# dialogs and a reliable way to check whether each node has a y/n question or not.
-		#if self.text_set:
-		#	dialog_set = []
-		#	for t in self.text_set:
-		#		portrait_filename = self.portrait_filename(t[1])
-		#		dialog = Dialog(t[0], portrait_filename, (DIALOG_BOX_WIDTH, DIALOG_BOX_HEIGHT), self.scrolling) 
-		#		dialog_set.append(dialog)
-		#	for i in range(0, len(dialog_set) - 1):
-		#		#TODO: the "next action" may be determined by how the player answers a yes/no question.
-		#		dialog_set[i].add_next_action(dialog_set[i + 1])
 		self.init_dialogs(self.dialog_tree)
 		event = GameEvent([self.first_dialog])
 		event.execute(level) #NOTE: be careful about the tabbing of this line!
@@ -108,3 +201,10 @@ NPCS_WITH_PORTRAITS = ["Kenstar"] #TODO: if this NPC's name is in this list, the
 								  # might not need this: could just use a default (None) arg for all NPCs that don't have portraits.
 
 #KENSTAR_PORTRAIT_SET = {} #TODO: instead of mapping individual key words to portrait filenames, build the filenames out of their individual components
+
+DIALOG_CHOICE = "dialog_choice"
+ACTION_SET = "action_set"	#consider other data types
+BUILD_METHOD_MAP = {
+	DIALOG_CHOICE:NonPlayerCharacter.build_dialog_choice_set, 
+	ACTION_SET:NonPlayerCharacter.build_action_set
+	}

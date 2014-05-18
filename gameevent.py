@@ -40,7 +40,7 @@ class GameEvent:
 
 	def update(self):
 		for a in self.current_actions:
-			a.update()
+			a.update(self)
 		#pass
 			#TODO (or maybe have subclasses inherit). Should probably update all current actions, which will
 			# add new actions to this event if necessary. Finished actions are removed.

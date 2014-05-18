@@ -19,13 +19,16 @@ class GameAction:
 		self.next_actions.append(action)
 
 	def continue_action(self):
-		return False #TODO: may need a better way to determine this
+		return self.duration > 0 #TODO: may need a better way to determine this
 
-	def execute(self, level):
+	def execute(self, level = None):
 		self.method(self.actor, self.arg)
 
 	def update(self, event):
 		if self.duration <= 0:
+			for a in self.next_actions:
+				event.add_action(a)
+				a.execute()
 			event.remove_action(self)
 			return
 		self.duration -= 1

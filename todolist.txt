@@ -56,6 +56,10 @@
     (some classes are not listed here)
     (Also do this for all LevelEditor classes)
 
+MAIN GOAL: Build a demo showing of dialogs, cutscenes, lighting mechanics, etc. once all immediate stuff is finished.
+
+---------------------------------------------------------------
+
 
 IMMEDIATE STUFF: reducing lag
 
@@ -67,21 +71,21 @@ IMMEDIATE STUFF: reducing lag
 when the level is created
     - do this for all the indivdual object types (monsters, platforms, etc) as well.
 
-
-IMMEDIATE STUFF: signs, cutscenes, events, dialog
-
 -------------------------------------------------------------
 
-# implement yes/no options (selected with arrow keys) for dialogs (and figure out how to store different results -- maybe different "next" dialogs?)
-    - keep in mind this will temporarily change controls
-    - consider the general dialog structure this will create (dialog trees?)
+IMMEDIATE STUFF: dialog
 
-# make it so talking to the same character multiple times can yield different results
+# make it so talking to the same character multiple times can yield different results.
+    - This means a new set of dialog tree data.
+    - Figure out how to switch to the next set of data properly and extensibly.
+
+# fix the SIGN arg that I use to determine the image for the dialog pane, or just make it so all dialog panes are the same (which I would prefer not to do)
 
 # make NPCs walk around slightly (if a certain attribute is set to true)
-    -maybe make them turn to face the player? Could have various possible behaviors
+    - maybe make them turn to face the player? Could have various possible behaviors
 
 # consider making Dialogs inherit from GameActions (or events?) instead of Effects, and make the level add/remove effects containing images based on the dialog.
+    - not 100% sure about this as it might uneccessarily change existing structrue
 
 # make it more visually clear when the player can press up to interact with something
 
@@ -93,6 +97,10 @@ IMMEDIATE STUFF: signs, cutscenes, events, dialog
     - could make a nice little "sign" image with a wooden grain
     - figure out what panes should be like for NPCs
     - make it more visually clear that dialogs are waiting for a button input. (maybe a blinking icon?)
+
+-------------------------------------------------------------
+
+IMMEDIATE STUFF: cutscenes
 
 # Try to implement some more examples of cutscenes, like two non-player characters with actions and scrolling dialogue.
     - use dialogue from girlchan in paradise as a test. It'll make it more fun.
@@ -140,7 +148,11 @@ IMMEDIATE STUFF: screens, menus, movement
 
     #LESS IMMEDIATE STUFF
 
+# implement collectable items of some kind and an inventory screen
+    - will require a lot of planning as far as actual game design
 # make lanterns run out with distance
+    - this means implementing lantern as a held object, making it different that the current system.
+    - Need to figure out how the player will interface with "Lantern oil" amounts and how that system will work.
 # consider making it so the player does not jump repeatedly if the jump button is held down.
 # Make a launcher that makes it possible to select which dungeon to load
     # It may help to change the dungeoneditor to let the user give different dungeons different saved names.
