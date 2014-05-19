@@ -13,17 +13,23 @@ class Sign(Block): #TODO: figure out how to set text, # of panes, whether text i
 		self.is_square = False
 		self.up_interactable = True
 		self.scrolling = True #might want to make more elaborate scrolling later
-		text_1 = "This is a sign. Press X to advance the dialog box."
-		text_2 = "This is the only thing any sign can ever say."
-		self.text_set = [text_1, text_2]
+		self.text_set = None
+
+	def set_text_set(self, text_set):
+		self.text_set = text_set
 	
 	def execute_event(self, level):
 		if self.text_set:
-			dialog_set = []
-			for t in self.text_set:
-				dialog = Dialog(SIGN, t, None, (DIALOG_BOX_WIDTH, DIALOG_BOX_HEIGHT), self.scrolling)
-				dialog_set.append(dialog)
-			for i in range(0, len(dialog_set) - 1):
-				dialog_set[i].add_next_action(dialog_set[i + 1])
+			dialog_set = self.build_dialog_set(self.text_set)
 			event = GameEvent([dialog_set[0]])
 			event.execute(level)
+
+	def build_dialog_set(self, text_data):
+		dialog_set = []
+		for t in text_data:
+				#portrait_filename = self.build_portrait_filename(d[1])
+				dialog = Dialog(SIGN, t, None, (DIALOG_BOX_WIDTH, DIALOG_BOX_HEIGHT), self.scrolling)
+				dialog_set.append(dialog)
+		for i in range(0, len(dialog_set) - 1):
+			dialog_set[i].add_next_action(dialog_set[i + 1])
+		return dialog_set

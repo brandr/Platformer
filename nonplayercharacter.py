@@ -8,7 +8,7 @@ from dialogchoice import *
 class NonPlayerCharacter(Being):
 	""" TODO: docstring
 	"""
-	def __init__(self, animations, x, y):#, portrait_set_key = None):
+	def __init__(self, animations, x, y):
 		Being.__init__(self, animations, x, y)
 		self.animated = True
 		self.up_interactable = True
@@ -18,95 +18,7 @@ class NonPlayerCharacter(Being):
 		self.direction_id = 'left'
 		self.changeAnimation('idle','left')
 
-		#TEMPORARY FOR TESTING
 		self.right = False #TEMP
-
-		
-
-
-		#TODO: redesign this structure so that lists of dialogs can be paired not only to dialog choices or None, but also to miscellaneous actions
-		# use string keys or something
-		TIRED_DIALOG = "tired_dialog"
-		branching_dialog_tree = (
-									[
-										("Whaaaaaaaaaaat is this place??", NEUTRAL),
-										("It looks like some kind of... demo.", NEUTRAL)
-									],
-									(
-										DIALOG_CHOICE,
-										("Do you know the way out of here?", NEUTRAL),
-										[ 
-											("Yes", 
-												[
-													("Whoa, really?", NEUTRAL)
-												],
-												(
-													DIALOG_CHOICE,
-													("Is it to the right?", NEUTRAL),
-													[
-														("Yes",
-															[
-																("Well, then, I'd better get going!", NEUTRAL),
-																("...and by that, I mean walk slightly to the right.", NEUTRAL)		
-															],
-
-															(
-																ACTION_SET,
-																[ 
-																	(	#TODO: make the action work
-																		NonPlayerCharacter.temp_npc_right_method, 30, None 
-																	),
-																	(
-																		NonPlayerCharacter.temp_stop_method, 0, None 
-																	)
-																],
-																(
-																	ADD_DIALOG_SET,
-																	[
-																		("That's enough walking for one day.", NEUTRAL)
-																	], 
-																	(
-																		SETUP_NEXT_DIALOG,
-																		TIRED_DIALOG
-																	)
-																), None
-															)
-														),
-														("No",
-															[
-																("I don't belive you! I came from that direction!", NEUTRAL)
-															], None
-														)
-													]
-												)
-											),
-											("No", 
-												[
-													("Well, let me know if you find it.", NEUTRAL)
-												], None
-											)
-										]
-									)
-							)
-		
-		tired_dialog_tree = (
-			[
-				("Boy, I sure am tired.", NEUTRAL)
-			], None
-		)
-
-		temp_dialog_tree_map = {
-			TIRED_DIALOG:tired_dialog_tree
-		}
-		#TEMP FOR TESTING
-
-		self.dialog_tree = branching_dialog_tree
-		self.dialog_tree_map = temp_dialog_tree_map
-	
-		#TODO: make it so talking to a character multiple times can (but doesn't always) yield different results.
-		# think of some example structures before implementing this
-		# for instance, should there be a "default" response that the character resolves into?
-		# How should y/n interactions affect the "next" dialog tree?
 
 	def get_name(self):
 		return self.name
@@ -129,7 +41,7 @@ class NonPlayerCharacter(Being):
 		Being.update(self, player)
 		Being.updatePosition(self)
 
-	def NPC_update(self, player):
+	def NPC_update(self, player):	#NOTE: might want some NPCs to walk around instead of doing this. Not sure.
 		self.face_towards(player)
 
 	def face_towards(self, target):
@@ -208,7 +120,7 @@ class NonPlayerCharacter(Being):
 		dialog_set = []
 		for d in dialog_data:
 				portrait_filename = self.build_portrait_filename(d[1])
-				dialog = Dialog(SIGN, d[0], portrait_filename, (DIALOG_BOX_WIDTH, DIALOG_BOX_HEIGHT), self.scrolling) 
+				dialog = Dialog(SIGN, d[0], portrait_filename, (DIALOG_BOX_WIDTH, DIALOG_BOX_HEIGHT), self.scrolling) #TODO: change the SIGN arg
 				dialog_set.append(dialog)
 		for i in range(0, len(dialog_set) - 1):
 			dialog_set[i].add_next_action(dialog_set[i + 1])
@@ -226,7 +138,9 @@ class NonPlayerCharacter(Being):
 
 NEUTRAL = "neutral"
 
-NPCS_WITH_PORTRAITS = ["Kenstar"] #TODO: if this NPC's name is in this list, they have a portrait. Otherwise, they don't.
+KENSTAR = "kenstar"
+
+#NPCS_WITH_PORTRAITS = ["Kenstar"] #TODO: if this NPC's name is in this list, they have a portrait. Otherwise, they don't.
 								  # might not need this: could just use a default (None) arg for all NPCs that don't have portraits.
 
 #KENSTAR_PORTRAIT_SET = {} #TODO: instead of mapping individual key words to portrait filenames, build the filenames out of their individual components
@@ -240,4 +154,4 @@ BUILD_METHOD_MAP = {
 	ADD_DIALOG_SET:NonPlayerCharacter.add_dialog_set,
 	DIALOG_CHOICE:NonPlayerCharacter.build_dialog_choice_set, 
 	SETUP_NEXT_DIALOG:NonPlayerCharacter.setup_next_dialog
-	}
+}

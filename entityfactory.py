@@ -1,11 +1,10 @@
 from platformfactory import *
 from ladder import *
-from sign import *
+from signfactory import *
 from lantern import *
 from exitblock import *
 from monster import *
-from nonplayercharacter import *
-
+from npcfactory import *
 from roomdata import *
 
 ENTITY_CONSTRUCTOR_MAP = {
@@ -43,8 +42,12 @@ class EntityFactory(object):
 		monster.name = name
 
 	@staticmethod
-	def inintNPC(npc, name):
-		npc.name = name
+	def initNPC(npc, name):
+		NPCFactory.init_NPC(npc, name)
+
+	@staticmethod
+	def initSign(sign, sign_key):	#not sure if sign_key is usable
+		SignFactory.init_sign(sign, sign_key)
 
 	@staticmethod
 	def initSlopingPlatform(platform, arg):
@@ -55,5 +58,6 @@ ENTITY_BUILD_MAP = {
 	SLOPING_PLATFORM:EntityFactory.initSlopingPlatform,
 	BAT:EntityFactory.initMonster,
 	GIANT_FROG:EntityFactory.initMonster,
-	KENSTAR:EntityFactory.inintNPC
+	KENSTAR:EntityFactory.initNPC,
+	DEFAULT_SIGN:EntityFactory.initSign
 }

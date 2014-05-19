@@ -75,15 +75,11 @@ when the level is created
 
 IMMEDIATE STUFF: dialog
 
-# make NPCs walk around slightly (if a certain attribute is set to true)
-    - maybe make them turn to face the player? Could have various possible behaviors
-
-# consider making Dialogs inherit from GameActions (or events?) instead of Effects, and make the level add/remove effects containing images based on the dialog.
-    - not 100% sure about this as it might uneccessarily change existing structrue
-
-# make it more visually clear when the player can press up to interact with something
-
-# Make signs/NPCS get their text (and number of panes of text, etc) through a more general process
+# Make signs/NPCS get their dialog data through a more general process
+    - implement the sign process before the dialog process since it's much simpler
+    - this will affect the level editor
+    - will need to pass some data besides entity key into entityfactory to build signs/NPCs
+    - IDEA: allow tiledata to store "additional_data" (in this case, dialog tree keys for the dict) and pass it to the entityfactory
 
 # make portraits prettier (look at cave story, consult people, consider resizing, etc.)
 
@@ -95,6 +91,11 @@ IMMEDIATE STUFF: dialog
     - figure out what panes should be like for NPCs
     - make it more visually clear that dialogs are waiting for a button input. (maybe a blinking icon?)
 
+# consider making Dialogs inherit from GameActions (or events?) instead of Effects, and make the level add/remove effects containing images based on the dialog.
+    - not 100% sure about this as it might uneccessarily change existing structrue
+    - note that this will affect DialogChoices, which inherit from Dialogs
+
+# make it more visually clear when the player can press up to interact with something
 -------------------------------------------------------------
 
 IMMEDIATE STUFF: cutscenes
