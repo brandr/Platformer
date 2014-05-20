@@ -9,9 +9,9 @@ MAX_LEVELS = 99
 
 #TODO:consider separating out the levelselectwindow into its own class....
 class LevelSelectContainer(Box):
-	def __init__(self,editor_screen,position,dimensions):
-		Box.__init__(self,dimensions[0],dimensions[1])
-		self.topleft = (position[0],position[1])
+	def __init__(self, editor_screen, position, dimensions):
+		Box.__init__(self, dimensions[0], dimensions[1])
+		self.topleft = (position[0], position[1])
 
 		self.editor_screen = editor_screen
 		self.level_count = 0

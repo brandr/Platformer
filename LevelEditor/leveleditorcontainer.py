@@ -1,7 +1,7 @@
 from levelgridwindow import *
 from entityselectcontainer import *
-
-#TODO: make it possible to set "outdoors".
+from entitydatapane import *
+#TODO: make it possible to set some kind of additional data
 
 class LevelEditorContainer(Box):
 	def __init__(self, window, level_cell, dimensions):
@@ -15,6 +15,8 @@ class LevelEditorContainer(Box):
 		
 		self.entity_select_container = self.entity_select_container(self.left + 8, level_name_label.bottom + 8, self.level_grid_window.left - 16, 400)
 
+		self.additional_entity_data_pane = self.additional_entity_data_pane(self.level_grid_window.width, 160, self.level_grid_window.left, self.level_grid_window.bottom + 8) #TODO: make this method and get dimensions right
+		
 		self.sunlit = False #TODO: make sure sunlit is set correctly based on level cell's data.
 		self.sunlit_button = CheckButton("Sunlit")
 		self.sunlit_button.connect_signal(SIG_TOGGLED, self.toggleSunlit)
@@ -27,6 +29,7 @@ class LevelEditorContainer(Box):
 		self.add_child(level_name_label) #should be self if it can be altered, I think.
 		self.add_child(self.level_grid_window)
 		self.add_child(self.entity_select_container)
+		self.add_child(self.additional_entity_data_pane)
 		self.add_child(self.sunlit_button)
 		self.add_child(close_editor_button)
 
@@ -42,6 +45,15 @@ class LevelEditorContainer(Box):
 		button.topleft = x,y
 		button.connect_signal(SIG_CLICKED, self.closeEditor)
 		return button
+
+	def additional_entity_data_pane(self, width, height, x, y):
+		data_pane = EntityDataPane(width, height)
+		data_pane.topleft = x, y
+		#file_list.connect_signal(SIG_SELECTCHANGED, self.change_selection, file_list) #connect to self if necessary
+		return data_pane
+
+	def select_tile(self, tile):
+		self.additional_entity_data_pane.select_tile(tile)
 
 	def closeEditor(self):	#I sometimes have trouble making this work for some reason. (I think it happens if something is childless but needs children, like a window.)
 		self.master_window.level_select_container.resume()

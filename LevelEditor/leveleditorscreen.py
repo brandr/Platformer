@@ -1,9 +1,6 @@
 from pygame import *
 from ocempgui.widgets import *
 from ocempgui.widgets.Constants import *
-#might not end up using this class- not sure yet
-#LEVEL_WIN_WIDTH = 1000
-#LEVEL_WIN_HEIGHT = 650
 
 class LevelEditorScreen(object):
 	def __init__(self,dungeon_screen,level_renderer):
@@ -15,9 +12,8 @@ class LevelEditorScreen(object):
 		self.level_renderer.start()
 
 	def initComponents(self):
-		#TODO: start with a button to close the level editor
-		close_editor_button = self.close_editor_button(32,32) #TEMP
-		self.level_renderer.add_widget(close_editor_button)	  #TEMP
+		close_editor_button = self.close_editor_button(32,32) 
+		self.level_renderer.add_widget(close_editor_button)	  
 
 	def closeLevelEditor(self):	#might not be using this
 		pass

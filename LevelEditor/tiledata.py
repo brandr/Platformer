@@ -104,7 +104,6 @@ class TileData(object):
 
 	def get_image(self, filepath_start = "./"):	#TODO: consider allowing filepath beginning here.
 		filepath = filepath_start + self.image_filepath
-		#return TileData.load_image ("./images/" + self.entity_key + ".bmp") #TEMP
 		return TileData.load_image (filepath)
 
 	@staticmethod

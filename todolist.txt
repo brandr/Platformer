@@ -77,7 +77,8 @@ IMMEDIATE STUFF: dialog
 
 # Make signs/NPCS get their dialog data through a more general process
     - implement the sign process before the dialog process since it's much simpler
-    - this will affect the level editor
+    - this will affect the level editor (entitydatapane class mostly)
+    - modify tiledata in a general way to allow "additional data" which is parsed differently depending on the circumstances (maybe use SignData and inherit?)
     - will need to pass some data besides entity key into entityfactory to build signs/NPCs
     - IDEA: allow tiledata to store "additional_data" (in this case, dialog tree keys for the dict) and pass it to the entityfactory
 

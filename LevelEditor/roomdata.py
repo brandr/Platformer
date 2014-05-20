@@ -5,7 +5,7 @@ ROOM_HEIGHT = 20
 
 class RoomData(object):
 	"""docstring for RoomData"""
-	def __init__(self,width,height,x,y):
+	def __init__(self, width, height, x, y):
 		self.global_x,self.global_y = x,y
 		self.tiles = RoomData.empty_tile_set(width,height)
 	
@@ -19,7 +19,7 @@ class RoomData(object):
 		return self.tiles[y][x]
 
 	def setAllTiles(self,tile_set):
-		rows, cols = len(tile_set),len(tile_set[0])
+		rows, cols = len(tile_set), len(tile_set[0])
 		for y in xrange(rows):
 			for x in xrange(cols):
 				self.tiles[y][x] = tile_set[y][x]

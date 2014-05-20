@@ -9,8 +9,8 @@ from leveleditorscreen import *
 DUNGEON_WIN_WIDTH = LEVEL_WIN_WIDTH	  #TEMP (maybe?)
 DUNGEON_WIN_HEIGHT = LEVEL_WIN_HEIGHT #TEMP
 
-class DungeonEditorScreen(object):
-	def __init__(self,dungeon_renderer):#,level_renderer):
+class DungeonEditorScreen:
+	def __init__(self, dungeon_renderer):#,level_renderer):
 		self.dungeon_renderer = dungeon_renderer
 
 	def openDungeonEditor(self):
@@ -19,8 +19,8 @@ class DungeonEditorScreen(object):
 
 	def initComponents(self):#,renderer): #could maybe be static
 
-		self.level_select_container = self.level_select_container(32,32,312,400)
-		self.dungeon_grid_container = self.dungeon_grid_container(self.level_select_container,self.level_select_container.right+36,self.level_select_container.top,312,400)
+		self.level_select_container = self.level_select_container(32, 32, 312, 400)
+		self.dungeon_grid_container = self.dungeon_grid_container(self.level_select_container,self.level_select_container.right + 36,self.level_select_container.top, 312, 400)
 		self.file_manager_container = self.file_manager_container(self.level_select_container,self.dungeon_grid_container, self.level_select_container.left,self.level_select_container.bottom+16, 700,128)
 
 		self.dungeon_renderer.add_widget(self.level_select_container)
