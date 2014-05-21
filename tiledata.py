@@ -1,9 +1,6 @@
 from pygame import image
 import pygame, pygame.locals
 
-
-# TODO: temporarily add kenstar
-
 DEFAULT_TILE_SIZE = 32
 
 #entity keys 
@@ -189,7 +186,7 @@ class TileData(object):
 		return tiles
 
 	@staticmethod
-	def addTiles(tiles,formatted_data, x_pos, y_pos, filepath = "./"):
+	def addTiles(tiles, formatted_data, x_pos, y_pos, filepath = "./"):
 		width = formatted_data[2]
 		height = formatted_data[3]
 		origin_tile = TileData.deformatted_tile(formatted_data, filepath)
@@ -208,7 +205,7 @@ class TileData(object):
 class BlockedTileData(TileData): #this is a space in a room's tiles blocked out by some object that takes up more than one tile.
 	def __init__(self, origin_tile, x, y):
 		self.origin_tile = origin_tile
-		self.origin_x, self.origin_y = x,y
+		self.origin_x, self.origin_y = x, y
 
 	def formatted_data(self):
 		return None

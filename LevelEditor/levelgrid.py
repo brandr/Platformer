@@ -10,20 +10,22 @@ RIGHT_MOUSE_BUTTON = 3
 TILE_WIDTH, TILE_HEIGHT = 32,32
 WHITE = Color(("#FFFFFF"))
 BLACK = Color(("#000000"))
+RED = Color(("#FF0000"))
 
 #TODO: give this class the same fuctionality as before using the ImageLabel setup instead of table
 
 class LevelGrid(ImageLabel):
 	def __init__(self, level_editor):
 		self.level_editor = level_editor
+		self.selected_tile, self.selected_row, self.selected_col = None, 0, 0
 		level_cell = self.level_cell()
 		room_cols, room_rows = self.get_room_dimensions()
 		self.cols, self.rows = room_cols*ROOM_WIDTH,room_rows*ROOM_HEIGHT
-		self.grid_image = LevelGrid.empty_grid_image(self.cols,self.rows)
+		self.grid_image = LevelGrid.empty_grid_image(self.cols, self.rows)
 		self.drawGridlines()
-		ImageLabel.__init__(self,self.grid_image)
+		ImageLabel.__init__(self, self.grid_image)
 		room_cells = level_cell.aligned_rooms()
-		self.init_cells(room_cells,room_rows,room_cols)
+		self.init_cells(room_cells, room_rows, room_cols)
 
 	def drawGridlines(self):
 		pixel_width, pixel_height = self.get_pixel_width(), self.get_pixel_height()
@@ -60,7 +62,7 @@ class LevelGrid(ImageLabel):
 		if(tile_data == None or isinstance(tile_data, BlockedTileData)): return
 		self.updateTileImage(tile_data.get_image(), x, y)
 
-	def updateTileImage(self,image,x,y):
+	def updateTileImage(self, image, x, y):
 		tile_image = image
 		pygame.draw.line(tile_image, BLACK, (0, 0), (0, TILE_HEIGHT))
 		pygame.draw.line(tile_image, BLACK, (0, 0), (TILE_WIDTH, 0))
@@ -88,10 +90,10 @@ class LevelGrid(ImageLabel):
 	def valid_coords(self, coords):
 		return coords[0] >= 0 and coords[0] < self.cols and coords[1] >= 0 and coords[1] < self.rows
 
-	def processClick(self, event, calculate_offset): #TODO: somewhere in here, load additional data if necessary.
+	def processClick(self, event, calculate_offset): #TODO: somewhere in here (or related methods), load additional data if necessary.
 		offset = calculate_offset()
 		pos = event.pos 
-		adjusted_pos = ((pos[0] - offset[0] - 3,pos[1] - offset[1] + 15))#this bit is still a little wonky, but functional for now.
+		adjusted_pos = ((pos[0] - offset[0] - 3, pos[1] - offset[1] + 15))#this bit is still a little wonky, but functional for now.
 		coordinate_x = int(adjusted_pos[0]/(TILE_WIDTH))
 		coordinate_y = int(adjusted_pos[1]/(TILE_HEIGHT))
 		coordinate_pos = (coordinate_x, coordinate_y) 
@@ -104,40 +106,77 @@ class LevelGrid(ImageLabel):
 			self.leftClick(coordinate_pos[1], coordinate_pos[0]) #TEMP
 			#print event
 			#TODO: other click types (maybe middle mouse?)
-			return
+		#self.set_picture(self.grid_image)
+		
 
 	def leftClick(self, row, col):
+		#TODO: deselect before doing anything else.
+		self.deselect()
 		tile = self.level_editor.entity_select_container.current_entity 
-		if (tile == None or not self.room_for_tile(tile, row, col)): 
-			self.select_cell(row, col)
+		if (tile == None):  #TODO: consider checking for blocked tiledata here
+			#self.select_cell(row, col)
 			return
 		existing_tile = self.tile_at(row, col)
 		if existing_tile != None: 
+			if isinstance(existing_tile, BlockedTileData):
+				row, col = existing_tile.origin_y, existing_tile.origin_x
+				existing_tile = existing_tile.origin_tile
 			self.select_cell(row, col)
+			return
+		elif not self.room_for_tile(tile, row, col):
 			return
 		self.addEntity(tile, row, col)
 
 	def select_cell(self, row, col):
-		tile = self.tile_at(row, col)
-		if tile == None: return
-		# TODO: allow for larger than tile size 1
-		# TODO: make selection visually clear. (maybe a red outline)
+		tile_data = self.tile_at(row, col)
+		if tile_data == None: return
+		if isinstance(tile_data, BlockedTileData):
+			row, col = tile_data.origin_y, tile_data.origin_x
+			tile_data = tile_data.origin_tile
 		# TODO: make sure different objects can have data set differently this way.
-		# maybe make a "save data" button in EntityDataPane?
+			# maybe make a "save data" button in EntityDataPane?
 		# TODO: implement and test for a one-pane sign before expanding to anything else
-		self.level_editor.select_tile(tile)
+		self.selected_tile, self.selected_row, self.selected_col = tile_data, row, col
+		self.level_editor.select_tile(tile_data)
+		self.outline_selection(row, col, tile_data) #NOTE: this part will not work for sprites over 1X1
+		self.set_picture(self.grid_image)
+
+	def deselect(self):
+		#TODO: get tile, row and col from somewhere (should probably be data members of this class)
+		tile, row, col = self.selected_tile, self.selected_row, self.selected_col
+		if tile == None: return
+		image = tile.get_image() 		#this part only needs to be done once.
+		self.drawGridlines()
+		self.updateTileImage(image, col, row)
+		self.selected_tile, selected_row, selected_col = None, 0, 0
+		#self.level_editor.deselect() #TODO
+
+	def outline_selection(self, row, col, tile_data):
+		self.drawGridlines()
+		entity_width, entity_height = tile_data.width, tile_data.height
+
+		p1 = (col*TILE_WIDTH, row*TILE_HEIGHT)
+		p2 = (col*TILE_WIDTH + entity_width*TILE_WIDTH - 1, row*TILE_HEIGHT)
+		p3 = (col*TILE_WIDTH, row*TILE_HEIGHT + entity_height*TILE_HEIGHT - 1)
+		p4 = (col*TILE_WIDTH + entity_width*TILE_WIDTH - 1, row*TILE_HEIGHT + entity_height*TILE_HEIGHT - 1)
+
+		pygame.draw.line(self.grid_image, RED, p1, p2, 2)
+		pygame.draw.line(self.grid_image, RED, p4, p2, 2)
+		pygame.draw.line(self.grid_image, RED, p1, p3, 2)
+		pygame.draw.line(self.grid_image, RED, p4, p3, 2)
 
 	def addEntity(self, tile, row, col):
 		width, height = tile.width, tile.height
 		self.level_cell().add_entity(tile, col, row) 	#this will be important to setting data differently for different signs
-		for x in range(col + 1,col + width):
+		for x in range(col + 1, col + width):
 			next_block = BlockedTileData(tile, col, row)
 			self.level_cell().add_entity(next_block, x, row)
-		for y in range(row + 1, row + height):
+		for y in range(row + 1,  row + height):
 			for x in range(col, col + width):
 				next_block = BlockedTileData(tile, col, row)
 				self.level_cell().add_entity(next_block, x, y)
 		image = tile.get_image() 		#this part only needs to be done once.
+		self.drawGridlines()
 		self.updateTileImage(image, col, row)
 
 	def rightClick(self, row, col):
@@ -150,6 +189,9 @@ class LevelGrid(ImageLabel):
 		self.removeEntity(row, col, tile.width, tile.height)
 
 	def removeEntity(self, row, col, width, height):
+		tile = self.tile_at(row, col)
+		if tile == self.selected_tile:
+			self.deselect()
 		for y in range(row, row + height):
 			for x in range(col, col + width):
 				self.level_cell().add_entity(None, x, y) 
@@ -159,7 +201,15 @@ class LevelGrid(ImageLabel):
 	def room_for_tile(self, tile, row, col): #make sure any tile larger that 1x1 will fit in the room.
 		end_x = col + tile.width - 1
 		end_y = row + tile.height - 1
-		return (end_x < self.cols and end_y < self.rows)
+		if not (end_x < self.cols and end_y < self.rows): return False
+		for x in range(col + 1, end_x):
+			check_tile = self.tile_at(row, x)
+			if check_tile != None: return False
+		for y in range(row + 1,  end_y + 1):
+			for x in range(col, end_x + 1):
+				check_tile = self.tile_at(y, x)
+				if check_tile != None: return False
+		return True
 
 	def tile_at(self, row, col):
 		return self.level_cell().tile_at(col, row)
