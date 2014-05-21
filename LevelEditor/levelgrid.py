@@ -114,7 +114,6 @@ class LevelGrid(ImageLabel):
 		self.deselect()
 		tile = self.level_editor.entity_select_container.current_entity 
 		if (tile == None):  #TODO: consider checking for blocked tiledata here
-			#self.select_cell(row, col)
 			return
 		existing_tile = self.tile_at(row, col)
 		if existing_tile != None: 
@@ -149,7 +148,7 @@ class LevelGrid(ImageLabel):
 		self.drawGridlines()
 		self.updateTileImage(image, col, row)
 		self.selected_tile, selected_row, selected_col = None, 0, 0
-		#self.level_editor.deselect() #TODO
+		self.level_editor.deselect_tile() #TODO (or this might not be necessary?)
 
 	def outline_selection(self, row, col, tile_data):
 		self.drawGridlines()
@@ -165,7 +164,8 @@ class LevelGrid(ImageLabel):
 		pygame.draw.line(self.grid_image, RED, p1, p3, 2)
 		pygame.draw.line(self.grid_image, RED, p4, p3, 2)
 
-	def addEntity(self, tile, row, col):
+	def addEntity(self, template, row, col):
+		tile = template.create_copy()
 		width, height = tile.width, tile.height
 		self.level_cell().add_entity(tile, col, row) 	#this will be important to setting data differently for different signs
 		for x in range(col + 1, col + width):

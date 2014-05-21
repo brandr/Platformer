@@ -55,6 +55,9 @@ class LevelEditorContainer(Box):
 	def select_tile(self, tile):
 		self.additional_entity_data_pane.select_tile(tile)
 
+	def deselect_tile(self):
+		self.additional_entity_data_pane.deselect_tile()
+
 	def closeEditor(self):	#I sometimes have trouble making this work for some reason. (I think it happens if something is childless but needs children, like a window.)
 		self.master_window.level_select_container.resume()
 		self.level_cell.updateSunlit(self.sunlit)

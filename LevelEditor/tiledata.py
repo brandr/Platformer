@@ -124,6 +124,9 @@ class TileData(object):
 		self.width, self.height = 1, 1
 		self.setDimensions(filepath_start)
 
+	def create_copy(self):
+		return TileData(self.entity_key, self.image_filepath)
+
 	def setDimensions(self, filepath_start):
 		image = self.get_image(filepath_start)
 		self.width = image.get_width()/DEFAULT_TILE_SIZE
