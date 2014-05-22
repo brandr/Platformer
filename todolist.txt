@@ -75,6 +75,8 @@ when the level is created
 
 IMMEDIATE STUFF: dialog
 
+# now that signs can store and (presumably) save different text sets via the level editor, need to load them into the game properly.
+
 # Make signs/NPCS get their dialog data through a more general process
     - implement the sign process before the dialog process since it's much simpler
     - this will affect the level editor (entitydatapane class mostly)

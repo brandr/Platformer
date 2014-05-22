@@ -1,11 +1,17 @@
 from tilefactory import *
 from entityfactory import *
+from signfactory import *
 from level import *
+
+DEFAULT_SIGN = "default_sign"
+NON_DEFAULT_ENTITY_MAP = {
+	DEFAULT_SIGN:SignFactory	# or a method in SignFactory?
+}
 
 class RoomFactory(object):
 
 	@staticmethod
-	def dungeon_rooms(dungeon,room_data_set):
+	def dungeon_rooms(dungeon, room_data_set):
 		rooms = []
 		x1, y1 = RoomFactory.origin(room_data_set)
 		x2, y2 = RoomFactory.lower_right(room_data_set)
@@ -14,7 +20,7 @@ class RoomFactory(object):
 			rooms.append([])
 			for x in range(x1, x2 + 1):
 				next_data = room_data_set[y][x]
-				next_room = RoomFactory.build_room(dungeon,next_data,x,y)
+				next_room = RoomFactory.build_room(dungeon, next_data, x, y)
 				rooms[y].append(next_room)
 		print "Rooms set up."
 		return rooms
@@ -24,7 +30,7 @@ class RoomFactory(object):
 		for y in xrange(len(room_data_set)):
 			for x in xrange(len(room_data_set[y])):
 				next_data = room_data_set[y][x]
-				if(room_data_set[y][x] != None):return x, y
+				if(room_data_set[y][x] != None): return x, y
 		return None
 
 	@staticmethod
@@ -32,12 +38,12 @@ class RoomFactory(object):
 		for y in range(len(room_data_set) - 1, -1, -1):
 			for x in range(len(room_data_set[y]) - 1, -1, -1):
 				next_data = room_data_set[y][x]
-				if(room_data_set[y][x] != None):return x, y
+				if(room_data_set[y][x] != None): return x, y
 		return None
 
 	@staticmethod
 	def build_room(dungeon, room_data, global_x, global_y): #might be able to get global x and global y through roomdata's coords instead
-		if(room_data == None): return RoomFactory.empty_room(dungeon,global_x,global_y) 
+		if(room_data == None): return RoomFactory.empty_room(dungeon, global_x, global_y) 
 		tiles = []
 		entities = [] #TODO: figure out why the original platformer used Group
 
@@ -56,7 +62,7 @@ class RoomFactory(object):
 		for row in xrange(end_y):
 			tiles.append([])
 			for col in xrange(end_x):
-				next_tile_data = room_data.tile_at(col,row)
+				next_tile_data = room_data.tile_at(col, row)
 				t = Tile(default_tile, x, y)
 				if next_tile_data != None and not isinstance(next_tile_data, BlockedTileData):
 					if next_tile_data.entity_key == PLAYER_START:
@@ -66,19 +72,29 @@ class RoomFactory(object):
 				#TODO: remember that this part may need some checks if the object created is larger than 32*32.
 					#  However, this is low priority since the level editor already handles this.
 					
-						key = next_tile_data.entity_key
+					
+
+						# TODO: somewhere around here, need to check next_tile_data for non-default types like SignData 
+						# 		and use different factory types if necessary.
 
 						raw_entity_image = next_tile_data.get_image("./LevelEditor/")
 						entity_width, entity_height = next_tile_data.width, next_tile_data.height
 						entity_rect = Rect(0, 0, entity_width*DEFAULT_TILE_SIZE, entity_height*DEFAULT_TILE_SIZE)
+
+						key = next_tile_data.entity_key
+						if key in NON_DEFAULT_ENTITY_MAP:
+							factory = NON_DEFAULT_ENTITY_MAP[key]
+							entity = factory.build_entity(raw_entity_image, entity_rect, next_tile_data, x, y)
+							entities.append(entity)
+							if isinstance(entity, Block): t.block = entity
 						
-						if next_tile_data.is_animated():
+						elif next_tile_data.is_animated():
 							entity_animation_set = GameImage.load_animation_set(next_tile_data, DEFAULT_TILE_SIZE)
 							e = EntityFactory.build_entity(entity_animation_set, key, x, y)
 							entities.append(e)
 		
 						else:
-							still_entity_image = GameImage.still_animation_set(raw_entity_image,entity_rect)
+							still_entity_image = GameImage.still_animation_set(raw_entity_image, entity_rect)
 							e = EntityFactory.build_entity(still_entity_image, key, x, y)
 							entities.append(e)
 							if isinstance(e, Block): t.block = e	
@@ -93,7 +109,7 @@ class RoomFactory(object):
 		return created_room
 
 	@staticmethod
-	def empty_room(dungeon,global_x,global_y):
+	def empty_room(dungeon, global_x, global_y):
 		tiles = []
 		entities = []
 

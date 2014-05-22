@@ -199,7 +199,16 @@ class TileData(object):
 
 	@staticmethod
 	def deformatted_tile(formatted_data, filepath = "./"):	#this will need to change as this class's constructor does.
-		return TileData(formatted_data[0], formatted_data[1], filepath)
+		entity_key = formatted_data[0]
+		tile_data = TileData(formatted_data[0], formatted_data[1], filepath)
+		if entity_key in TILE_INIT_MAP:
+			init_function = TILE_INIT_MAP[entity_key] #TODO: get a constructor from a map
+			init_function(tile_data, formatted_data)
+		return tile_data
+
+	@staticmethod
+	def deformatted_sign(sign_data, formatted_data):	#this will need to change as this class's constructor does.
+		sign_data.text_panes = formatted_data[4]
 
 
 class BlockedTileData(TileData): #this is a space in a room's tiles blocked out by some object that takes up more than one tile.
@@ -209,3 +218,7 @@ class BlockedTileData(TileData): #this is a space in a room's tiles blocked out 
 
 	def formatted_data(self):
 		return None
+
+TILE_INIT_MAP = {
+	DEFAULT_SIGN:TileData.deformatted_sign
+}

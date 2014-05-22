@@ -16,7 +16,13 @@ class Sign(Block): #TODO: figure out how to set text, # of panes, whether text i
 		self.text_set = None
 
 	def set_text_set(self, text_set):
-		self.text_set = text_set
+		self.text_set = []
+		for i in xrange(len(text_set)):
+			self.text_set.append("")
+			for line in text_set[i]:
+				if line != "":
+					self.text_set[i] += line + "\n"
+		#self.text_set = text_set
 	
 	def execute_event(self, level):
 		if self.text_set:

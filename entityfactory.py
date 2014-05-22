@@ -1,11 +1,14 @@
 from platformfactory import *
 from ladder import *
-from signfactory import *
 from lantern import *
 from exitblock import *
 from monster import *
 from npcfactory import *
 from roomdata import *
+
+#NON_DEFAULT_ENTITY_MAP = {
+#	DEFAULT_SIGN:EntityFactory.build_sign
+#}
 
 ENTITY_CONSTRUCTOR_MAP = {
 	DEFAULT_PLATFORM:Platform,
@@ -13,7 +16,7 @@ ENTITY_CONSTRUCTOR_MAP = {
 
 	DEFAULT_LADDER:Ladder,
 
-	DEFAULT_SIGN:Sign,
+	#DEFAULT_SIGN:Sign,
 
 	DEFAULT_LANTERN:Lantern,
 	
@@ -28,13 +31,16 @@ class EntityFactory(object):
 
 	@staticmethod
 	def build_entity(animation_set, entity_key, x, y):
+		#if entity_key in NON_DEFAULT_ENTITY_MAP:
+		#	non_default_function = NON_DEFAULT_ENTITY_MAP[entity_key]
+		#	non_default_function()
 		if entity_key not in ENTITY_CONSTRUCTOR_MAP: return None
 		constructor = ENTITY_CONSTRUCTOR_MAP[entity_key]
 		entity = constructor(animation_set, x, y)
 		if entity_key in ENTITY_BUILD_MAP:
 			build_function = ENTITY_BUILD_MAP[entity_key]
-			build_function(entity, entity_key)
-		return entity
+			build_function(entity, entity_key)	# this is not sufficient to create signs-- need to figure out where bulid_entity is called so that non-default methods can also be called.
+		return entity 							# figure out where TileData is built to pass into the EntityFactory and make sure SignData can be built, too.
 
 	#add other monster init stuff as necessary.
 	@staticmethod

@@ -9,7 +9,7 @@ class SignData(TileData):
 		#TODO: we also need data to represent the sign's text
 		#self.temp_data = "check dis data bro"	
 		self.text_panes = [
-			["", "","",""]
+			["", "", "", ""]
 		]
 
 	def create_copy(self):
@@ -19,3 +19,6 @@ class SignData(TileData):
 
 	def set_sign_text(self, text_panes):
 		self.text_panes = text_panes
+
+	def formatted_data(self):
+		return (self.entity_key, self.image_filepath, self.width, self.height, self.text_panes) 

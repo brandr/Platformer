@@ -10,7 +10,7 @@ class DungeonData(object):
 	def formatted_data(self):	#may need a corresponding method to build a dungeonData object from this.
 		formatted_level_set = self.formatted_level_set()
 		formatted_rooms =  self.formatted_room_set()
-		return (formatted_level_set,formatted_rooms)
+		return (formatted_level_set, formatted_rooms)
 
 	def formatted_level_set(self):
 		levels = []
@@ -36,8 +36,5 @@ class DungeonData(object):
 	@staticmethod
 	def deformatted_dungeon(formatted_data, filepath = "./"):
 		level_data_set = LevelData.deformatted_level_set(formatted_data[0])
-		room_data_set = RoomData.deformatted_room_set(formatted_data[1],filepath)
-		return DungeonData(level_data_set,room_data_set)
-		#return dungeon_data
-		#TODO: return a DungeonData object.
-		#return None
+		room_data_set = RoomData.deformatted_room_set(formatted_data[1], filepath)
+		return DungeonData(level_data_set, room_data_set)
