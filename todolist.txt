@@ -67,7 +67,7 @@ IMMEDIATE STUFF: reducing lag
 # IDEA to reduce lag: instead of immediately updating the lightvalues as light is spread by tiles, simply update some "lightmap" (or return it?)
     and somehow apply it to each tile after the entity images have been blitted (this solves a couple other problems, as well)
 
-# IDEA to reduce lag: instead of having the level constantly check for up-interacatbles, simply generate an array stored in levelobjects
+# IDEA to reduce lag: instead of having the level constantly check for up-interacatbles, simply generate a list stored in levelobjects
 when the level is created
     - do this for all the indivdual object types (monsters, platforms, etc) as well.
 
@@ -75,14 +75,22 @@ when the level is created
 
 IMMEDIATE STUFF: dialog
 
-# now that signs can store and (presumably) save different text sets via the level editor, need to load them into the game properly.
+# fix the lag in the leveleditor before doing anything else because it is goddamn ridiculous
+    - when openining the dungeon editor, most of the lag seems to come from the init_cells() method in dungeongrid
+    - figure out where the lag comes from in the actual level editor.
+
+# possible solution to lag: reduce room size and when editing a level, only include one room at a time in the grid.
+    (this may obviate the need for scrolling)
+    - should probably add in some more interface for going between rooms
+
+# Allow multiple panes of sign text to be set via the leveleditor.
+    - this is partially implemented but needs to be fixed.
 
 # Make signs/NPCS get their dialog data through a more general process
-    - implement the sign process before the dialog process since it's much simpler
-    - this will affect the level editor (entitydatapane class mostly)
-    - modify tiledata in a general way to allow "additional data" which is parsed differently depending on the circumstances (maybe use SignData and inherit?)
-    - will need to pass some data besides entity key into entityfactory to build signs/NPCs
-    - IDEA: allow tiledata to store "additional_data" (in this case, dialog tree keys for the dict) and pass it to the entityfactory
+    - partially done for signs, but will require a lot of planning for NPCs
+        *this is because different actions in the game will affect NPC behavior/dialog later on.
+        *need to start really implementing (or planning in detail) the game's main story 
+            in order to flesh out the NPC system I'll need
 
 # make portraits prettier (look at cave story, consult people, consider resizing, etc.)
 
@@ -99,6 +107,7 @@ IMMEDIATE STUFF: dialog
     - note that this will affect DialogChoices, which inherit from Dialogs
 
 # make it more visually clear when the player can press up to interact with something
+
 -------------------------------------------------------------
 
 IMMEDIATE STUFF: cutscenes
@@ -180,19 +189,19 @@ IMMEDIATE STUFF: screens, menus, movement
 #TODO: consider having tiles/textures be procedurally generated based on hardcoded platform locations/level data and a library of tiles.
        # Alternately, use the map editor and a tileFactory to load in tiles from images which represent levels using only entities.
 
-        #ENEMY/AI STUFF
+    # ENEMY/AI STUFF
 
 #TODO: implement more enemies. Try to give them very different behavior to force myself to expand the AI system.
     # when adding AI, try to be creative and extensible, as though this were a roguelike.
     #IDEA: could give some monsters strong knockback by increasing the bounce they deliver.
 # NOTE: enemies remain in the exact same state they were left in when the player leaves a level. should decide if this is good or bad.
 
-        #PLATFORM STUFF
+    # PLATFORM STUFF
 
 #TODO: make the "platform" system more complex, possibly with inheritance/factory
 # consider platforms that  the player can jump up through and/or fall through  by tapping down
 
-        # MISC STUFF
+    # MISC STUFF
 
 #TODO: make invisible caverns which can be revealed somehow. (test in sunlight first)
 #TODO: give exit blocks super terrifying sprites. (they can't be seen normally so it will be a fun surprise if there's a glitch or something)

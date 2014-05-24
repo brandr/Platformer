@@ -1,9 +1,9 @@
 import dungeoneditorscreen
 from dungeoneditorscreen import *
-
+"""
 	#IMMEDIATE STUFF
 
-# Nothing immediate right now.
+# Fix that lag!
 
 	#LEVEL EDITOR GRID STUFF
 
@@ -65,17 +65,21 @@ from dungeoneditorscreen import *
 #consider a set of "level tags", as well as different "layers" that can be toggled 
 	#(i.e.,background layer, platforms layer, and (at dungeon zoom level)
          #a layer which shows which levels contain which rooms)
-
-def loadMapEditor():
+"""
+def load_dungeon_editor():
 	pygame.init()
 	
+	print "Loading dungeon editor..."
+
 	dungeon_renderer = Renderer()
-	dungeon_renderer.create_screen(DUNGEON_WIN_WIDTH,DUNGEON_WIN_HEIGHT)
+	dungeon_renderer.create_screen(DUNGEON_WIN_WIDTH, DUNGEON_WIN_HEIGHT)
 	dungeon_renderer.title = "Dungeon Editor"
 	dungeon_renderer.color = (250, 250, 250)
 
 	dungeon_editor_screen = DungeonEditorScreen(dungeon_renderer)
 	dungeon_editor_screen.openDungeonEditor() #add more args if necessary
 
+
+
 if __name__ == "__main__":
-	loadMapEditor()
+	load_dungeon_editor()

@@ -10,9 +10,9 @@ class LevelEditorContainer(Box):
 		self.level_cell = level_cell
 		
 		level_name_label = Label(level_cell.get_name())
-
+		print "Building level grid window..."
 		self.level_grid_window = self.level_grid_window()
-		
+		print "Level grid windows built."
 		self.entity_select_container = self.entity_select_container(self.left + 8, level_name_label.bottom + 8, self.level_grid_window.left - 16, 400)
 
 		self.additional_entity_data_pane = self.additional_entity_data_pane(self.level_grid_window.width, 160, self.level_grid_window.left, self.level_grid_window.bottom + 8) #TODO: make this method and get dimensions right
@@ -49,7 +49,6 @@ class LevelEditorContainer(Box):
 	def additional_entity_data_pane(self, width, height, x, y):
 		data_pane = EntityDataPane(width, height)
 		data_pane.topleft = x, y
-		#file_list.connect_signal(SIG_SELECTCHANGED, self.change_selection, file_list) #connect to self if necessary
 		return data_pane
 
 	def select_tile(self, tile):

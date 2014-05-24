@@ -6,15 +6,17 @@ class SignData(TileData):
 	""" TODO: docstring"""
 	def __init__(self, key, filepath, filepath_start = "./"):
 		TileData.__init__(self, key, filepath, filepath_start)
-		#TODO: we also need data to represent the sign's text
-		#self.temp_data = "check dis data bro"	
 		self.text_panes = [
 			["", "", "", ""]
 		]
 
 	def create_copy(self):
 		copy_sign = SignData(self.entity_key, self.image_filepath)
-		copy_sign.text_panes = self.text_panes
+		copy_sign.text_panes = []
+		for i in range(len(self.text_panes)):
+			copy_sign.text_panes.append([])
+			for line in self.text_panes[i]:
+				copy_sign.text_panes[i].append(line)
 		return copy_sign
 
 	def set_sign_text(self, text_panes):

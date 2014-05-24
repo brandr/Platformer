@@ -7,25 +7,30 @@ LEFT_MOUSE_BUTTON = 1      #NOTE: this variable is repeated in dungeongridcontai
 RIGHT_MOUSE_BUTTON = 3
 # IDEA: middle mouse button to "paint" tiles.
 
-TILE_WIDTH, TILE_HEIGHT = 32,32
+TILE_WIDTH, TILE_HEIGHT = 32, 32
 WHITE = Color(("#FFFFFF"))
 BLACK = Color(("#000000"))
 RED = Color(("#FF0000"))
 
 #TODO: give this class the same fuctionality as before using the ImageLabel setup instead of table
 
-class LevelGrid(ImageLabel):
+class LevelGrid(ImageLabel):	#maybe this should be a table instead? not sure
 	def __init__(self, level_editor):
+		print "Creating level grid..."
 		self.level_editor = level_editor
 		self.selected_tile, self.selected_row, self.selected_col = None, 0, 0
-		level_cell = self.level_cell()
 		room_cols, room_rows = self.get_room_dimensions()
-		self.cols, self.rows = room_cols*ROOM_WIDTH,room_rows*ROOM_HEIGHT
+		self.cols, self.rows = room_cols*ROOM_WIDTH, room_rows*ROOM_HEIGHT
 		self.grid_image = LevelGrid.empty_grid_image(self.cols, self.rows)
-		self.drawGridlines()
 		ImageLabel.__init__(self, self.grid_image)
-		room_cells = level_cell.aligned_rooms()
+		print "Level grid created."
+
+	def init_components(self):		
+		room_cells = self.level_cell().aligned_rooms()
+		room_cols, room_rows = self.get_room_dimensions()
 		self.init_cells(room_cells, room_rows, room_cols)
+		self.drawGridlines()
+		self.set_picture(self.grid_image)
 
 	def drawGridlines(self):
 		pixel_width, pixel_height = self.get_pixel_width(), self.get_pixel_height()
@@ -56,6 +61,7 @@ class LevelGrid(ImageLabel):
 		for y in range (origin_y, origin_y + ROOM_HEIGHT):
 			for x in range(origin_x, origin_x + ROOM_WIDTH):
 				tile_data = room_data.tile_at(x - origin_x, y - origin_y)
+				if tile_data == None: continue
 				self.add_tile_cell(tile_data, x, y)
 
 	def add_tile_cell(self, tile_data, x, y):
@@ -147,8 +153,8 @@ class LevelGrid(ImageLabel):
 		image = tile.get_image() 		#this part only needs to be done once.
 		self.drawGridlines()
 		self.updateTileImage(image, col, row)
-		self.selected_tile, selected_row, selected_col = None, 0, 0
-		self.level_editor.deselect_tile() #TODO (or this might not be necessary?)
+		self.selected_tile, self.selected_row, self.selected_col = None, 0, 0
+		self.level_editor.deselect_tile() 
 
 	def outline_selection(self, row, col, tile_data):
 		self.drawGridlines()
@@ -165,6 +171,7 @@ class LevelGrid(ImageLabel):
 		pygame.draw.line(self.grid_image, RED, p4, p3, 2)
 
 	def addEntity(self, template, row, col):
+		self.deselect()
 		tile = template.create_copy()
 		width, height = tile.width, tile.height
 		self.level_cell().add_entity(tile, col, row) 	#this will be important to setting data differently for different signs

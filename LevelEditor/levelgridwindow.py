@@ -2,12 +2,16 @@ from levelgrid import *
 
 class LevelGridWindow(ScrolledWindow):
 	def __init__(self, level_editor, x, y, width, height):
-		ScrolledWindow.__init__(self,width,height)
+		ScrolledWindow.__init__(self, width, height)
 		self.topleft = x, y
-		self.level_grid = LevelGrid(level_editor)
-		self.set_child(self.level_grid)
+		
+		self.level_grid = LevelGrid(level_editor)	
+		print "Adding level grid to window..."
+		self.set_child(self.level_grid)		# lots of lag still happening in here for some reason
+		print "Level grid added to window."
+		self.level_grid.init_components()
 		self.master_editor = level_editor
-		self.connect_signal(SIG_MOUSEDOWN,self.processClick)
+		self.connect_signal(SIG_MOUSEDOWN, self.processClick)
 
 	def setLevelData(self, level_cell):#TODO: build from dungeon grid cells, not level data.
 		self.level_grid.setLevelData(level_cell)

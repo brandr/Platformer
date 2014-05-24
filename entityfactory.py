@@ -6,17 +6,11 @@ from monster import *
 from npcfactory import *
 from roomdata import *
 
-#NON_DEFAULT_ENTITY_MAP = {
-#	DEFAULT_SIGN:EntityFactory.build_sign
-#}
-
 ENTITY_CONSTRUCTOR_MAP = {
 	DEFAULT_PLATFORM:Platform,
 	SLOPING_PLATFORM:Platform,
 
 	DEFAULT_LADDER:Ladder,
-
-	#DEFAULT_SIGN:Sign,
 
 	DEFAULT_LANTERN:Lantern,
 	
@@ -31,9 +25,6 @@ class EntityFactory(object):
 
 	@staticmethod
 	def build_entity(animation_set, entity_key, x, y):
-		#if entity_key in NON_DEFAULT_ENTITY_MAP:
-		#	non_default_function = NON_DEFAULT_ENTITY_MAP[entity_key]
-		#	non_default_function()
 		if entity_key not in ENTITY_CONSTRUCTOR_MAP: return None
 		constructor = ENTITY_CONSTRUCTOR_MAP[entity_key]
 		entity = constructor(animation_set, x, y)

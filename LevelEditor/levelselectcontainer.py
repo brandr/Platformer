@@ -6,7 +6,6 @@ from ocempgui.widgets.Constants import *
 
 MAX_LEVELS = 99
 
-
 #TODO:consider separating out the levelselectwindow into its own class....
 class LevelSelectContainer(Box):
 	def __init__(self, editor_screen, position, dimensions):
@@ -19,15 +18,15 @@ class LevelSelectContainer(Box):
 
 		level_select_label = Label("Dungeon Levels:")
 
-		self.level_data_table = Table(MAX_LEVELS,1)
-		self.level_window_dimensions = (dimensions[0]-36,dimensions[1]-200,self.level_data_table)
-		self.level_window = self.create_level_window(self.level_window_dimensions[0],self.level_window_dimensions[1],self.level_data_table)
-		self.selected_level_label = self.selected_level_label(self.level_window.left,self.level_window.bottom+12)
+		self.level_data_table = Table(MAX_LEVELS, 1)
+		self.level_window_dimensions = (dimensions[0] - 36,dimensions[1] - 200,self.level_data_table)
+		self.level_window = self.create_level_window(self.level_window_dimensions[0], self.level_window_dimensions[1], self.level_data_table)
+		self.selected_level_label = self.selected_level_label(self.level_window.left, self.level_window.bottom + 12)
 
-		self.add_level_button = self.add_level_button(224,6)
-		self.rename_level_button = self.rename_level_button(self.selected_level_label.left,self.selected_level_label.bottom+8)
-		self.level_name_entry = self.rename_level_entry_field(self.rename_level_button.right+8, self.rename_level_button.top)
-		self.edit_level_button = self.edit_level_button(self.rename_level_button.left,self.rename_level_button.bottom+8)
+		self.add_level_button = self.add_level_button(224, 6)
+		self.rename_level_button = self.rename_level_button(self.selected_level_label.left, self.selected_level_label.bottom + 8)
+		self.level_name_entry = self.rename_level_entry_field(self.rename_level_button.right + 8, self.rename_level_button.top)
+		self.edit_level_button = self.edit_level_button(self.rename_level_button.left, self.rename_level_button.bottom + 8)
 
 		self.add_child(level_select_label)
 		self.add_child(self.level_window)
@@ -48,41 +47,41 @@ class LevelSelectContainer(Box):
 
 	#buttons/entry fields
 
-	def add_level_button(self,x,y):
+	def add_level_button(self, x, y):
 		button = Button("Add a level")
-		button.topleft = (x,y)
+		button.topleft = (x, y)
 		button.connect_signal (SIG_CLICKED, self.addLevel)
 		return button
 
-	def rename_level_button(self,x,y):
+	def rename_level_button(self, x, y):
 		button = Button("Rename")
-		button.topleft = x,y
-		button.connect_signal(SIG_CLICKED,self.renameSelectedLevel)
+		button.topleft = x, y
+		button.connect_signal(SIG_CLICKED, self.renameSelectedLevel)
 		return button
 
-	def rename_level_entry_field(self,x,y):
+	def rename_level_entry_field(self, x, y):
 		entry = Entry(self.selected_level_string())
-		entry.topleft = x,y
+		entry.topleft = x, y
 		return entry
 
-	def edit_level_button(self,x,y):
+	def edit_level_button(self, x, y):
 		button = Button("Edit Level")
-		button.topleft = x,y
-		button.connect_signal(SIG_CLICKED,self.editSelectedLevel)
+		button.topleft = x, y
+		button.connect_signal(SIG_CLICKED, self.editSelectedLevel)
 		return button
 
 	#level window
 	#not to be confused with level editor window
-	def create_level_window(self,width,height,level_data_table):
+	def create_level_window(self, width, height, level_data_table):
 		window = ScrolledWindow(width,height)
 		window.set_child(level_data_table)
 		window.connect_signal(SIG_MOUSEDOWN,self.clickLevelCell)
-		window.topleft = (18,45)
+		window.topleft = (18, 45)
 		return window
 
-	def selected_level_label(self,x,y):
+	def selected_level_label(self, x, y):
 		label = Label("Selected Level:              ")
-		label.topleft = x,y
+		label.topleft = x, y
 		return label
 
 	def selected_level_string(self):
@@ -117,9 +116,9 @@ class LevelSelectContainer(Box):
 
 	def addLevel(self, level_data = None):
 		if level_data == None:
-			level_name = "level "+str(self.level_count)
+			level_name = "level " + str(self.level_count)
 			added_level_cell = LevelSelectCell(level_name)
-			self.level_data_table.add_child(self.level_count,0,added_level_cell)
+			self.level_data_table.add_child(self.level_count, 0, added_level_cell)
 			self.level_count += 1
 			return
 		added_level_cell = LevelSelectCell(level_data.name, level_data.sunlit)	#it might later be better just to take the whole leveldata as an arg
@@ -132,7 +131,7 @@ class LevelSelectContainer(Box):
 		for L in xrange(len(level_data_set)):
 			next_level = level_data_set[L]
 			self.addLevel(next_level)
-			self.selected_level_cell = self.level_data_table.grid[(L,0)]
+			self.selected_level_cell = self.level_data_table.grid[(L,0 )]
 			if next_level != None and next_level.corners != None:
 				dungeon_grid.setLevelRooms(next_level.corners)
 				self.selected_level_cell.room_cells = dungeon_grid.selected_cells
@@ -147,24 +146,26 @@ class LevelSelectContainer(Box):
 
 	def editSelectedLevel(self):
 		title = "Level Editor" #might have title vary more and include level's name
-		level_editor_window = LevelEditorWindow(self,title,self.selected_level_cell,(32,32),(800,550))
+		print "Openining level editor..."
+		level_editor_window = LevelEditorWindow(self, title, self.selected_level_cell, (32, 32), (800, 550))	#TODO: fix lag
 		level_editor_window.depth = 1
 		self.editor_screen.dungeon_renderer.add_widget(level_editor_window)
 		self.editor_screen.adjustSensitivty(False)
+		print "Level editor opened."
 
-	def clickLevelCell(self,event):
+	def clickLevelCell(self, event):
 		coords = event.pos
 		screen_offset = (self.left + self.level_window.left,self.top + self.level_window.top)
-		relative_coords = (coords[0]-screen_offset[0],coords[1]-screen_offset[1])
+		relative_coords = (coords[0] - screen_offset[0], coords[1] - screen_offset[1])
 		if relative_coords[0] > self.level_window.vscrollbar.left or relative_coords[1] > self.level_window.hscrollbar.top: return
 		y_scroll_offset = self.level_window.vscrollbar.value
 		#adjusted coords represent the coordinates of the clicked cell, in pixels, 
 		#assuming that 0,0 is the upper left of the top cell (regardless of scrolling).
-		adjusted_coords = (relative_coords[0],relative_coords[1]+y_scroll_offset) 
-		selected_level_cell = self.cell_at(adjusted_coords)
+		adjusted_coords = (relative_coords[0],relative_coords[1] + y_scroll_offset) 
+		selected_level_cell = self.cell_at(adjusted_coords) 
 		self.selectLevelCell(selected_level_cell)
 
-	def selectLevelCell(self,level_cell):
+	def selectLevelCell(self, level_cell):
 		if level_cell == None or self.selected_level_cell == level_cell:
 			self.updateSelectedLevel()
 			return 
@@ -174,21 +175,21 @@ class LevelSelectContainer(Box):
 		self.selected_level_cell = level_cell
 		self.updateSelectedLevel()
 
-	def updateSelectedLevel(self,reset_rooms = True):
-		self.selected_level_label.set_text("Selected Level: "+self.selected_level_string())
+	def updateSelectedLevel(self, reset_rooms = True):
+		self.selected_level_label.set_text("Selected Level: " + self.selected_level_string())
 		self.level_name_entry.set_text(self.selected_level_string())
 		
 		rename_sensitive = (self.selected_level_cell != None)
 		edit_level_sensitive = (self.selected_level_cell != None and self.selected_level_cell.room_cells != None)
 		
-		self.setSensitivity(self.rename_level_button,rename_sensitive)
-		self.setSensitivity(self.level_name_entry,rename_sensitive)
-		self.setSensitivity(self.edit_level_button,edit_level_sensitive)
+		self.setSensitivity(self.rename_level_button, rename_sensitive)
+		self.setSensitivity(self.level_name_entry, rename_sensitive)
+		self.setSensitivity(self.edit_level_button, edit_level_sensitive)
 
 		if self.dungeon_grid_container != None and reset_rooms:
 			self.dungeon_grid_container.dungeon_grid.resetRooms()
 
-	def setSensitivity(self,component,sensitive):
+	def setSensitivity(self, component, sensitive):
 		state = Constants.STATE_INSENSITIVE
 		if(sensitive): state = Constants.STATE_NORMAL
 		component.set_state(state)
@@ -199,12 +200,12 @@ class LevelSelectContainer(Box):
 		if self.selected_level_cell != None: self.selected_level_cell.select()
 		self.dungeon_grid_container.dungeon_grid.updateSelectedCells()
 
-	def cell_at(self,coords):
-		height = CELL_HEIGHT+2
+	def cell_at(self, coords):
+		height = CELL_HEIGHT + 2
 		row = int(coords[1]/height)
 		col = 0	#since the level data cells have only one column, we always use the first index.
-		if (row, col) not in self.level_data_table.grid:return
-		cell = self.level_data_table.grid[(row,col)]
+		if (row, col) not in self.level_data_table.grid: return
+		cell = self.level_data_table.grid[(row, col)]
 		return cell
 
 	@staticmethod

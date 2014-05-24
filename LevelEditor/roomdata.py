@@ -1,7 +1,7 @@
 from tiledata import *
 
-ROOM_WIDTH = 28
-ROOM_HEIGHT = 20
+ROOM_WIDTH = 11
+ROOM_HEIGHT = 11
 
 class RoomData(object):
 	"""docstring for RoomData"""

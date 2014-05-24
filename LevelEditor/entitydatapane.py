@@ -1,10 +1,17 @@
 """ A special pane used in the LevelEditor fuor some (but not all) entity types to specify additional data.
 """
 
-from ocempgui.widgets import Bin, Box, FileList, Label, ImageLabel, Label, Entry, Button
+from ocempgui.widgets import Bin, Box, FileList, Label, ImageLabel, Label, Entry, Button, ImageButton
 from ocempgui.widgets.BaseWidget import *
-from ocempgui.widgets.Constants import *
+from ocempgui.widgets import Constants #.Constants import *
 from ocempgui.widgets.components import *
+from pygame import Surface, Color
+from pygame.draw import polygon
+
+WHITE = Color("#FFFFFF")
+BLACK = Color("#000000")
+RED = Color("#FF0000")
+GREY = Color("#999999")
 
 class EntityDataPane(Box): #TODO: figure what class this should extend
 	"""TODO: docstring"""
@@ -37,55 +44,132 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 
 	def update_sign(self):
 		sign_data = self.current_selection
-		#TODO: allow saving sign text so that it corresponds to sign_data (a specific TileData object)
-			# - not sure if this alone will make it possible to give different signs different text or not
 		#TODO: add buttons which allow scrolling through different panes of sign text.
 			# -also allow adding panes (in a different, distinct way)
-		#TODO: modify TileData reading so that a sign can be created in the leveleditor, have its text panes set, and then
-			#  added to the game with the same text panes.
-
-		#print sign_data.temp_data #TEST
 
 		sign_label = Label("Sign Text:")
-		sign_text_panes = sign_data.text_panes
+		self.sign_text_panes = sign_data.text_panes
 		sign_text_entries = []
 
-		for i in range(0, 1): #TEMP: want to iterate through all panes eventually
-			sign_text_lines = sign_text_panes[i]
-			y_offset = 16
-			for s in sign_text_lines:
-				next_entry = Entry(s)
-				next_entry.set_minimum_size(self.width, 12)
-				next_entry.padding = 4
-				next_entry.top += y_offset
-				y_offset += 24
-				sign_text_entries.append(next_entry)
+		#for i in range(0, 1): #TEMP: want to iterate through all panes eventually
+		sign_text_lines = self.sign_text_panes[0]
+		y_offset = 16
+		for s in sign_text_lines:
+			next_entry = Entry(s)
+			next_entry.set_minimum_size(self.width, 12)
+			next_entry.padding = 4
+			next_entry.top += y_offset
+			y_offset += 24
+			sign_text_entries.append(next_entry)
 
-		self.set_children([sign_label])	#TEMP: want to iterate through all panes eventually (and only add children for 0, or )
-		for s in sign_text_entries:
+		self.set_children([sign_label])	
+		self.sign_entry_set = sign_text_entries
+		for s in self.sign_entry_set:
 			self.add_child(s)
 
-		self.sign_entry_set = sign_text_entries #TEMP. eventually I want to replace this with the set of all panes.
-		bottom_entry = sign_text_entries[-1]
+		#self.sign_entry_set = sign_text_entries #TEMP. eventually I want to replace this with the set of all panes.
+		bottom_entry = self.sign_entry_set[-1]
 		save_sign_button = self.save_sign_button(bottom_entry.left, bottom_entry.bottom + 8)
+		self.prev_pane_button = self.build_prev_pane_button(save_sign_button.right + 8, save_sign_button.top + 4, False)
+		self.next_pane_button = self.build_next_pane_button(self.prev_pane_button.right + 8, self.prev_pane_button.top, len(self.sign_text_panes) > 1)
+		add_sign_pane_button = self.add_sign_pane_button(self.next_pane_button. right + 8, self.next_pane_button.top)
 		self.add_child(save_sign_button)
+		self.add_child(self.prev_pane_button)
+		self.add_child(self.next_pane_button)
+		self.add_child(add_sign_pane_button)
+		self.pane_index = 0
+
+	def change_current_pane(self, pane_index):
+		sign_text_lines = self.sign_text_panes[pane_index]
+		y_offset = 16
+		#self.sign_entry_set = []
+		for i in range(len(sign_text_lines)):
+			self.sign_entry_set[i].text = sign_text_lines[i]
+			#next_entry = Entry(s)
+			#next_entry.set_minimum_size(self.width, 12)
+			#next_entry.padding = 4
+			#next_entry.top += y_offset
+			#y_offset += 24
+			#self.sign_entry_set.append(next_entry)
 
 	def save_sign_button(self, x, y):
-		button = Button("Save sign text")
+		button = Button("Save current pane")
 		button.topleft = x, y
 		button.connect_signal(SIG_CLICKED, self.save_sign_data)	
 		return button
 
 	def save_sign_data(self):
-		sign_text_panes = []
-		for i in range(0, 1): #TEMP: eventually want to get all panes
-			sign_text_panes.append([])
-			for j in range(0, 4):
-				next_entry = self.sign_entry_set[j]
-				next_text = next_entry.text	
-				sign_text_panes[i].append(next_text)
-		self.current_selection.set_sign_text(sign_text_panes)
-		 #TODO: change self.current_selection on the assumption that it is a SignData object (set the text panes)
+		i = self.pane_index
+		for j in range(0, 4):
+			next_entry = self.sign_entry_set[j]
+			next_text = next_entry.text	
+			self.sign_text_panes[i][j] = next_text
+		self.current_selection.set_sign_text(self.sign_text_panes)
+
+	def add_sign_pane_button(self, x, y):
+		button = Button("Add pane")
+		button.topleft = x, y
+		button.connect_signal(SIG_CLICKED, self.add_sign_pane)	
+		return button
+
+	def add_sign_pane(self):
+		next_pane_lines = ["", "", "", ""]
+		self.sign_text_panes.append(next_pane_lines)
+		self.set_sensitivity(self.next_pane_button, True)
+
+	def set_sensitivity(self, component, sensitive):
+		state = Constants.STATE_INSENSITIVE
+		if(sensitive): state = Constants.STATE_NORMAL
+		component.set_state(state)
+		component.sensitive = sensitive
+
+	def build_prev_pane_button(self, x, y, has_prev):
+		prev_image = None
+		prev_image = EntityDataPane.draw_prev_image(BLACK)
+		prev_button = ImageButton(prev_image)
+		prev_button.topleft = x, y
+		prev_button.connect_signal(SIG_CLICKED, self.pane_back)
+		self.set_sensitivity(prev_button, has_prev)
+		return prev_button
+
+	@staticmethod
+	def draw_prev_image(color):
+		prev_image = Surface((24, 24))
+		prev_image.fill(WHITE)
+		polygon(prev_image, color, [(24, 0), (0, 12), (24, 24)])
+		return prev_image
+
+	def build_next_pane_button(self, x, y, has_next):
+		next_image = None
+		next_image = EntityDataPane.draw_next_image(BLACK)
+		next_button = ImageButton(next_image)
+		next_button.topleft = x, y
+		next_button.connect_signal(SIG_CLICKED, self.pane_next)
+		self.set_sensitivity(next_button, has_next)
+		return next_button
+
+	@staticmethod
+	def draw_next_image(color):
+		next_image = Surface((24, 24))
+		next_image.fill(WHITE)
+		polygon(next_image, color, [(0, 0), (0, 24), (24, 12)])
+		return next_image
+
+	def pane_back(self):
+		self.pane_index -= 1
+		self.change_current_pane(self.pane_index)
+		self.update_pane_buttons()
+
+	def pane_next(self):
+		self.pane_index += 1
+		self.change_current_pane(self.pane_index)
+		self.update_pane_buttons()
+
+	def update_pane_buttons(self):
+		has_prev = self.pane_index > 0
+		self.set_sensitivity(self.prev_pane_button, has_prev)
+		has_next = self.pane_index < len(self.sign_text_panes) - 1
+		self.set_sensitivity(self.next_pane_button, has_next)
 
 DEFAULT_SIGN = "default_sign"
 ENTITY_DATA_MAP = {
