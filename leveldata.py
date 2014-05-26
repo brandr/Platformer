@@ -4,14 +4,15 @@ class LevelData(object):
 	"""docstring for LevelData"""
 	def __init__(self, name, coords1, coords2, sunlit = False):
 		self.name = name
-		self.corners = (coords1,coords2)
+		self.corners = (coords1, coords2)
 		self.sunlit = sunlit #TODO: as level data gets more complicated, make this part of a more general set of tags.
 
-	def room_set(self,rooms):
+	def room_set(self, rooms):
 		room_set = []
+		if self.corners[0] == None: return None
 		corner1 = self.corners[0]
 		corner2 = self.corners[1]
-		for y in range(corner1[1],corner2[1]+1):
+		for y in range(corner1[1], corner2[1] + 1):
 			#room_set.append([]) #not sure if this would be useful
 			for x in range(corner1[0],corner2[0]+1):
 				room_set.append(rooms[y][x])

@@ -58,6 +58,15 @@
 
 MAIN GOAL: Build a demo showing of dialogs, cutscenes, lighting mechanics, etc. once all immediate stuff is finished.
 
+
+-------------------------------------------------------------------
+
+IMMEDIATE STUFF: most immediate
+
+# fix the problem where the player can't go up slopes to the left.
+# fix the problem where tiles aren't darkened properly.
+# change the way "mapped" ladders look.
+
 ---------------------------------------------------------------
 
 
@@ -75,19 +84,8 @@ when the level is created
 
 IMMEDIATE STUFF: dialog
 
-# fix the lag in the leveleditor before doing anything else because it is goddamn ridiculous
-    - when openining the dungeon editor, most of the lag seems to come from the init_cells() method in dungeongrid
-    - figure out where the lag comes from in the actual level editor.
-
-# possible solution to lag: reduce room size and when editing a level, only include one room at a time in the grid.
-    (this may obviate the need for scrolling)
-    - should probably add in some more interface for going between rooms
-
-# Allow multiple panes of sign text to be set via the leveleditor.
-    - this is partially implemented but needs to be fixed.
-
-# Make signs/NPCS get their dialog data through a more general process
-    - partially done for signs, but will require a lot of planning for NPCs
+# Make NPCS get their dialog data through a more general process
+    - will require a lot of planning
         *this is because different actions in the game will affect NPC behavior/dialog later on.
         *need to start really implementing (or planning in detail) the game's main story 
             in order to flesh out the NPC system I'll need
@@ -183,6 +181,10 @@ IMMEDIATE STUFF: screens, menus, movement
 # figure out how to handle monsters in complete/partial darkness
     # I put an idea in Being class
     # Keep in mind that the being may occupy multiple tiles
+
+    # USER SUGGESTIONS
+
+# Add pigs (simon)
 
     #SPRITE STUFF
 

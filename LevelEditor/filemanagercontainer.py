@@ -102,12 +102,14 @@ class FileManagerContainer(Box):
 		save_data = dungeon_data.formatted_data()
 		json.dump(save_data, dungeon_file)
 		
-		dev_filepath = "C:\Users\Robert\Documents\platformer\Platformer\dungeon_map_files"
+		dev_filepath = "C:\Users\Robert\Documents\python_stuff\Platformer\dungeon_map_files"
 		if(path.exists(dev_filepath)):
 			dev_filename = dev_filepath + "\dungeon" + slot
 			print "Saving dungeon for the developers..."
 			dev_dungeon_file = open(dev_filename,'wb') #'wb' means "write binary"
 			json.dump(save_data, dev_dungeon_file)
+		else:
+			print "ERROR: failed to save for developers."
 
 		print "Dungeon saved."
 

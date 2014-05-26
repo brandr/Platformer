@@ -88,8 +88,9 @@ class Tile(GameImage):
 
         nexttile1 = self.relativetile(d1, tiles)
         nexttile2 = self.relativetile(d2, tiles)
-        nextdist = math.sqrt(math.pow(iteration + dist - 1 , 2) - math.pow(iteration - 1, 2))
-        
+        #nextdist = math.sqrt(math.pow(iteration + dist - 1 , 2) - math.pow(iteration - 1, 2))
+        nextdist = sqrt(pow(iteration + dist - 1 , 2) - pow(iteration - 1, 2))
+
         if nexttile1 != None:
             nexttile1.spreadlight(nextdist, tiles, iteration + 1, d1, True, None, otherlights)  
         if nexttile2 != None:

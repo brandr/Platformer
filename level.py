@@ -79,7 +79,9 @@ class Level(object):
 
 		#level building methods (called in constructor)
 	def addRooms(self, rooms):
+		if rooms == None: return
 		for r in rooms:
+			if r == None: continue
 			level_objects = r.level_objects
 			self.level_objects.addLevelObjects(r.global_coords, level_objects)
 			self.setStartCoords(r)

@@ -32,7 +32,7 @@ class Dungeon(object):
 		next_level.screen = screen
 		next_level.addPlayer(player, next_coords)
 		
-	def level_at(self,x,y):
+	def level_at(self, x, y):
 		for L in self.dungeon_levels:
 			global_coords = L.origin
 			level_end = L.level_end_coords()

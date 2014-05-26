@@ -22,6 +22,7 @@ class LevelFactory(object):
 		for d in level_data_set:
 			level_rooms = d.room_set(rooms)
 			origin = d.corners[0]
+			if origin == None: continue
 			next_level = self.build_level(dungeon,d,origin,level_rooms)
 			levels.append(next_level)
 		return levels
