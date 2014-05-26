@@ -3,6 +3,7 @@ from block import *
 class Platform(Block):
     def __init__(self, animations, x, y):
         Block.__init__(self, animations, x, y)
+        self.is_solid = True
 
     def update(self, player):	
         pass

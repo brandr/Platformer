@@ -14,6 +14,7 @@ class Sign(Block): #TODO: figure out how to set text, # of panes, whether text i
 		self.up_interactable = True
 		self.scrolling = True #might want to make more elaborate scrolling later
 		self.text_set = None
+		self.is_solid = False
 
 	def set_text_set(self, text_set):
 		self.text_set = []

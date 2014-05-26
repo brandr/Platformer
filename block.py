@@ -7,6 +7,7 @@ class Block(Entity):
 		self.rect = Rect(x, y, 32, 32)
 		self.is_sloped = False
 		self.is_square = True
+		self.is_solid = True
 
 	def updateimage(self, lightvalue = 0):#visible arg was removed
 		if(lightvalue != 0): 

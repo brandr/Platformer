@@ -12,6 +12,7 @@ class Level(object):
 		self.effect_layer = []
 		self.has_effects = False
 		self.current_event = None
+		self.bg = Surface((32, 32))
 
 		self.dungeon = dungeon 		#the LevelGroup that the level is part of
 		self.level_ID = level_data.name #a currently unused value which identifies the level uniquely
@@ -285,6 +286,9 @@ class Level(object):
 			platforms = self.getPlatforms()
 			#for p in platforms: #not sure this is necessary. may use it later.
 			#	p.update(player)	
+			for y in range(WIN_HEIGHT/32):	#TODO: make sure this process is correct and efficient.
+				for x in range(WIN_WIDTH/32):
+					self.screen.blit(self.bg, (x * 32, y * 32))
 			for row in tiles:
 				for t in row:
 					self.screen.blit(t.image, self.level_camera.apply(t))

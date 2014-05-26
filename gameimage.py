@@ -59,7 +59,7 @@ class GameImage(pygame.sprite.Sprite):
         self.direction_set = self.animation_set.set_in_direction(direction) 
 
     def updateimage(self, lightvalue = 0):
-        if(lightvalue != 0): 
+        if(lightvalue > 0): 
             if(self.default_image != None):
                 self.image = self.default_image
             self.image.set_alpha(lightvalue)

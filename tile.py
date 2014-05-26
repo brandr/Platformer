@@ -31,6 +31,7 @@ class Tile(GameImage):
             if self.block.is_square:        #TODO: if people are bothered by the effect, make it so non-square block are not transparent in caves.
                 return
         GameImage.updateimage(self, lightvalue)
+        #self.image.set_alpha(lightvalue) #TEMP
 
     def darkenTo(self, lightvalue):
         GameImage.darkenTo(self, lightvalue)
@@ -64,11 +65,14 @@ class Tile(GameImage):
                 if o.withindist(self, o.light_distance()):
                     checkbrightness = o.calculate_brightness(self.coordinates(), tiles)
                     maxbrightness = max(checkbrightness, brightness)
+        #if maxbrightness == 256:
+        #   print self.coordinates()
         self.updateimage(maxbrightness)  #update the current image based on light level
         if dist <= 0:
             return               #once the light reaches its max distance, stop
 
-        if self.block != None:
+        #if self.block != None:
+        if not self.passable():
             d1 = (-1*direction[1], direction[0])
             d2 = (direction[1], -1*direction[0])
             nexttile1 = self.relativetile(d1, tiles)
@@ -88,7 +92,6 @@ class Tile(GameImage):
 
         nexttile1 = self.relativetile(d1, tiles)
         nexttile2 = self.relativetile(d2, tiles)
-        #nextdist = math.sqrt(math.pow(iteration + dist - 1 , 2) - math.pow(iteration - 1, 2))
         nextdist = sqrt(pow(iteration + dist - 1 , 2) - pow(iteration - 1, 2))
 
         if nexttile1 != None:
@@ -120,7 +123,7 @@ class Tile(GameImage):
             self.block.unseen_image = mapped_block_image
 
     def passable(self):
-        return self.block == None #TODO: change this if some blocks are passable.
+        return self.block == None or (not self.block.is_solid) #TODO: change this if some blocks are passable. (might already be necessary for signs and ladders)
 
     @staticmethod
     def validcoords(coords, tiles): #checks if a set of tile coords correspond to an actual tile on the level.

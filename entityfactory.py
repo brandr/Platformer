@@ -30,8 +30,8 @@ class EntityFactory(object):
 		entity = constructor(animation_set, x, y)
 		if entity_key in ENTITY_BUILD_MAP:
 			build_function = ENTITY_BUILD_MAP[entity_key]
-			build_function(entity, entity_key)	# this is not sufficient to create signs-- need to figure out where bulid_entity is called so that non-default methods can also be called.
-		return entity 							# figure out where TileData is built to pass into the EntityFactory and make sure SignData can be built, too.
+			build_function(entity, entity_key)
+		return entity 					
 
 	#add other monster init stuff as necessary.
 	@staticmethod
@@ -50,6 +50,7 @@ class EntityFactory(object):
 	def initSlopingPlatform(platform, arg):
 		platform.is_sloped = True
 		platform.is_square = False
+		platform.is_solid = False # this might not be correct in the long run.
 
 ENTITY_BUILD_MAP = {
 	SLOPING_PLATFORM:EntityFactory.initSlopingPlatform,

@@ -11,7 +11,7 @@ class Player(Being):
         self.animated = True
         self.default_image = self.animation.images[0]
         self.current_level = start_level
-        self.sightdist = 2
+        self.sightdist = 2 #TEMP. I usually use 2 though.
         self.can_jump = True
         self.on_ladder = False #TEMP
         self.left, self.right, self.down, self.up, self.space, self.control = False, False, False, False, False, False
