@@ -20,3 +20,13 @@ class Block(Entity):
 				self.image.set_alpha(16)
 				return
 			self.image.fill(BACKGROUND_COLOR)
+
+	def map(self):
+		self.mapped = True
+		self.unseen_image = self.mapped_block_image()
+
+	def mapped_block_image(self):
+		block_image = Surface((32, 32))
+		self.unseen_color = Color("#000000")
+		block_image.fill(self.unseen_color)
+		return block_image

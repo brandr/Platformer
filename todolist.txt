@@ -1,10 +1,6 @@
 
     #KNOWN BUGS
 
-# weird jankiness happens if the player collides with a non-sloping platform and a sloping platform at the same time.
-
-# giant frogs only occupy one tile. (this might have been fixed in the version nick has.)
-
 # Bats can fly outside the level and disappear.
 
 # player can end up in a "None" level (and crash game) when leaving a level.
@@ -12,6 +8,9 @@
     #so far it seems to only happen when leaving the level horizontally while jumping and
         #sprinting through a gap of the same height as the player.
     #it's possible that other bugs may occur if the player does this combination of actions, even when not leaving the level.
+
+# when falling down a large chasm, player can get to the other side of a wall by holding left.
+    - may be reproducible in more generalizable situations, like "leaving the level very quickly and diagonally"
 
     #IMMEDIATE STUFF
 
@@ -63,74 +62,7 @@ MAIN GOAL: Build a demo showing of dialogs, cutscenes, lighting mechanics, etc. 
 
 IMMEDIATE STUFF: most immediate
 
-# fix the problem where the player can get caught on slopes when going left.
-# change the way "mapped" ladders look.
-
----------------------------------------------------------------
-
-
-IMMEDIATE STUFF: reducing lag
-
-
-# IDEA to reduce lag: instead of immediately updating the lightvalues as light is spread by tiles, simply update some "lightmap" (or return it?)
-    and somehow apply it to each tile after the entity images have been blitted (this solves a couple other problems, as well)
-
-# IDEA to reduce lag: instead of having the level constantly check for up-interacatbles, simply generate a list stored in levelobjects
-when the level is created
-    - do this for all the indivdual object types (monsters, platforms, etc) as well.
-
--------------------------------------------------------------
-
-IMMEDIATE STUFF: dialog
-
-# Make NPCS get their dialog data through a more general process
-    - will require a lot of planning
-        *this is because different actions in the game will affect NPC behavior/dialog later on.
-        *need to start really implementing (or planning in detail) the game's main story 
-            in order to flesh out the NPC system I'll need
-
-# make portraits prettier (look at cave story, consult people, consider resizing, etc.)
-
-# fix the SIGN arg that I use to determine the image for the dialog pane, or just make it so all dialog panes are the same (which I would prefer not to do)
-    - this will change the NPC class, the dialog class (I think), and probaly the dialogchoice one (and maybe some others)
-
-# figure out how to give the existing dialog boxes borders, maybe even make them loaded images instead.
-    - could make a nice little "sign" image with a wooden grain
-    - figure out what panes should be like for NPCs
-    - make it more visually clear that dialogs are waiting for a button input. (maybe a blinking icon?)
-
-# consider making Dialogs inherit from GameActions (or events?) instead of Effects, and make the level add/remove effects containing images based on the dialog.
-    - not 100% sure about this as it might uneccessarily change existing structrue
-    - note that this will affect DialogChoices, which inherit from Dialogs
-
-# make it more visually clear when the player can press up to interact with something
-
--------------------------------------------------------------
-
-IMMEDIATE STUFF: cutscenes
-
-# Try to implement some more examples of cutscenes, like two non-player characters with actions and scrolling dialogue.
-    - use dialogue from girlchan in paradise as a test. It'll make it more fun.
-    - Have Yusuke talking to Kenstar
-    - to test something I'll probably use a lot: 
-        * have Yusuke start on the screen, but not Kenstar
-        * make the cutscene start when the player talks to Yusuke
-        * Have the cutscene "create" Kenstar off the left edge of the screen and make him walk on
-        * Test different facial expressions in the portraits
-        * use other actions from there (don't care as much about these)
-        * maybe end with Kenstar leaving and Yusuke staying (you can talk to him, but it doesn't start a new cutscene)
-        * alternately, figure out how to keep Kenstar but take away his cutscene trigger.
-    - probably use that scene where they're about to fight but spend forever talking instead
-    - still have actions mixed with dialogue for testing reasons, though
-
-# Think of a structure that will allow different events to happen at the same time in a cutscene 
-    - i.e., entity A starts walking, entity B does something while A is still walking
-    - this might work if actions are not ended when new actions start, meaning ending an action is an action in itself.
-    - IDEA: different actions that make up a cutscene are linked to "next" actions, which execute when they are over.
-
-# Finish and clean up the frameworks that will handle text, dialogs, events, cutscenes, etc.
-    - Remember that some things should be skippable while others should not.
-    - Test a number of different cutscene types for testing and implement them using the same general system.
+# Nothing for now-- go ahead and pick a category
 
     -------------------------------------------------------------
 
@@ -150,6 +82,62 @@ IMMEDIATE STUFF: screens, menus, movement
 # fix movement/rect related stuff, and put all relevant methods in gameImage, to be called by subclasses.
     # This is partially, maybe completely done, but make sure before removing this TODO.
 # fix imports to be efficient/useful
+
+-------------------------------------------------------------
+
+IMMEDIATE STUFF: dialog
+
+# Make NPCS get their dialog data through a more general process
+    - will require a lot of planning
+        *this is because different actions in the game will affect NPC behavior/dialog later on.
+        *need to start really implementing (or planning in detail) the game's main story 
+            in order to flesh out the NPC system I'll need
+    - IDEA: simple NPCs (which won't appear again) have their dialogs set similarly to signs,
+            while main characters have "triggers" linked to text files and other saved data
+            which make them appear.
+
+# make portraits prettier (look at cave story, consult people, consider resizing, etc.)
+
+# fix the SIGN arg that I use to determine the image for the dialog pane, or just make it so all dialog panes are the same (which I would prefer not to do)
+    - this will change the NPC class, the dialog class (I think), and probaly the dialogchoice one (and maybe some others)
+
+# figure out how to give the existing dialog boxes borders, maybe even make them loaded images instead.
+    - could make a nice little "sign" image with a wooden grain
+    - figure out what panes should be like for NPCs
+    - make it more visually clear that dialogs are waiting for a button input. (maybe a blinking icon?)
+
+# make it more visually clear when the player can press up to interact with something
+
+# consider making Dialogs inherit from GameActions (or events?) instead of Effects, and make the level add/remove effects containing images based on the dialog.
+    - not 100% sure about this as it might uneccessarily change existing structrue
+    - note that this will affect DialogChoices, which inherit from Dialogs
+
+-------------------------------------------------------------
+
+IMMEDIATE STUFF: cutscenes
+
+# Try to implement some more examples of cutscenes, like two non-player characters with actions and scrolling dialogue.
+    - use dialogue from girlchan in paradise as a test. It'll make it more fun.
+    - Have Yusuke talking to Kenstar
+    - to test something I'll probably use a lot: 
+        * have Yusuke start on the screen, but not Kenstar
+        * make the cutscene start when the player talks to Yusuke
+        * Have the cutscene "create" Kenstar off the left edge of the screen and make him walk on
+        * Test different facial expressions in the portraits
+        * use other actions from there (don't care as much about these)
+        * maybe end with Kenstar leaving and Yusuke staying (you can talk to him, but it doesn't start a new cutscene)
+        * alternately, figure out how to keep Kenstar but take away his cutscene trigger.
+    - probably use that scene where they're about to fight but spend forever talking instead
+        * still have actions mixed with dialogue for testing reasons, though
+
+# Think of a structure that will allow different events to happen at the same time in a cutscene 
+    - i.e., entity A starts walking, entity B does something while A is still walking
+    - this might work if actions are not ended when new actions start, meaning ending an action is an action in itself.
+    - IDEA: different actions that make up a cutscene are linked to "next" actions, which execute when they are over.
+
+# Finish and clean up the frameworks that will handle text, dialogs, events, cutscenes, etc.
+    - Remember that some things should be skippable while others should not.
+    - Test a number of different cutscene types for testing and implement them using the same general system.
 
 ------------------------------------------------------------------------
 
@@ -184,6 +172,19 @@ IMMEDIATE STUFF: screens, menus, movement
     # USER SUGGESTIONS
 
 # Add pigs (simon)
+
+---------------------------------------------------------------
+
+
+    # REDUCING LAG
+
+
+# IDEA to reduce lag: instead of immediately updating the lightvalues as light is spread by tiles, simply update some "lightmap" (or return it?)
+    and somehow apply it to each tile after the entity images have been blitted (this solves a couple other problems, as well)
+
+# IDEA to reduce lag: instead of having the level constantly check for up-interacatbles, simply generate a list stored in levelobjects
+when the level is created
+    - do this for all the indivdual object types (monsters, platforms, etc) as well.
 
     #SPRITE STUFF
 

@@ -41,6 +41,10 @@ class MainGameControls(Controls):
 	def move_control(self, key, toggle):
 		self.player.control = toggle
 
+	def pause(self, key, toggle):
+		if(toggle):
+			self.player.pause_game()
+
 move_up = MainGameControls.move_up
 move_down = MainGameControls.move_down
 move_left = MainGameControls.move_left
@@ -49,7 +53,10 @@ move_right = MainGameControls.move_right
 move_space = MainGameControls.move_space
 move_control = MainGameControls.move_control
 
+pause = MainGameControls.pause
+
 MAIN_GAME_CONTROL_MAP = { 
 	K_UP:move_up, K_DOWN:move_down, K_LEFT: move_left, K_RIGHT:move_right,
-	K_SPACE:move_space, K_LCTRL:move_control
+	K_SPACE:move_space, K_LCTRL:move_control,
+	K_RETURN:pause
 }

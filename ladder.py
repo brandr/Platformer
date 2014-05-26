@@ -8,3 +8,5 @@ class Ladder(Block):
 		Block.__init__(self, animations, x, y)
 		self.is_square = False
 		self.is_solid = False
+
+	#TODO: map ladders properly in darkness

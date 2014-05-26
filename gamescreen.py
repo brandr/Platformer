@@ -22,6 +22,7 @@ class GameScreen:
     def __init__(self, control_manager): #not sure what other args should be yet.
         self.control_manager = control_manager
         self.screen_image = Surface((WIN_WIDTH, WIN_HEIGHT))
+        self.bg = Surface((32, 32))
 
     def update(self):
         return None #TEMP
@@ -31,3 +32,8 @@ class GameScreen:
 
     def draw_screen(self, master_screen):
         master_screen.blit(self.screen_image, (0, 0))
+
+    def draw_bg(self):
+        for y in range(WIN_HEIGHT/32):  #TODO: make sure this process is correct and efficient.
+                for x in range(WIN_WIDTH/32):
+                    self.screen_image.blit(self.bg, (x * 32, y * 32))

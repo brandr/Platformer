@@ -107,7 +107,7 @@ class Player(Being):
             self.yvel += 0.35
             #TODO: falling animation starts once self.yvel >=0 (or maybe slightly lower/higher)
             # max falling speed
-            if self.yvel > 100: self.yvel = 100
+            if self.yvel > 90: self.yvel = 90
             if not space or self.yvel > 0:
                 self.yvel = max(self.yvel, 0)
                 self.can_jump = False
@@ -133,8 +133,6 @@ class Player(Being):
         self.updateView(tiles)
 
     def up_action_check(self):
-        #TODO: check more generally if anything in the player's current tile in up-interactable.
-        #signs = self.current_level.getSigns()
         ups = self.current_level.up_interactable_objects()
         for u in ups:
             if pygame.sprite.collide_rect(self, u):
@@ -142,9 +140,6 @@ class Player(Being):
 
     def up_interact(self, interactable):
         interactable.execute_event(self.current_level)
-        #print sign.text 
-        # TODO: when the sign text pops up, the control scheme should probably change. (X to continue rather than movement)
-        # also need a pane to pop up at the top displaying the sign's text. Will probably need an image for this in paint.
      
      #this gets laggy when there is too much light. try to fix it. (might have to fix other methods instead)
     def updateView(self, all_tiles): #note: this is only to be used in "cave" settings. for areas that are outdoors, use something else.
@@ -197,6 +192,16 @@ class Player(Being):
     def collide(self, xvel, yvel):
         level = self.current_level
         platforms = level.getPlatforms() #TODO: remember that it might be possible to pass through some platforms in some directions.
+        slopes = []
+        default_platforms = []
+        for p in platforms:
+            if p.is_sloped:
+                slopes.append(p)
+            else:
+                default_platforms.append(p)
+        for s in slopes:
+            if pygame.sprite.collide_mask(self, s):
+                Being.collideWith(self, xvel, yvel, s)
         for p in platforms:
             if pygame.sprite.collide_mask(self, p):
                 Being.collideWith(self, xvel, yvel, p)
@@ -260,10 +265,16 @@ class Player(Being):
 
     def exitLevelCheck(self):
         if(self.currenttile() == None):
-            #a bug can sometimes occur here.
+            #a bug can sometimes occur here, crashing the game. (this is rare however.)
             self.exitLevel(self.coordinates())
             return True
         return False
 
     def exitLevel(self, coords):
         self.current_level.movePlayer(coords)
+
+    def pause_game(self):
+        self.current_level.pause_game(self)
+
+    def unpause_game(self):
+        self.current_level.unpause_game(self)

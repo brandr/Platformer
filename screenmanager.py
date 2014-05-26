@@ -2,6 +2,7 @@
 """
 
 from maingamescreen import *
+from pausescreen import *
 
 class ScreenManager:
 	""" ScreenManager (...) -> ScreenManager
@@ -31,3 +32,17 @@ class ScreenManager:
 
 	def draw_screen(self):
 		self.current_screen.draw_screen(self.master_screen)
+
+	def switch_to_main_screen(self, player):
+		game_controls = MainGameControls(player) 
+		control_manager = ControlManager(game_controls)
+		main_screen = MainGameScreen(control_manager, player) 
+		self.set_current_screen(main_screen)
+		level = player.current_level
+		level.initialize_screen(self, main_screen)
+
+	def switch_to_pause_screen(self, player):
+		controls = PauseControls(player)
+		control_manager = ControlManager(controls)
+		pause_screen = PauseScreen(control_manager, player)
+		self.set_current_screen(pause_screen)

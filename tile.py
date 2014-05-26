@@ -110,13 +110,10 @@ class Tile(GameImage):
         return GameImage.coordinates(self)
 
     def map(self):
-        if(self.mapped):return
+        if(self.mapped): return
         self.mapped = True 
         if(self.block != None):
-            self.block.mapped = True
-            mapped_block_image = Surface((32, 32))
-            mapped_block_image.fill(Color("#111111"))
-            self.block.unseen_image = mapped_block_image
+            self.block.map()
 
     def passable(self):
         return self.block == None or (not self.block.is_solid) #TODO: change this if some blocks are passable. (might already be necessary for signs and ladders)

@@ -3,6 +3,7 @@
 
 from maingamecontrols import * 
 from eventcontrols import *
+from pausecontrols import *
 
 class ControlManager:
 	""" ControlManager( ... ) -> ControlManager

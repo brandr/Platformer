@@ -12,6 +12,7 @@ class Level(object):
 		self.effect_layer = []
 		self.has_effects = False
 		self.current_event = None
+		self.active = True
 		self.bg = Surface((32, 32))
 
 		self.dungeon = dungeon 		#the LevelGroup that the level is part of
@@ -211,11 +212,27 @@ class Level(object):
 		player.update(self.getTiles())
 		pygame.display.update()
 
+	# pausing/events/other thing that change screen and controls
+	def pause_game(self, player):
+		self.set_active(False)
+		self.screen_manager.switch_to_pause_screen(player)	
+
+	def unpause_game(self, player):
+		self.set_active(True)
+		self.screen_manager.switch_to_main_screen(player)
+
 	def activate_actors(self):
 		for n in self.getNPCs():
 			n.set_active(True)
 
-	def deactivate_actors(self):
+	def set_active(self, active):
+		if active:
+			self.activate_actors()
+		else:
+			self.deactivate_actors()
+		self.active = active
+
+	def deactivate_actors(self):	#TODO: should probably do this for monsters, too
 		self.getPlayer().deactivate()	
 		for n in self.getNPCs():
 			n.set_active(False)
@@ -269,6 +286,8 @@ class Level(object):
 
 #TODO: could put up,down,left,right and running into a single object which describes the player's current state
 	def update(self, up, down, left, right, space, running):	
+		if(not self.active):
+			return
 		if(self.current_event):
 			self.current_event.update(self)
 			if(self.current_event.is_complete()):
@@ -284,11 +303,6 @@ class Level(object):
 			self.level_camera.update(player)
 			player.update(all_tiles)
 			platforms = self.getPlatforms()
-			#for p in platforms: #not sure this is necessary. may use it later.
-			#	p.update(player)	
-			for y in range(WIN_HEIGHT/32):	#TODO: make sure this process is correct and efficient.
-				for x in range(WIN_WIDTH/32):
-					self.screen.blit(self.bg, (x * 32, y * 32))
 			for row in tiles:
 				for t in row:
 					self.screen.blit(t.image, self.level_camera.apply(t))
