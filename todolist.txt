@@ -63,7 +63,7 @@ MAIN GOAL: Build a demo showing of dialogs, cutscenes, lighting mechanics, etc. 
 
 IMMEDIATE STUFF: most immediate
 
-# fix the problem where the player can't go up slopes to the left.
+# fix the problem where the player can get caught on slopes when going left.
 # change the way "mapped" ladders look.
 
 ---------------------------------------------------------------

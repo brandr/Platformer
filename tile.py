@@ -65,14 +65,10 @@ class Tile(GameImage):
                 if o.withindist(self, o.light_distance()):
                     checkbrightness = o.calculate_brightness(self.coordinates(), tiles)
                     maxbrightness = max(checkbrightness, brightness)
-        #if maxbrightness == 256:
-        #   print self.coordinates()
         self.updateimage(maxbrightness)  #update the current image based on light level
         if dist <= 0:
             return               #once the light reaches its max distance, stop
-
-        #if self.block != None:
-        if not self.passable():
+        if self.block != None and self.block.is_solid:
             d1 = (-1*direction[1], direction[0])
             d2 = (direction[1], -1*direction[0])
             nexttile1 = self.relativetile(d1, tiles)

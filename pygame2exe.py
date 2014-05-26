@@ -142,26 +142,26 @@ class BuildExe:
             self.icon_file = os.path.join(path, 'pygame.ico')
  
         #List all data files to add
-        dungeon_data_files = ["C:\Users\Robert\Documents\platformer\Platformer\LevelEditor\dungeon_map_files\dungeon0"]
+        dungeon_data_files = ["C:\Users\Robert\Documents\python_stuff\Platformer\LevelEditor\dungeon_map_files\dungeon0"]
         dungeon_datas = ("dungeon_map_files", dungeon_data_files)
 
         extra_datas = [dungeon_datas]
-        main_images_dir = "C:\Users\Robert\Documents\platformer\Platformer\LevelEditor\images\\"
+        main_images_dir = "C:\Users\Robert\Documents\python_stuff\Platformer\LevelEditor\images\\"
         image_files = self.all_files_in_dir("images", main_images_dir)
         for i in image_files:
             extra_datas.append(i)
 
-        main_animations_dir = "C:\Users\Robert\Documents\platformer\Platformer\LevelEditor\\animations\\"
+        main_animations_dir = "C:\Users\Robert\Documents\python_stuff\Platformer\LevelEditor\\animations\\"
         animation_files = self.all_files_in_dir("animations", main_animations_dir)
         for a in animation_files:
             extra_datas.append(a)
 
-        main_portraits_dir = "C:\Users\Robert\Documents\platformer\Platformer\LevelEditor\\portraits\\"
+        main_portraits_dir = "C:\Users\Robert\Documents\python_stuff\Platformer\LevelEditor\\portraits\\"
         portrait_files = self.all_files_in_dir("portraits", main_portraits_dir)
         for p in portrait_files:
             extra_datas.append(p)
 
-        main_data_dir = "C:\Users\Robert\Documents\platformer\Platformer\data\\"
+        main_data_dir = "C:\Users\Robert\Documents\python_stuff\Platformer\data\\"
         data_files = self.all_files_in_dir("data", main_data_dir)
         for d in data_files:
             extra_datas.append(d)

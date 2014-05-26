@@ -119,6 +119,9 @@ class Being(Entity):
         if yvel == 0:
             while pygame.sprite.collide_mask(self, slope):
                 self.rect.bottom -= 1
+            self.rect.bottom -= 10  #TEMP
+            if xvel != 0:
+                self.rect.left += int(xvel/(abs(xvel)))
         else:
             while pygame.sprite.collide_mask(self, slope):
                 if xvel > 0:

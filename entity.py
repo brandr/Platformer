@@ -23,7 +23,7 @@ class Entity(GameImage):
             xdist -= ((self.rect.width/2) + (other.rect.width/2))
         if not yaligned:
             ydist -= ((self.rect.height/2) + (other.rect.height/2))
-        return (math.sqrt(math.pow(xdist, 2) + math.pow(ydist, 2)))/32 + 0.0
+        return (sqrt(pow(xdist, 2) + pow(ydist, 2)))/32 + 0.0
 
     def x_dist_from(self,other,absolute = True):
         x1 = self.rect.centerx
