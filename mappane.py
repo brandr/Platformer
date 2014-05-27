@@ -1,0 +1,67 @@
+""" A pane showing a map of the the dungeon that the player is in.
+"""
+
+from pygame import Color, Surface, draw
+from draw import *
+
+WHITE = Color("#FFFFFF")
+RED = Color("#FF0000")
+GREEN = Color("#00FF00")
+CYAN = Color("#00FFFF")
+
+MAP_PANE_WIDTH, MAP_PANE_HEIGHT = 400, 400
+ROOM_TILE_WIDTH, ROOM_TILE_HEIGHT = MAP_PANE_WIDTH/20, MAP_PANE_HEIGHT/20
+
+class MapPane: #inheritance?
+	""" TODO: docstring"""
+	def __init__(self, player, x, y):
+		self.player, self.x, self.y = player, x, y
+		self.pane_image = Surface((MAP_PANE_WIDTH, MAP_PANE_HEIGHT)) #TEMP
+		self.draw_borders()
+		self.draw_map()
+
+	def draw_borders(self):
+		corners = [(0, 0), (MAP_PANE_WIDTH - 2, 0), (MAP_PANE_WIDTH - 2, MAP_PANE_HEIGHT - 2), (0, MAP_PANE_HEIGHT - 2)] #TEMP
+		lines(self.pane_image, WHITE, True, corners, 2)
+
+	def draw_map(self):	 
+		current_level = self.player.current_level
+		dungeon = current_level.dungeon
+
+		current_room_image = MapPane.draw_current_room_image()
+		unexplored_room_image = MapPane.draw_unexplored_room_image()
+		for L in dungeon.dungeon_levels:
+			if not L.is_explored(): continue
+			origin = L.origin
+			width, height = L.room_width(), L.room_height()
+			pixel_coords = ((origin[0] + 1)*ROOM_TILE_WIDTH, (origin[1] + 1)*ROOM_TILE_HEIGHT)
+			explored_level_image = MapPane.draw_explored_level_image(width, height)
+			self.pane_image.blit(explored_level_image, pixel_coords)
+			for y in xrange(height):
+				for x in xrange(width):
+					if not L.explored_at(x, y):
+						pixel_coords = ((origin[0] + x + 1)*ROOM_TILE_WIDTH, (origin[1] + y + 1)*ROOM_TILE_HEIGHT)
+						self.pane_image.blit(unexplored_room_image, pixel_coords)
+		current_global_coords = current_level.global_coords(self.player.coordinates())
+		current_pixel_coords = ( (current_global_coords[0] + 1)*ROOM_TILE_WIDTH, (current_global_coords[1] + 1 )*ROOM_TILE_HEIGHT)
+		self.pane_image.blit(current_room_image, current_pixel_coords)
+
+					
+	@staticmethod
+	def draw_explored_level_image(width, height):
+		explored_level_image = Surface((width*ROOM_TILE_WIDTH, height*ROOM_TILE_HEIGHT))
+		explored_level_image.fill(GREEN)
+		corners = [(0, 0), (width*ROOM_TILE_WIDTH - 2, 0), (width*ROOM_TILE_WIDTH - 2, height*ROOM_TILE_HEIGHT - 2), (0, height*ROOM_TILE_HEIGHT - 2)] #TEMP
+		lines(explored_level_image, RED, True, corners, 2)
+		return explored_level_image
+
+	@staticmethod
+	def draw_unexplored_room_image():
+		return Surface((ROOM_TILE_WIDTH, ROOM_TILE_HEIGHT))
+
+	@staticmethod
+	def draw_current_room_image():	#technically, this refers to rooms contained in the current level, NOT the current room. (though maybe it should?)
+		current_room_image = Surface((ROOM_TILE_WIDTH, ROOM_TILE_HEIGHT))
+		current_room_image.fill(CYAN)
+		return current_room_image
+

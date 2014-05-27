@@ -21,6 +21,7 @@ class Level(object):
 		self.level_objects = LevelObjects(self) #all objects in the level (tiles and entities)
 		self.start_coords = None #coords where the player appears upon entering the level (set by addRooms)
 		self.addRooms(rooms)
+
 		tiles = self.getTiles()
 		self.width = len(tiles[0])
 		self.height = len(tiles)
@@ -32,6 +33,7 @@ class Level(object):
 		if(self.outdoors): self.setTilesOutdoors() #TEMP
 		
 		self.calibrateLighting()
+		self.init_explored()
 
 	def initialize_screen(self, screen_manager, game_screen):
 		self.screen_manager = screen_manager
@@ -149,6 +151,31 @@ class Level(object):
 			block_y = 32*(y + direction[1])
 			self.level_objects.addBlock(Platform(exit_platform, block_x, block_y))
 
+	def init_explored(self):
+		self.explored = []
+		width, height = self.room_width(), self.room_height()
+		for y in xrange(height):
+			self.explored.append([])
+			for x in xrange(width):
+				self.explored[y].append(False)
+
+	def update_explored(self):
+		player = self.getPlayer()
+		coords = player.coordinates()
+		room_x, room_y = coords[0]/ROOM_WIDTH, coords[1]/ROOM_HEIGHT
+		if room_y < len(self.explored) and room_x < len(self.explored[0]):
+			self.explored[room_y][room_x] = True #may or may not need checks
+
+	def is_explored(self):
+		width, height = self.room_width(), self.room_height()
+		for row in self.explored:
+			for col in row:
+				if col: return True		
+		return False 
+
+	def explored_at(self, x, y):
+		return self.explored[y][x]
+		
 		#directonal/movement methods
 
 	def level_in_direction(self, global_x, global_y, direction): #doesn't really need anything from this level in particular, but this method works here for now
@@ -163,14 +190,20 @@ class Level(object):
 		if(coords[0] >= dimensions[0] - 1): return (1, 0)
 		if(coords[1] <= 1): return (0, -1)
 		if(coords[1] >= dimensions[1] - 1): return (0, 1)
-		return (0,0)
+		return (0, 0)
 
-	def global_coords(self,position):
+	def global_coords(self, position):
 		min_x = self.origin[0]
 		min_y = self.origin[1]
 		x_offset = position[0]/ROOM_WIDTH
 		y_offset = position[1]/ROOM_HEIGHT
 		return (min_x + x_offset, min_y + y_offset)
+
+	def room_width(self): #gives the width of thihs level in rooms.
+		return self.width/ROOM_WIDTH
+
+	def room_height(self):
+		return self.height/ROOM_HEIGHT
 
 	def flipped_coords(self, global_coords, local_coords):
 		dimensions = self.get_dimensions()
@@ -199,13 +232,14 @@ class Level(object):
 		if(self.next_level_exists(global_coords, direction)):
 			next_level = self.level_in_direction(global_coords[0], global_coords[1], direction)
 			self.dungeon.movePlayer(self.screen_manager, self.screen, player, next_level, global_coords, adjusted_coords)
-		#TODO: error case
+		player.current_level.update_explored()
 
 	def addPlayer(self, player, coords = None):
 		player.current_level = self
 		self.level_objects.addPlayer(player)
 		if(coords == None):	
 			player.moveRect(self.start_coords[0], self.start_coords[1], True)
+			self.update_explored()
 			return
 		player.moveTo(coords)
 		self.level_camera.update(player)
@@ -300,6 +334,7 @@ class Level(object):
 		end_y = min(self.level_camera.state.bottom/32, self.height)
 		tiles = all_tiles[start_y:end_y][start_x:end_x]
 		if(player != None):
+			self.update_explored()
 			self.level_camera.update(player)
 			player.update(all_tiles)
 			platforms = self.getPlatforms()

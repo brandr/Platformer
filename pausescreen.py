@@ -2,19 +2,18 @@
 """
 
 from gamescreen import *
+from mappane import *
 
 class PauseScreen(GameScreen):
 	""" TODO: docstring """
 	def __init__(self, control_manager, player):
 		GameScreen.__init__(self, control_manager) #TODO
 		self.player = player
-		self.pause_pane = self.build_pause_pane(player) 
+		self.map_pane = MapPane(player, 40, 40) #TODO: other panes
+		self.pause_panes = [self.map_pane]
+		self.current_pane = self.map_pane
 
 	def update(self):
 		self.draw_bg()
-		self.screen_image.blit(self.pause_pane, (0, 0))
-
-	def build_pause_pane(self, player):
-		pause_pane = Surface((300, 300)) #TODO: probably make this its own class (and pass self.screen_image in, like is done with level)
-		pause_pane.fill(Color("#FFFFFF")) #TEMP
-		return pause_pane
+		x, y = self.current_pane.x, self.current_pane.y
+		self.screen_image.blit(self.current_pane.pane_image, (x, y))
