@@ -69,8 +69,7 @@ class RoomFactory(object):
 						start_coords = (True, x, y)
 					else:
 
-				#TODO: remember that this part may need some checks if the object created is larger than 32*32.
-					#  However, this is low priority since the level editor already handles this.
+						#TODO: remember that this part may need some checks if the object created is larger than 32*32.
 					
 					
 
@@ -86,7 +85,19 @@ class RoomFactory(object):
 							factory = NON_DEFAULT_ENTITY_MAP[key]
 							entity = factory.build_entity(raw_entity_image, entity_rect, next_tile_data, x, y)
 							entities.append(entity)
-							if isinstance(entity, Block): t.block = entity
+							if isinstance(entity, Block): 
+								t.block = entity
+								"""
+								block_width, block_height = entity.tile_dimensions()
+								for x1 in range(col + 1, col + block_width):
+									add_x = x + (x1*DEFAULT_TILE_SIZE)
+									room_data.set_tile(entity.additional_block(add_x, add_y), x1, row)
+								for y1 in range(row + 1, row + block_height):
+									for x1 in range(col, col + block_width):
+										add_x = x + (x1*DEFAULT_TILE_SIZE)
+										add_y = y + (y1*DEFAULT_TILE_SIZE)
+										room_data.set_tile(entity.additional_block(add_x, add_y), x1, y1)
+								"""
 						
 						elif next_tile_data.is_animated():
 							entity_animation_set = GameImage.load_animation_set(next_tile_data, DEFAULT_TILE_SIZE)
@@ -97,7 +108,19 @@ class RoomFactory(object):
 							still_entity_image = GameImage.still_animation_set(raw_entity_image, entity_rect)
 							e = EntityFactory.build_entity(still_entity_image, key, x, y)
 							entities.append(e)
-							if isinstance(e, Block): t.block = e	
+							if isinstance(e, Block): 
+								t.block = e
+								"""
+								block_width, block_height = e.tile_dimensions()
+								for x1 in range(col + 1, col + block_width):
+									add_x = x + (x1*DEFAULT_TILE_SIZE)
+									room_data.set_tile(e.additional_block(add_x, add_y), x1, row)
+								for y1 in range(row + 1, row + block_height):
+									for x1 in range(col, col + block_width):
+										add_x = x + (x1*DEFAULT_TILE_SIZE)
+										add_y = y + (y1*DEFAULT_TILE_SIZE)
+										room_data.set_tile(e.additional_block(add_x, add_y), x1, y1)
+								"""
 		
 				tiles[y/DEFAULT_TILE_SIZE].append(t)
 				x += DEFAULT_TILE_SIZE 

@@ -21,6 +21,9 @@ class Block(Entity):
 				return
 			self.image.fill(BACKGROUND_COLOR)
 
+	def additional_block(self, x, y):
+		return None
+
 	def map(self):
 		self.mapped = True
 		self.unseen_image = self.mapped_block_image()

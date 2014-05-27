@@ -39,6 +39,12 @@ class Level(object):
 		self.screen_manager = screen_manager
 		self.screen = game_screen.screen_image
 
+	def init_blocks(self): #applies only to special blocks, like doors
+		#TEMP
+		doors = self.level_objects.get_entities(Door)
+		for d in doors:
+			d.fill_tiles(self.getTiles())
+
 		#toString test methods
 	def to_string(self): #will only be used for testing, I  think
 		level_string = ""
@@ -89,6 +95,7 @@ class Level(object):
 			level_objects = r.level_objects
 			self.level_objects.addLevelObjects(r.global_coords, level_objects)
 			self.setStartCoords(r)
+		self.init_blocks()
 
 	def setStartCoords(self, room):
 		if self.start_coords != None: return
@@ -380,6 +387,11 @@ class Level(object):
 			if e.up_interactable:
 				ups.append(e)
 		return ups
+
+	def get_impassables(self):
+		impassables = self.getPlatforms()
+		doors = self.level_objects.get_entities(Door)
+		return impassables + doors
 
 	def remove(self, entity):
 		self.level_objects.remove(entity)

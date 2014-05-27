@@ -34,6 +34,9 @@ class GameImage(pygame.sprite.Sprite):
     def rect_coords(self):
         return (self.rect.left, self.rect.top)
 
+    def tile_dimensions(self):
+        return self.image.get_width()/32, self.image.get_height()/32
+
     def moveTo(self, coords):
         self.moveRect(coords[0]*32, coords[1]*32, True)
 

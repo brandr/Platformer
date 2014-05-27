@@ -16,4 +16,5 @@ class PauseScreen(GameScreen):
 	def update(self):
 		self.draw_bg()
 		x, y = self.current_pane.x, self.current_pane.y
+		self.current_pane.update()
 		self.screen_image.blit(self.current_pane.pane_image, (x, y))

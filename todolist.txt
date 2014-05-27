@@ -62,26 +62,28 @@ MAIN GOAL: Build a demo showing of dialogs, cutscenes, lighting mechanics, etc. 
 
 IMMEDIATE STUFF: most immediate
 
-# Nothing for now-- go ahead and pick a category
+# Nothing for now-- go ahead and pick a category!
 
-    -------------------------------------------------------------
+----------------------------------------------------------------------
 
-IMMEDIATE STUFF: screens, menus, movement
+IMMEDIATE STUFF: movement
 
-# make it possible for the player to open up a map screen.
-    - Work with the general design for "screens", "menus", and "controls"
-
-# IDEA to reduce lag: make level blit directly onto a pygame screen and simply change this screen when necessary using the screemanager.
-    - Currently, the level blits onto an image which is then blitted onto a main screen, which is twice as much blitting as we really need.
-
-# restructure player (and possibly entity) movement, possibly by using a dict to map situations/input to actions.
-    - DEFINITELY draw a flowchart
+# come up with more movement examples to expand movement process
     - consider making ice blocks (or some other example besides ladders) to test whether this system is really extensible.
 
-# implement one-way platforms, doors, etc
+# implement one-way platforms, doors, spikes, etc
 # fix movement/rect related stuff, and put all relevant methods in gameImage, to be called by subclasses.
     # This is partially, maybe completely done, but make sure before removing this TODO.
 # fix imports to be efficient/useful
+
+-------------------------------------------------------------------
+
+IMMEDIATE STUFF: screens and menus
+
+# make the map screen more sophisticated. (get feedback)
+# make more panes to go with the map screen. (these should also be accessible via the pause menu)
+    - one possible pane is inventory-- for this, make it possible to get the lantern as an upgrade, and have it contain oil which can be collected to increase light radius.
+        * note that this will require some planning (should probably sketch the screen before making it)
 
 -------------------------------------------------------------
 
@@ -158,12 +160,7 @@ IMMEDIATE STUFF: cutscenes
     # change the bat's attack patterns so that it periodically flaps around the player before diving, bounces off, 
         # moves away, and then dives again.
         # (some randomness may make this pattern look more natural)
-    # make lighting less laggy for large amounts of light
-        # one way might be to only udpate tiles within rectangular areas around light sources.
-    # consider possible combat systems (damage, HP, etc)
-# reduce lag when player is in a cave 
-    -monsters may affect the lag, though it mostly seems to come from the spreadLight method in Tile.
-# reduce lag in dungeon editor, particularly for the level editor.
+# consider possible combat systems (damage, HP, etc)
 # consider removing level_ID, but first try to think of possible uses for it.
 # figure out how to handle monsters in complete/partial darkness
     # I put an idea in Being class
@@ -178,6 +175,8 @@ IMMEDIATE STUFF: cutscenes
 
     # REDUCING LAG
 
+# IDEA to reduce lag: make level blit directly onto a pygame screen and simply change this screen when necessary using the screemanager.
+    - Currently, the level blits onto an image which is then blitted onto a main screen, which is twice as much blitting as we really need.
 
 # IDEA to reduce lag: instead of immediately updating the lightvalues as light is spread by tiles, simply update some "lightmap" (or return it?)
     and somehow apply it to each tile after the entity images have been blitted (this solves a couple other problems, as well)
@@ -189,7 +188,8 @@ when the level is created
     #SPRITE STUFF
 
 #TODO: consider having tiles/textures be procedurally generated based on hardcoded platform locations/level data and a library of tiles.
-       # Alternately, use the map editor and a tileFactory to load in tiles from images which represent levels using only entities.
+       # Alternately, use the map editor and a tileFactory to load in tiles from images which represent levels using only entities. 
+            *(i.e., entities against a white background with variable images.)
 
     # ENEMY/AI STUFF
 
@@ -207,4 +207,10 @@ when the level is created
 
 #TODO: make invisible caverns which can be revealed somehow. (test in sunlight first)
 #TODO: give exit blocks super terrifying sprites. (they can't be seen normally so it will be a fun surprise if there's a glitch or something)
-#TODO: think up lots of cool easter eggs (though this might be more of a long-term thing)
+
+--------------------------------------------------------------------
+
+    # LONG-TERM STUFF
+
+# make it possible for the player to save the game
+#TODO: think up lots of cool easter eggs 

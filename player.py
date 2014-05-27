@@ -13,9 +13,9 @@ class Player(Being):
         self.current_level = start_level
         self.sightdist = 2 #TEMP. I usually use 2 though.
         self.can_jump = True
-        self.on_ladder = False #TEMP
         self.left, self.right, self.down, self.up, self.space, self.control = False, False, False, False, False, False
-        
+        self.movement_state = DEFAULT_MOVEMENT_STATE
+
     @staticmethod
     def load_player_animation_set():
         player_rect = Rect(0, 0, 32, 64)
@@ -58,20 +58,21 @@ class Player(Being):
         self.up, self.down, self.left, self.right, self.space, self.control = False, False, False, False, False, False
 
     def update(self, tiles):
-        #TODO: move some of this stuff to "being", and break it up to be more extensible.
-            #could also make a Movement class, held as a data type by player or being.
-
         if(self.exitLevelCheck()): return
-        if(self.bounce_count > 0):
-            self.bounce()
-        
+        update_method = MOVEMENT_STATE_MAP[self.movement_state]
+        update_method(self, tiles)
+        Being.updatePosition(self)
+        self.updateView(tiles)
 
+    def default_move_update(self, tiles):   #consider separating midair update into its own method if this gets too complex.
         up, down, left, right, space, running = self.up, self.down, self.left, self.right, self.space, self.control
-
-        if up and self.up_action_check():
-            return
-
         self.xvel = 0
+
+        if up:
+            if self.up_action_check(): return
+            if self.collide_ladder():
+                self.movement_state = LADDER_MOVEMENT_STATE
+
         if down:
             pass
 
@@ -83,20 +84,7 @@ class Player(Being):
             self.xvel = 4
             self.direction_id = 'right'
 
-        if self.on_ladder:  #TEMP
-            self.onGround = True
-            self.yvel = 0
-
-        if up and not down:            # only jump if on the ground
-            if self.on_ladder:         # TEMP. need more sophisticated checks as we implement more movement situations.
-                self.yvel = -2
-                #TODO: ladder climing animation goes here
-
-        if down and not up: 
-            if self.on_ladder: #TEMP
-                self.yvel = 2
-
-        if space and self.onGround and not self.on_ladder: 
+        if space and self.onGround:
                 self.yvel -= 8.0
                 self.changeAnimation('jumping', self.direction_id)
                 self.animation.iter()
@@ -129,8 +117,30 @@ class Player(Being):
                 if(left == right):
                     self.xvel = 0
 
-        Being.updatePosition(self)
-        self.updateView(tiles)
+    def bounce_move_update(self, tiles):
+        self.bounce()
+
+    def ladder_move_update(self, tiles):
+        #TODO: ladder climbing animations go here
+        up, down, left, right, space, running = self.up, self.down, self.left, self.right, self.space, self.control
+        self.xvel, self.yvel = 0, 0
+        if not self.collide_ladder():
+            self.movement_state = DEFAULT_MOVEMENT_STATE
+            return
+        #TODO: make behavior at the top and bottom of a ladder less awkward.
+        if up and not down:         
+            self.yvel = -2      
+
+        elif down and not up: 
+            self.yvel = 2
+
+        if left and not right:
+            self.xvel = -2
+            self.direction_id = 'left'
+
+        if right and not left:
+            self.xvel = 2
+            self.direction_id = 'right'
 
     def up_action_check(self):
         ups = self.current_level.up_interactable_objects()
@@ -144,7 +154,6 @@ class Player(Being):
      #this gets laggy when there is too much light. try to fix it. (might have to fix other methods instead)
     def updateView(self, all_tiles): #note: this is only to be used in "cave" settings. for areas that are outdoors, use something else.
         level = self.current_level
-        #entities = level.getEntities()
         player_interactables = level.player_interactables()
         lanterns = level.getLanterns()
 
@@ -191,7 +200,7 @@ class Player(Being):
 #TODO: collide could be an abstract method in the object we collide with
     def collide(self, xvel, yvel):
         level = self.current_level
-        platforms = level.getPlatforms() #TODO: remember that it might be possible to pass through some platforms in some directions.
+        platforms = level.get_impassables() #TODO: remember that it might be possible to pass through some platforms in some directions.
         slopes = []
         default_platforms = []
         for p in platforms:
@@ -205,20 +214,18 @@ class Player(Being):
         for p in platforms:
             if pygame.sprite.collide_mask(self, p):
                 Being.collideWith(self, xvel, yvel, p)
-        self.collideLadders() #TEMP
         self.collideExits()
         self.collideLanterns()
         if(self.bounce_count <= 0):
             self.collideMonsters(xvel, yvel)
 
-    def collideLadders(self): #TEMP. if other blocks alter player motion (which they probably will), should handle this more generally.
-        self.on_ladder = False  # could also consider having this check in the ladder class, not the player class (to keep player class shorter)
+    def collide_ladder(self): #note that this is a boolean, not an action. (might be a more general and efficient way to implement the check for what object(s) the player is currently colliding with)
         ladders = self.current_level.getLadders()
         for l in ladders:
             if pygame.sprite.collide_rect(self, l):
-                self.on_ladder = True
+                return True
+        return False
 
-        #not sure if this method is still being used. If not, delete it.
     def collideExits(self):
         exits = self.current_level.get_exit_blocks()
         for e in exits:
@@ -234,7 +241,7 @@ class Player(Being):
                 l.delete()
                 self.sightdist += l.lightvalue
 
-    def collideMonsters(self,xvel,yvel):
+    def collideMonsters(self, xvel, yvel):
         x_direction_sign = 1
         y_direction_sign = 1
         level = self.current_level
@@ -249,12 +256,15 @@ class Player(Being):
                 new_yvel = y_direction_sign
                 self.xvel = new_xvel
                 self.yvel = new_yvel 
+                self.movement_state = BOUNCING_MOVEMENT_STATE
                 self.bounce_count = 15
                 m.bounceAgainst(self)
                 break #makes sure the player can only collide with one monster per cycle
 
     def bounce(self):
-        if(self.bounce_count <= 0): return
+        if(self.bounce_count <= 0): 
+            self.movement_state = DEFAULT_MOVEMENT_STATE
+            return
         self.collide(self.xvel,self.yvel)
         self.updatePosition()
         self.updateView()
@@ -278,3 +288,13 @@ class Player(Being):
 
     def unpause_game(self):
         self.current_level.unpause_game(self)
+
+DEFAULT_MOVEMENT_STATE = "default_movement_state"
+BOUNCING_MOVEMENT_STATE = "bouncing_movement_state"
+LADDER_MOVEMENT_STATE = "ladder_movement_state"
+
+MOVEMENT_STATE_MAP = {
+    DEFAULT_MOVEMENT_STATE:Player.default_move_update,
+    BOUNCING_MOVEMENT_STATE:Player.bounce_move_update,
+    LADDER_MOVEMENT_STATE:Player.ladder_move_update
+}
