@@ -27,8 +27,9 @@ class Tile(GameImage):
     def updateimage(self, lightvalue = 0):
         if(self.block != None): 
             self.image = Surface((32, 32))
+            self.image.blit(self.block.image, (0, 0))
             self.block.updateimage(lightvalue)
-            if self.block.is_square:        #TODO: if people are bothered by the effect, make it so non-square block are not transparent in caves.
+            if self.block.is_square:        #TODO: if people are bothered by the effect, make it so non-square blocks are not transparent in caves.
                 return
         GameImage.updateimage(self, lightvalue)
         #self.image.set_alpha(lightvalue) #TEMP

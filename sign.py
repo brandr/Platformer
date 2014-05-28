@@ -11,7 +11,7 @@ class Sign(Block): #TODO: figure out how to set text, # of panes, whether text i
 	def __init__(self, animations, x, y):
 		Block.__init__(self, animations, x, y)
 		self.is_square = False
-		self.up_interactable = True
+		self.x_interactable = True
 		self.scrolling = True #might want to make more elaborate scrolling later
 		self.text_set = None
 		self.is_solid = False
@@ -23,8 +23,10 @@ class Sign(Block): #TODO: figure out how to set text, # of panes, whether text i
 			for line in text_set[i]:
 				if line != "":
 					self.text_set[i] += line + "\n"
-		#self.text_set = text_set
-	
+
+	def execute_x_action(self, level, player):
+		self.execute_event(level)
+
 	def execute_event(self, level):
 		if self.text_set:
 			dialog_set = self.build_dialog_set(self.text_set)

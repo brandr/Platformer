@@ -13,7 +13,7 @@ class Player(Being):
         self.current_level = start_level
         self.sightdist = 2 #TEMP. I usually use 2 though.
         self.can_jump = True
-        self.left, self.right, self.down, self.up, self.space, self.control = False, False, False, False, False, False
+        self.left, self.right, self.down, self.up, self.space, self.control, self.x = False, False, False, False, False, False, False
         self.movement_state = DEFAULT_MOVEMENT_STATE
 
     @staticmethod
@@ -30,8 +30,8 @@ class Player(Being):
         player_walking_left = GameImage.load_animation(filepath, 'player_walking_left.bmp', player_rect, -1)
         player_walking_right = GameImage.load_animation(filepath, 'player_walking_right.bmp', player_rect, -1)
 
-        player_running_left = GameImage.load_animation(filepath, 'player_running_left.bmp', player_rect, -1,True, 5)
-        player_running_right = GameImage.load_animation(filepath, 'player_running_right.bmp', player_rect, -1,True, 5)
+        player_running_left = GameImage.load_animation(filepath, 'player_running_left.bmp', player_rect, -1, True, 5)
+        player_running_right = GameImage.load_animation(filepath, 'player_running_right.bmp', player_rect, -1, True, 5)
 
         player_jumping_left = GameImage.load_animation(filepath, 'player_jumping_left.bmp', player_rect, -1, True, 12)
         player_jumping_right = GameImage.load_animation(filepath, 'player_jumping_right.bmp', player_rect, -1, True, 12)
@@ -55,7 +55,7 @@ class Player(Being):
         return animation_set
 
     def deactivate(self):
-        self.up, self.down, self.left, self.right, self.space, self.control = False, False, False, False, False, False
+        self.up, self.down, self.left, self.right, self.space, self.control, self.x = False, False, False, False, False, False, False
 
     def update(self, tiles):
         if(self.exitLevelCheck()): return
@@ -65,11 +65,11 @@ class Player(Being):
         self.updateView(tiles)
 
     def default_move_update(self, tiles):   #consider separating midair update into its own method if this gets too complex.
-        up, down, left, right, space, running = self.up, self.down, self.left, self.right, self.space, self.control
+        up, down, left, right, space, running, x = self.up, self.down, self.left, self.right, self.space, self.control, self.x
         self.xvel = 0
-
+        if x:
+            if self.x_action_check(): return
         if up:
-            if self.up_action_check(): return
             if self.collide_ladder():
                 self.movement_state = LADDER_MOVEMENT_STATE
 
@@ -122,7 +122,7 @@ class Player(Being):
 
     def ladder_move_update(self, tiles):
         #TODO: ladder climbing animations go here
-        up, down, left, right, space, running = self.up, self.down, self.left, self.right, self.space, self.control
+        up, down, left, right, space, running = self.up, self.down, self.left, self.right, self.space, self.control, self.x
         self.xvel, self.yvel = 0, 0
         if not self.collide_ladder():
             self.movement_state = DEFAULT_MOVEMENT_STATE
@@ -142,14 +142,16 @@ class Player(Being):
             self.xvel = 2
             self.direction_id = 'right'
 
-    def up_action_check(self):
-        ups = self.current_level.up_interactable_objects()
-        for u in ups:
-            if pygame.sprite.collide_rect(self, u):
-                self.up_interact(u)
+    def x_action_check(self):
+        x_interactables = self.current_level.x_interactable_objects()
+        for x in x_interactables:
+            if x.in_interact_range(self) or pygame.sprite.collide_rect(self, x):
+                self.x_interact(x)
+                return
 
-    def up_interact(self, interactable):
-        interactable.execute_event(self.current_level)
+    def x_interact(self, interactable):
+        interactable.execute_x_action(self.current_level, self)
+        #interactable.execute_event(self.current_level)
      
      #this gets laggy when there is too much light. try to fix it. (might have to fix other methods instead)
     def updateView(self, all_tiles): #note: this is only to be used in "cave" settings. for areas that are outdoors, use something else.
@@ -212,7 +214,7 @@ class Player(Being):
             if pygame.sprite.collide_mask(self, s):
                 Being.collideWith(self, xvel, yvel, s)
         for p in platforms:
-            if pygame.sprite.collide_mask(self, p):
+            if pygame.sprite.collide_mask(self, p) and p.is_solid:
                 Being.collideWith(self, xvel, yvel, p)
         self.collideExits()
         self.collideLanterns()

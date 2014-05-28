@@ -7,8 +7,14 @@ class Entity(GameImage):
         self.color = BACKGROUND_COLOR
         self.unseen_color = Color("#FFFFFF")
         self.mapped = False
-        self.up_interactable = False
+        self.x_interactable = False
         self.current_level = None
+
+    def in_interact_range(self, player):
+        return False
+
+    def execute_x_action(self, level, player):
+        pass
 
     def dist_from(self,other):
         xdist = self.x_dist_from(other)

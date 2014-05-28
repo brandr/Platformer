@@ -6,16 +6,25 @@ from block import *
 class Door(Block): #not sure how to handle a 2-part block yet
 	"""TODO: docstring"""
 	def __init__(self, animations, x, y):
-		#TODO: build door blocks
+		#TODO: build open and closed images out of input
 		Block.__init__(self, animations, x, y)
 		self.is_square = False
 		self.is_solid = True
+		self.x_interactable = True
+		self.open = False
+		self.open_door_image = None
 
-	def additional_block(self, x, y):
-		door_component_image = self.image #TEMP
-		door_component_rect = Rect(0, 0, 32, 32)
-		door_animation_set = GameImage.still_animation_set(door_component_image, door_component_rect)
-		return DoorBlock(door_animation_set, x, y)
+	def in_interact_range(self, player):
+		return True #TEMP: check distance first
+
+	def execute_x_action(self, level, player):
+		if not self.open: self.set_open()
+
+	def set_open(self):
+		self.default_image = self.open_door_image
+		self.image = self.open_door_image
+		self.is_solid = False
+		self.is_square = True
 
 	def fill_tiles(self, tiles):
 		width, height = self.tile_dimensions()

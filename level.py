@@ -15,11 +15,11 @@ class Level(object):
 		self.active = True
 		self.bg = Surface((32, 32))
 
-		self.dungeon = dungeon 		#the LevelGroup that the level is part of
-		self.level_ID = level_data.name #a currently unused value which identifies the level uniquely
-		self.origin = origin 	#upper-left corner of the level (in terms of global coords, so each coordinate pair corresponds to a room)
+		self.dungeon = dungeon 			# the LevelGroup that the level is part of
+		self.level_ID = level_data.name # a currently unused value which identifies the level uniquely
+		self.origin = origin 			# upper-left corner of the level (in terms of global coords, so each coordinate pair corresponds to a room)
 		self.level_objects = LevelObjects(self) #all objects in the level (tiles and entities)
-		self.start_coords = None #coords where the player appears upon entering the level (set by addRooms)
+		self.start_coords = None 		# coords where the player appears upon entering the level (set by addRooms)
 		self.addRooms(rooms)
 
 		tiles = self.getTiles()
@@ -381,17 +381,20 @@ class Level(object):
 		return interactables
 		#TODO: other objects that should update based on the player
 
-	def up_interactable_objects(self):
-		ups = []
+	def x_interactable_objects(self):
+		x_interactables = []
 		for e in self.getEntities():
-			if e.up_interactable:
-				ups.append(e)
-		return ups
+			if e.x_interactable:
+				x_interactables.append(e)
+		return x_interactables
 
 	def get_impassables(self):
 		impassables = self.getPlatforms()
 		doors = self.level_objects.get_entities(Door)
-		return impassables + doors
+		for d in doors:
+			if not d.open:
+				impassables.append(d)
+		return impassables
 
 	def remove(self, entity):
 		self.level_objects.remove(entity)
@@ -421,6 +424,9 @@ class Level(object):
 
 	def getSigns(self):
 		return self.level_objects.get_entities(Sign)
+
+	def getDoors(self):
+		return self.level_objects.get_entities(Door)
 		
 	def getMonsters(self):
 		return self.level_objects.get_entities(Monster)

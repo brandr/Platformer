@@ -5,6 +5,7 @@ a block or monster. A being is an entity that does not occupy a specific tile
 
 from entity import *
 from platform import *
+from door import Door
 
 class Being(Entity):
     """ Being ( animations ) -> Being
@@ -101,8 +102,11 @@ class Being(Entity):
         to move in the direction of that platform. (i.e., through the platform.)
         """
         if pygame.sprite.collide_mask(self, collide_object): 
-            if isinstance(collide_object, Platform) and collide_object.is_sloped:
-                self.collideWithSlope(xvel, yvel, collide_object)
+            if isinstance(collide_object, Platform) and collide_object.is_sloped:   #consider dict here instead of if statements if we are trying to deal with lag
+                self.collide_with_slope(xvel, yvel, collide_object)
+                return
+            if isinstance(collide_object, Door):
+                self.collide_with_door(xvel, yvel, collide_object)
                 return
             if xvel > 0:
                 self.rect.right = collide_object.rect.left
@@ -115,7 +119,7 @@ class Being(Entity):
             if yvel < 0:
                 self.rect.top = collide_object.rect.bottom
 
-    def collideWithSlope(self, xvel, yvel, slope): #NOTE: this only works for slopes on the ground, not on the ceiling.
+    def collide_with_slope(self, xvel, yvel, slope): #NOTE: this only works for slopes on the ground, not on the ceiling.
         if yvel == 0:
             while pygame.sprite.collide_mask(self, slope):
                 self.rect.bottom -= 1
@@ -131,6 +135,14 @@ class Being(Entity):
                     self.yvel = 0
                 if yvel < 0:
                     self.rect.top += 1
+
+    def collide_with_door(self, xvel, yvel, door):
+        if xvel >= 0:
+            while pygame.sprite.collide_mask(self, door):
+                self.rect.right -= 1
+        else:
+            while pygame.sprite.collide_mask(self, door):
+                self.rect.left += 1
 
     def moveTowards(self, destination):
         """ moveTowards (GameImage) -> None

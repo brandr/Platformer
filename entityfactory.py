@@ -1,6 +1,5 @@
 from platformfactory import *
 from ladder import *
-from door import *
 from lantern import *
 from exitblock import *
 from monster import *

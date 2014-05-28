@@ -11,7 +11,7 @@ class NonPlayerCharacter(Being):
 	def __init__(self, animations, x, y):
 		Being.__init__(self, animations, x, y)
 		self.animated = True
-		self.up_interactable = True
+		self.x_interactable = True
 		self.scrolling = True #might want to make more elaborate scrolling later
 		self.name = None
 		self.active = True
@@ -125,6 +125,9 @@ class NonPlayerCharacter(Being):
 		for i in range(0, len(dialog_set) - 1):
 			dialog_set[i].add_next_action(dialog_set[i + 1])
 		return dialog_set
+		
+	def execute_x_action(self, level, player):
+		self.execute_event(level)
 
 	def execute_event(self, level):
 		self.init_dialogs(self.dialog_tree)

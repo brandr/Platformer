@@ -12,7 +12,7 @@ class GameImage(pygame.sprite.Sprite):
     def __init__(self, animations):
         pygame.sprite.Sprite.__init__(self)
 
-        self.unseen_image = Surface((32,32))
+        self.unseen_image = Surface((32, 32))
         self.mapped = False
         self.animated = False #Temporary. this should probably be determined some other way (eg as a property of the animationSet itself)
 
@@ -79,11 +79,6 @@ class GameImage(pygame.sprite.Sprite):
             return
         self.updateimage(lightvalue)
 
-    #def map_image(self,unseen_color = Color("#000000")):
-    #    if(self.mapped): return
-    #    self.mapped = True
-    #    self.unseen_color = unseen_color
-
     @staticmethod
     def setLightLevel(image, light_value):
         light_value = 255
@@ -108,7 +103,7 @@ class GameImage(pygame.sprite.Sprite):
         self.image = self.unseen_image
 
     @staticmethod
-    def still_animation_set(still_image, rect = Rect(0, 0, 32, 32), colorkey = DEF_COLORKEY):#colorkey = None):
+    def still_animation_set(still_image, rect = Rect(0, 0, 32, 32), colorkey = DEF_COLORKEY):
         still_animation = SpriteStripAnimator(still_image, rect, 1, colorkey, False, 1)
         return AnimationSet(still_animation)
 

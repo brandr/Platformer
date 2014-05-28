@@ -13,8 +13,3 @@ class SignFactory:
 		sign_text_panes = sign_data.text_panes
 		sign.set_text_set(sign_text_panes)
 		return sign
-
-#TEST_SIGN_TEXT_SET = [
-#	"This is a sign. Press X to advance the dialog box.",
-#	"This is the only thing any sign can ever say."
-#]

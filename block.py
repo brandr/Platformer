@@ -9,7 +9,7 @@ class Block(Entity):
 		self.is_square = True
 		self.is_solid = True
 
-	def updateimage(self, lightvalue = 0):#visible arg was removed
+	def updateimage(self, lightvalue = 0): # visible arg was removed
 		if(lightvalue != 0): 
 			self.image = self.default_image 
 			self.image.set_alpha(lightvalue)

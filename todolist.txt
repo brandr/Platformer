@@ -55,14 +55,32 @@
     (some classes are not listed here)
     (Also do this for all LevelEditor classes)
 
-MAIN GOAL: Build a demo showing of dialogs, cutscenes, lighting mechanics, etc. once all immediate stuff is finished.
+MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mechanics, etc. once all immediate stuff is finished.
+    - the next demo should include inventory screen and lantern mechanics based on fading light/oil
 
 
 -------------------------------------------------------------------
 
 IMMEDIATE STUFF: most immediate
 
-# Nothing for now-- go ahead and pick a category!
+# Nothing to do right now-- pick a category
+
+
+-------------------------------------------------------------------
+
+IMMEDIATE STUFF: pickups
+
+# implement lantern oil, creating a general structure for pickups
+
+-------------------------------------------------------------------
+
+IMMEDIATE STUFF: screens and menus
+
+# make the map screen more sophisticated. (get feedback)
+    - consider how it should be centered
+# make more panes to go with the map screen. (these should also be accessible via the pause menu)
+    - one possible pane is inventory-- for this, make it possible to get the lantern as an upgrade, and have it contain oil which can be collected to increase light radius.
+        * note that this will require some planning (should probably sketch the screen before making it)
 
 ----------------------------------------------------------------------
 
@@ -71,19 +89,9 @@ IMMEDIATE STUFF: movement
 # come up with more movement examples to expand movement process
     - consider making ice blocks (or some other example besides ladders) to test whether this system is really extensible.
 
-# implement one-way platforms, doors, spikes, etc
+# implement one-way platforms, spikes, etc
 # fix movement/rect related stuff, and put all relevant methods in gameImage, to be called by subclasses.
-    # This is partially, maybe completely done, but make sure before removing this TODO.
-# fix imports to be efficient/useful
-
--------------------------------------------------------------------
-
-IMMEDIATE STUFF: screens and menus
-
-# make the map screen more sophisticated. (get feedback)
-# make more panes to go with the map screen. (these should also be accessible via the pause menu)
-    - one possible pane is inventory-- for this, make it possible to get the lantern as an upgrade, and have it contain oil which can be collected to increase light radius.
-        * note that this will require some planning (should probably sketch the screen before making it)
+    # This is partially, maybe completely done, but make sure before removing this TODO
 
 -------------------------------------------------------------
 
@@ -108,7 +116,7 @@ IMMEDIATE STUFF: dialog
     - figure out what panes should be like for NPCs
     - make it more visually clear that dialogs are waiting for a button input. (maybe a blinking icon?)
 
-# make it more visually clear when the player can press up to interact with something
+# make it more visually clear when the player can press X to interact with something (this includes signs, NPCs, doors, and whatever else we make by this point)
 
 # consider making Dialogs inherit from GameActions (or events?) instead of Effects, and make the level add/remove effects containing images based on the dialog.
     - not 100% sure about this as it might uneccessarily change existing structrue
@@ -168,6 +176,7 @@ IMMEDIATE STUFF: cutscenes
 
     # USER SUGGESTIONS
 
+# make it so when reading signs, the "continue reading" button is the same as the "start reading button"
 # Add pigs (simon)
 
 ---------------------------------------------------------------
@@ -205,6 +214,7 @@ when the level is created
 
     # MISC STUFF
 
+# fix imports to be efficient/useful
 #TODO: make invisible caverns which can be revealed somehow. (test in sunlight first)
 #TODO: give exit blocks super terrifying sprites. (they can't be seen normally so it will be a fun surprise if there's a glitch or something)
 
