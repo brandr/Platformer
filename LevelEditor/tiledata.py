@@ -29,6 +29,10 @@ DEFAULT_DOOR = "default_door"
 LANTERNS = "lanterns"
 DEFAULT_LANTERN = "default_lantern"
 
+#pickups
+PICKUPS = "pickups"
+OIL_PICKUP = "oil_pickup"
+
 #monsters
 MONSTERS = "monsters"
 BAT = "bat"
@@ -51,6 +55,7 @@ ENTITY_CATEGORY_MAP = {
 	DEFAULT_SIGN:SIGNS,
 	DEFAULT_DOOR:DOORS,
 	DEFAULT_LANTERN:LANTERNS, 
+	OIL_PICKUP:PICKUPS,
 	BAT:MONSTERS, GIANT_FROG:MONSTERS,
 	#TEMP
 	KENSTAR:NPCS

@@ -11,10 +11,15 @@ class Player(Being):
         self.animated = True
         self.default_image = self.animation.images[0]
         self.current_level = start_level
-        self.sightdist = 2 #TEMP. I usually use 2 though.
+
+        self.active = True
         self.can_jump = True
         self.left, self.right, self.down, self.up, self.space, self.control, self.x = False, False, False, False, False, False, False
         self.movement_state = DEFAULT_MOVEMENT_STATE
+
+        #TODO: implement the new lighting system
+        self.lantern = None
+        # self.sightdist = 0 #TEMP. I usually use 2 though.
 
     @staticmethod
     def load_player_animation_set():
@@ -55,12 +60,17 @@ class Player(Being):
         return animation_set
 
     def deactivate(self):
+        self.active = False
         self.up, self.down, self.left, self.right, self.space, self.control, self.x = False, False, False, False, False, False, False
+
+    def activate(self):
+        self.active = True
 
     def update(self, tiles):
         if(self.exitLevelCheck()): return
         update_method = MOVEMENT_STATE_MAP[self.movement_state]
         update_method(self, tiles)
+        self.lantern_update()
         Being.updatePosition(self)
         self.updateView(tiles)
 
@@ -122,7 +132,7 @@ class Player(Being):
 
     def ladder_move_update(self, tiles):
         #TODO: ladder climbing animations go here
-        up, down, left, right, space, running = self.up, self.down, self.left, self.right, self.space, self.control, self.x
+        up, down, left, right, space, running, x = self.up, self.down, self.left, self.right, self.space, self.control, self.x
         self.xvel, self.yvel = 0, 0
         if not self.collide_ladder():
             self.movement_state = DEFAULT_MOVEMENT_STATE
@@ -142,6 +152,10 @@ class Player(Being):
             self.xvel = 2
             self.direction_id = 'right'
 
+    def lantern_update(self):
+        if self.lantern and self.active and not self.current_level.outdoors:
+            self.lantern.oil_update()
+
     def x_action_check(self):
         x_interactables = self.current_level.x_interactable_objects()
         for x in x_interactables:
@@ -160,10 +174,10 @@ class Player(Being):
         lanterns = level.getLanterns()
 
         coords = self.coordinates()
-        start_x = max(0, coords[0] - self.sightdist - 2)
-        end_x = min(len(all_tiles[0]), coords[0] + self.sightdist + 2)
-        start_y = max(0, coords[1] - self.sightdist - 2)
-        end_y = min(len(all_tiles), coords[1] + self.sightdist + 2)
+        start_x = max(0, coords[0] - self.sight_dist() - 2)
+        end_x = min(len(all_tiles[0]), coords[0] + self.sight_dist() + 2)
+        start_y = max(0, coords[1] - self.sight_dist() - 2)
+        end_y = min(len(all_tiles), coords[1] + self.sight_dist() + 2)
 
         GameImage.updateAnimation(self, 256) 
         for e in player_interactables:
@@ -173,6 +187,7 @@ class Player(Being):
         nearby_light_sources = []
         far_light_sources = []
         for l in lanterns:
+            l.update(self)
             if self.invisionrange(l):
                 nearby_light_sources.append(l)
             else:
@@ -183,10 +198,15 @@ class Player(Being):
                     t.updateimage()
         for f in far_light_sources:
         	f.update_light(all_tiles)
-        self.emit_light(self.sightdist, all_tiles, nearby_light_sources)
+        self.emit_light(self.sight_dist(), all_tiles, nearby_light_sources)
+
+    def sight_dist(self):
+        if self.lantern and not self.lantern.is_empty():
+            return self.lantern.light_distance()
+        return 0 #TODO: get sight_dist from self.lantern
 
     def invisionrange(self, other):	#checks if the player can see a platform
-        if(self.withindist(other, self.sightdist + other.light_distance())):
+        if(self.withindist(other, self.sight_dist() + other.light_distance())):
             return True
         else:
             return False 
@@ -217,7 +237,8 @@ class Player(Being):
             if pygame.sprite.collide_mask(self, p) and p.is_solid:
                 Being.collideWith(self, xvel, yvel, p)
         self.collideExits()
-        self.collideLanterns()
+        self.collidePickups()
+        self.collideLanterns() #might not need this with the new lantern system (if lantern is obtained  from a chest or something)
         if(self.bounce_count <= 0):
             self.collideMonsters(xvel, yvel)
 
@@ -235,13 +256,31 @@ class Player(Being):
                 self.exitLevel(e)
                 return
 
+    def collidePickups(self):
+        level = self.current_level
+        pickups = level.getPickups()
+        for p in pickups:
+            if pygame.sprite.collide_rect(self, p):
+                self.pick_up(p)
+                return
+
     def collideLanterns(self):
         level = self.current_level
         lanterns = level.getLanterns()
         for l in lanterns:
             if pygame.sprite.collide_rect(self, l):
-                l.delete()
-                self.sightdist += l.lightvalue
+                self.pick_up_lantern(l) #TEMP
+                return
+
+    def pick_up(self, pickup):
+        pickup.delete()
+        pickup.take_effect(self)
+
+        #TEMP METHOD
+    def pick_up_lantern(self, lantern):
+        lantern.delete()
+        self.lantern = lantern
+        #TEMP METHOD
 
     def collideMonsters(self, xvel, yvel):
         x_direction_sign = 1
@@ -273,7 +312,7 @@ class Player(Being):
         self.bounce_count -= 1
 
     def light_distance(self):
-    	return self.sightdist
+    	return self.sight_dist()
 
     def exitLevelCheck(self):
         if(self.currenttile() == None):
@@ -290,6 +329,9 @@ class Player(Being):
 
     def unpause_game(self):
         self.current_level.unpause_game(self)
+
+    def get_lantern(self):
+        return self.lantern
 
 DEFAULT_MOVEMENT_STATE = "default_movement_state"
 BOUNCING_MOVEMENT_STATE = "bouncing_movement_state"

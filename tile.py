@@ -49,6 +49,7 @@ class Tile(GameImage):
     	if otherlights != None:
     	    for o in otherlights:
     		    o.update_light(tiles)
+        if dist == 0: return
         self.updateimage(256)
         directions = ((-1, 0), (1, 0), (0, -1), (0, 1))
         for d in directions:
@@ -83,6 +84,7 @@ class Tile(GameImage):
         if starttile != None:
             starttile.spreadlight(dist - 1, tiles, iteration + 1, direction, lineflag, None, otherlights)
         if lineflag: return
+        
         #non-lineflag case (still going in one of the four intial directions)
         d1 = (-1*direction[1], direction[0])
         d2 = (direction[1], -1*direction[0])

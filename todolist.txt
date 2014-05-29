@@ -63,21 +63,33 @@ MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mechanics, etc.
 
 IMMEDIATE STUFF: most immediate
 
-# Nothing to do right now-- pick a category
-
+# Implement lantern oil system
+    - change lantern oil so that it becomes invisible in the darkness
+        * ideally do this in a very general way so that it can apply to other things, like monsters.
+        * could change lighting system so that instead of tiles altering their own alpha values directly, they yield a "light map" array each cycle
+            # the screen-processing methods (or level) would then blit all entities/tiles as normal, and then apply this light map by setting alpha values
+                of subsurfaces based on it.
+            # could even make it so lighting doesn't snap to tiles, if that looks better
+    - note that there is a bug where the player can influence lighting even when not holding a lantern
+       * this could possibly be fixed by controlling the angle the player approache the lantern from (i.e., no wall in the way) so that it looks like he is actually casting a shadow, which looks cool
+# fix doors so that they appear properly in darkness
+# figure out a combat system 
+# figure out an item system
 
 -------------------------------------------------------------------
 
 IMMEDIATE STUFF: pickups
 
 # implement lantern oil, creating a general structure for pickups
+# consider a special case for lightdist == 1 because right now it looks weird.
 
 -------------------------------------------------------------------
 
 IMMEDIATE STUFF: screens and menus
 
 # make the map screen more sophisticated. (get feedback)
-    - consider how it should be centered
+    - consider how it should be centered (and how to scroll if there is not room for the entire explored area)
+    - consider making parts of the map fade with time 
 # make more panes to go with the map screen. (these should also be accessible via the pause menu)
     - one possible pane is inventory-- for this, make it possible to get the lantern as an upgrade, and have it contain oil which can be collected to increase light radius.
         * note that this will require some planning (should probably sketch the screen before making it)
@@ -222,5 +234,10 @@ when the level is created
 
     # LONG-TERM STUFF
 
+# since being in the dark with no light could make it extremely tedious to get out, make a "suicide" option and ensure that death
+    has siginficant pentalties and sends the player back to a save point where they are guaranteed to have access to light
+        - want to structure the game partly around this system
 # make it possible for the player to save the game
 #TODO: think up lots of cool easter eggs 
+# when actually implementing the game, make sure that at some point the player is forced to go through dark areas with no lantern/empty lantern
+    so that they know what it's like.   

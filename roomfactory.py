@@ -1,14 +1,18 @@
 from tilefactory import *
 from entityfactory import *
+
 from signfactory import *
 from doorfactory import *
+from pickupfactory import *
+
 from level import *
 
 DEFAULT_SIGN = "default_sign"
 DEFAULT_DOOR = "default_door"
 NON_DEFAULT_ENTITY_MAP = {
-	DEFAULT_SIGN:SignFactory,	# or a method in SignFactory?
-	DEFAULT_DOOR:DoorFactory
+	DEFAULT_SIGN:SignFactory,	
+	DEFAULT_DOOR:DoorFactory,
+	OIL_PICKUP:PickupFactory
 }
 
 class RoomFactory(object):

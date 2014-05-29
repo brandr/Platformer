@@ -263,6 +263,7 @@ class Level(object):
 		self.screen_manager.switch_to_main_screen(player)
 
 	def activate_actors(self):
+		self.getPlayer().activate()
 		for n in self.getNPCs():
 			n.set_active(True)
 
@@ -301,8 +302,8 @@ class Level(object):
 	def end_current_event(self):
 		self.current_event = None
 		self.end_effects()
-		self.activate_actors()
 		self.screen_manager.current_screen.control_manager.switch_to_main_controls(self.getPlayer())
+		self.activate_actors()
 
 	def add_effect(self, effect):
 		self.effect_layer.append(effect)
@@ -415,6 +416,9 @@ class Level(object):
 
 	def getEntities(self):
 		return self.level_objects.get_entities(Entity)
+
+	def getPickups(self):
+		return self.level_objects.get_entities(Pickup)
 		
 	def getPlatforms(self):
 		return self.level_objects.get_entities(Platform)

@@ -27,6 +27,10 @@ DEFAULT_DOOR = "default_door"
 LANTERNS = "lanterns"
 DEFAULT_LANTERN = "default_lantern"
 
+#pickups
+PICKUPS = "pickups"
+OIL_PICKUP = "oil_pickup"
+
 #monsters
 MONSTERS = "monsters"
 BAT = "bat"
@@ -49,6 +53,7 @@ ENTITY_CATEGORY_MAP = {
 	DEFAULT_SIGN:SIGNS,
 	DEFAULT_DOOR:DOORS,
 	DEFAULT_LANTERN:LANTERNS, 
+	OIL_PICKUP:PICKUPS,
 	BAT:MONSTERS, GIANT_FROG:MONSTERS,
 	#TEMP
 	KENSTAR:NPCS
@@ -125,7 +130,7 @@ class TileData(object):
 	def __init__(self, key, filepath, filepath_start = "./"):
 		self.entity_key = key #could also set some values using this
 		self.image_filepath = filepath
-		self.width, self.height = 1,1
+		self.width, self.height = 1, 1
 		self.setDimensions(filepath_start)
 
 	def setDimensions(self, filepath_start):

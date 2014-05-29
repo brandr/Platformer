@@ -1,4 +1,6 @@
 from platformfactory import *
+from pickupfactory import *
+
 from ladder import *
 from lantern import *
 from exitblock import *
