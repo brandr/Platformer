@@ -66,15 +66,15 @@ class Player(Being):
     def activate(self):
         self.active = True
 
-    def update(self, tiles):
+    def update(self, tiles, light_map):
         if(self.exitLevelCheck()): return
         update_method = MOVEMENT_STATE_MAP[self.movement_state]
-        update_method(self, tiles)
+        update_method(self)
         self.lantern_update()
         Being.updatePosition(self)
-        self.updateView(tiles)
+        self.updateView(tiles, light_map)
 
-    def default_move_update(self, tiles):   #consider separating midair update into its own method if this gets too complex.
+    def default_move_update(self):#, tiles, light_map = None):   #consider separating midair update into its own method if this gets too complex.
         up, down, left, right, space, running, x = self.up, self.down, self.left, self.right, self.space, self.control, self.x
         self.xvel = 0
         if x:
@@ -127,10 +127,10 @@ class Player(Being):
                 if(left == right):
                     self.xvel = 0
 
-    def bounce_move_update(self, tiles):
+    def bounce_move_update(self):#, tiles, light_map = None):
         self.bounce()
 
-    def ladder_move_update(self, tiles):
+    def ladder_move_update(self):#, tiles, light_map = None):
         #TODO: ladder climbing animations go here
         up, down, left, right, space, running, x = self.up, self.down, self.left, self.right, self.space, self.control, self.x
         self.xvel, self.yvel = 0, 0
@@ -168,7 +168,7 @@ class Player(Being):
         #interactable.execute_event(self.current_level)
      
      #this gets laggy when there is too much light. try to fix it. (might have to fix other methods instead)
-    def updateView(self, all_tiles): #note: this is only to be used in "cave" settings. for areas that are outdoors, use something else.
+    def updateView(self, all_tiles, light_map): #note: this is only to be used in "cave" settings. for areas that are outdoors, use something else.
         level = self.current_level
         player_interactables = level.player_interactables()
         lanterns = level.getLanterns()
@@ -192,13 +192,9 @@ class Player(Being):
                 nearby_light_sources.append(l)
             else:
                 far_light_sources.append(l)
-        for row in all_tiles[start_y:end_y]:    #IDEA: if the program becomes very slow, could limit tiles/lanterns to only the ones on camera. 
-            for t in row[start_x:end_x]:    #(might need to add 1 to each border though)
-                if t.mapped:
-                    t.updateimage()
         for f in far_light_sources:
-        	f.update_light(all_tiles)
-        self.emit_light(self.sight_dist(), all_tiles, nearby_light_sources)
+       	    f.update_light(all_tiles, light_map)
+        self.emit_light(self.sight_dist(), all_tiles, light_map, nearby_light_sources)
 
     def sight_dist(self):
         if self.lantern and not self.lantern.is_empty():
@@ -302,13 +298,13 @@ class Player(Being):
                 m.bounceAgainst(self)
                 break #makes sure the player can only collide with one monster per cycle
 
-    def bounce(self):
+    def bounce(self): #, tiles, light_map):
         if(self.bounce_count <= 0): 
             self.movement_state = DEFAULT_MOVEMENT_STATE
             return
         self.collide(self.xvel,self.yvel)
         self.updatePosition()
-        self.updateView()
+        #self.updateView(tiles, light_map)
         self.bounce_count -= 1
 
     def light_distance(self):

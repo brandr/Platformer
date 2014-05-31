@@ -125,7 +125,8 @@ class Level(object):
 		tiles = self.getTiles()
 		for row in tiles:
 			for t in row:
-				t.fullyDarken()
+				t.updateimage(256)
+				#t.fullyDarken()
 	
 		#if any exits to the level don't lead anywhere, add blocks barring the player from leaving.
 	def calibrateExits(self):
@@ -250,7 +251,7 @@ class Level(object):
 			return
 		player.moveTo(coords)
 		self.level_camera.update(player)
-		player.update(self.getTiles())
+		player.update(self.getTiles(), self.empty_light_map())
 		pygame.display.update()
 
 	# pausing/events/other thing that change screen and controls
@@ -334,6 +335,7 @@ class Level(object):
 			self.current_event.update(self)
 			if(self.current_event.is_complete()):
 				self.end_current_event()
+		dimensions = self.get_dimensions()
 		player = self.getPlayer()
 		all_tiles = self.getTiles()
 		start_x = max(0, self.level_camera.state.left/32)			#TODO: get rid of these 32s and replace with some constant.
@@ -341,19 +343,44 @@ class Level(object):
 		start_y = max(0, self.level_camera.state.top/32)
 		end_y = min(self.level_camera.state.bottom/32, self.height)
 		tiles = all_tiles[start_y:end_y][start_x:end_x]
+		light_map = self.empty_light_map()
 		if(player != None):
 			self.update_explored()
 			self.level_camera.update(player)
-			player.update(all_tiles)
+			player.update(all_tiles, light_map)
 			platforms = self.getPlatforms()
+			# TODO: fix the lag that occurs somewhere around here
 			for row in tiles:
 				for t in row:
 					self.screen.blit(t.image, self.level_camera.apply(t))
 			for e in self.getEntities():
 				self.screen.blit(e.image, self.level_camera.apply(e))
-			if(self.has_effects):
+			if light_map: self.update_light(light_map)
+			self.screen.blit(player.image, self.level_camera.apply(player))
+			if(self.has_effects): 
 				self.update_effects()
 			pygame.display.update()
+
+	def update_light(self, light_map):	# TODO: make this method more efficient
+		origin_x, origin_y = self.level_camera.origin()
+		dark = Surface((32, 32))	
+		for y in xrange(len(light_map)):
+			for x in xrange(len(light_map[y])):
+				light_value = light_map[y][x]
+				x1 = x*32 + origin_x
+				y1 = y*32 + origin_y
+				dark.set_alpha(256 - light_value)
+				self.screen.blit(dark, (x1, y1))				
+
+	def empty_light_map(self):
+		if self.outdoors: return None
+		light_map = []
+		dimensions = self.get_dimensions()
+		for y in xrange(dimensions[1]):
+			light_map.append([])
+			for x in xrange(dimensions[0]):
+				light_map[y].append(0)
+		return light_map
 
 	def update_effects(self):
 		for e in self.effect_layer:

@@ -59,10 +59,10 @@ class Entity(GameImage):
         coords = self.coordinates()  
         return Tile.tileat(coords, tiles)
 
-    def emit_light(self, dist, tiles, otherlights = None):
+    def emit_light(self, dist, tiles, light_map, otherlights = None):
         starttile = self.currenttile()
         if not (starttile == None):
-            starttile.emit_light(dist, tiles, otherlights)
+            starttile.emit_light(dist, tiles, light_map, otherlights)
 
     def darken_surf(self, amount):
         pass

@@ -63,25 +63,19 @@ MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mechanics, etc.
 
 IMMEDIATE STUFF: most immediate
 
-# Implement lantern oil system
-    - change lantern oil so that it becomes invisible in the darkness
-        * ideally do this in a very general way so that it can apply to other things, like monsters.
-        * could change lighting system so that instead of tiles altering their own alpha values directly, they yield a "light map" array each cycle
-            # the screen-processing methods (or level) would then blit all entities/tiles as normal, and then apply this light map by setting alpha values
-                of subsurfaces based on it.
-            # could even make it so lighting doesn't snap to tiles, if that looks better
-    - note that there is a bug where the player can influence lighting even when not holding a lantern
-       * this could possibly be fixed by controlling the angle the player approache the lantern from (i.e., no wall in the way) so that it looks like he is actually casting a shadow, which looks cool
-# fix doors so that they appear properly in darkness
 # figure out a combat system 
 # figure out an item system
 
+
 -------------------------------------------------------------------
 
-IMMEDIATE STUFF: pickups
+IMMEDIATE STUFF: lighting system
 
-# implement lantern oil, creating a general structure for pickups
+# fix the lag
 # consider a special case for lightdist == 1 because right now it looks weird.
+# could make it so lighting doesn't snap to tiles, if that looks better
+# there is a bug where the player can influence lighting even when not holding a lantern
+    * this could possibly be fixed by controlling the angle the player approache the lantern from (i.e., no wall in the way) so that it looks like he is actually casting a shadow, which looks cool
 
 -------------------------------------------------------------------
 

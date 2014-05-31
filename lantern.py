@@ -11,7 +11,7 @@ class Lantern(Entity):	#lantern which can help the player see
         self.flicker_index = 0
 
         # TODO: figure out a good oil system
-        self.oil_meter = [4000, 4000]
+        self.oil_meter = [3999, 3999]
         self.light_multiplier = 4
 
     def update(self, player):
@@ -36,9 +36,9 @@ class Lantern(Entity):	#lantern which can help the player see
             distance -= 1 
         return distance
 
-    def update_light(self, tiles):
+    def update_light(self, tiles, light_map):
         light_distance = self.light_distance()
-        self.emit_light(light_distance, tiles)
+        self.emit_light(light_distance, tiles, light_map)
 
     def add_oil(self, oil_value):
         self.oil_meter[0] = min(self.oil_meter[0] + oil_value, self.oil_meter[1])

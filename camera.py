@@ -26,6 +26,9 @@ class Camera(object):
     def apply(self, target):
         return target.rect.move(self.state.topleft)
 
+    def origin(self):
+        return self.state.left, self.state.top
+
     def update(self, target):
         camera = self.state
         
