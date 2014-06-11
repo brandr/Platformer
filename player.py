@@ -3,6 +3,8 @@ from lantern import *
 from exitblock import *
 from platform import *
 
+from sword import * #TEMP
+
 class Player(Being):
     def __init__(self, player_animations, start_level):
         Being.__init__(self, player_animations)
@@ -12,14 +14,30 @@ class Player(Being):
         self.default_image = self.animation.images[0]
         self.current_level = start_level
 
+        self.active_subentities = []
         self.active = True
         self.can_jump = True
         self.left, self.right, self.down, self.up, self.space, self.control, self.x = False, False, False, False, False, False, False
         self.movement_state = DEFAULT_MOVEMENT_STATE
 
-        #TODO: implement the new lighting system
         self.lantern = None
-        # self.sightdist = 0 #TEMP. I usually use 2 though.
+
+        #TODO: come up with a more general system for swords/weapons
+        self.sword = Sword(self)
+        #TEMP
+
+    def temp_z_method(self):    #TODO: add sword to active subentities
+        #TEMP
+        #TODO: find some way to pass this directional check into the sword itself.
+        self.sword.activate(32, 0, self.direction_id) 
+        #if self.direction_id == 'left':
+        #    self.sword.activate(-32, 32) 
+        #elif self.direction_id == 'right':
+        #    self.sword.activate(32, 32) 
+
+        #TODO: make a sword-swinging animation for the player, and set it so that the player cannot face the other way if moving left while swinging right (i.e., he just walks backwards)
+
+        #TEMP
 
     @staticmethod
     def load_player_animation_set():
@@ -165,7 +183,6 @@ class Player(Being):
 
     def x_interact(self, interactable):
         interactable.execute_x_action(self.current_level, self)
-        #interactable.execute_event(self.current_level)
      
      #this gets laggy when there is too much light. try to fix it. (might have to fix other methods instead)
     def updateView(self, all_tiles, light_map): #note: this is only to be used in "cave" settings. for areas that are outdoors, use something else.
@@ -195,6 +212,13 @@ class Player(Being):
         for f in far_light_sources:
        	    f.update_light(all_tiles, light_map)
         self.emit_light(self.sight_dist(), all_tiles, light_map, nearby_light_sources)
+
+    def add_subentity(self, subentity):
+        self.active_subentities.append(subentity)
+
+    def remove_subentity(self, subentity):
+        if subentity in self.active_subentities:
+            self.active_subentities.remove(subentity)
 
     def sight_dist(self):
         if self.lantern and not self.lantern.is_empty():
@@ -304,7 +328,6 @@ class Player(Being):
             return
         self.collide(self.xvel,self.yvel)
         self.updatePosition()
-        #self.updateView(tiles, light_map)
         self.bounce_count -= 1
 
     def light_distance(self):

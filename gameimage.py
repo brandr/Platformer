@@ -61,7 +61,7 @@ class GameImage(pygame.sprite.Sprite):
     def changeDirection(self, direction):
         self.direction_set = self.animation_set.set_in_direction(direction) 
 
-    def updateimage(self, lightvalue = 0):
+    def updateimage(self, lightvalue = 0):  #this darkening system may be useless now that the lighting system is different.
         if(lightvalue > 0): 
             if(self.default_image != None):
                 self.image = self.default_image
@@ -73,9 +73,6 @@ class GameImage(pygame.sprite.Sprite):
     def updateAnimation(self, lightvalue = 0):
         if(self.animated):
             self.animate()
-            #not sure how best  to process lightvalue at this point.
-            #GameImage.setLightLevel(self.image,lightvalue)
-            #self.image.set_alpha(lightvalue)
             return
         self.updateimage(lightvalue)
 
@@ -138,11 +135,10 @@ class GameImage(pygame.sprite.Sprite):
         return animation_set
 
     @staticmethod
-    def load_animation(filepath, filename, rect, colorkey = None, loop = True, frames = 10): #change frames to 50 if necessaryfor testing
-        #animation_strip = GameImage.load_image_file(filepath, filename)
+    def load_animation(filepath, filename, rect, colorkey = None, loop = True, frames = 10): #change frames to 50 if necessary for testing
         animation_strip = GameImage.load_image_file("./animations", filename) #TEMP
         count = animation_strip.get_width()/rect.width #assume that the animation strip is wide only, not long
-        return SpriteStripAnimator(animation_strip,rect, count, colorkey, loop, frames)
+        return SpriteStripAnimator(animation_strip, rect, count, colorkey, loop, frames)
 
     @staticmethod
     def load_image_file(path, name, colorkey = None):

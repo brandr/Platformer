@@ -29,6 +29,7 @@ class Level(object):
 		total_level_height = self.height*32
 		self.level_camera = Camera(total_level_width, total_level_height) #might not be the best way to make the camera
 		self.outdoors = level_data.sunlit
+		self.current_light_map = self.empty_light_map()
 
 		if(self.outdoors): self.setTilesOutdoors() #TEMP
 		
@@ -357,11 +358,23 @@ class Level(object):
 				self.screen.blit(e.image, self.level_camera.apply(e))
 			if light_map: self.update_light(light_map)
 			self.screen.blit(player.image, self.level_camera.apply(player))
+
+			#TEMP
+			player_subs = player.active_subentities
+			if player_subs:
+				#count = 0
+				for s in player_subs:
+					#count += 1
+					#print count
+					s.update()
+					self.screen.blit(s.image, self.level_camera.apply(s))				
+			#TEMP
+
 			if(self.has_effects): 
 				self.update_effects()
 			pygame.display.update()
 
-	def update_light(self, light_map):	# TODO: make this method more efficient
+	def update_light(self, light_map):	# TODO: make this method more efficient (probably by filtering out the tiles that are not onscreen)
 		origin_x, origin_y = self.level_camera.origin()
 		dark = Surface((32, 32))	
 		for y in xrange(len(light_map)):
@@ -369,8 +382,13 @@ class Level(object):
 				light_value = light_map[y][x]
 				x1 = x*32 + origin_x
 				y1 = y*32 + origin_y
-				dark.set_alpha(256 - light_value)
-				self.screen.blit(dark, (x1, y1))				
+				x_check = x1 >= -32 and x1 < WIN_WIDTH + 32
+				y_check = y1 >= -32 and y1 < WIN_HEIGHT + 32
+				if x_check and y_check:
+					
+					dark.set_alpha(256 - light_value)
+					self.screen.blit(dark, (x1, y1))				
+		self.current_light_map = light_map
 
 	def empty_light_map(self):
 		if self.outdoors: return None

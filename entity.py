@@ -1,4 +1,3 @@
-#from gameimage import *
 from tile import *
 
 class Entity(GameImage):
@@ -16,7 +15,7 @@ class Entity(GameImage):
     def execute_x_action(self, level, player):
         pass
 
-    def dist_from(self,other):
+    def dist_from(self, other):
         xdist = self.x_dist_from(other)
         ydist = self.y_dist_from(other)  
         xaligned = True
@@ -31,14 +30,14 @@ class Entity(GameImage):
             ydist -= ((self.rect.height/2) + (other.rect.height/2))
         return (sqrt(pow(xdist, 2) + pow(ydist, 2)))/32 + 0.0
 
-    def x_dist_from(self,other,absolute = True):
+    def x_dist_from(self, other, absolute = True):
         x1 = self.rect.centerx
         x2 = other.rect.centerx
         if(absolute):
             return abs(x2 - x1)
         return x2 - x1
 
-    def y_dist_from(self,other,absolute = True):
+    def y_dist_from(self, other, absolute = True):
         y1 = self.rect.centery
         y2 = other.rect.centery
         if(absolute):

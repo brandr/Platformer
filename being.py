@@ -59,11 +59,11 @@ class Being(Entity):
         completely for a value of 0 if this works well for the gameplay.
         """
         if self.currenttile() == None: return
-        if(light_value == None):
-            light_value = self.currenttile().check_brightness()
+        #if(light_value == None):
+        #    light_value = self.currenttile().check_brightness()
         #IDEA: if light value is 0 at this point, set the animation either to complete darkness or to some "darkened" animation. 
         #(i.e., the bat's darkened animation appears only as two red eyes. )
-        GameImage.updateAnimation(self, light_value)
+        GameImage.updateAnimation(self, 256) #TEMP
 
     def updatePosition(self):
         """ updatePosition () -> None

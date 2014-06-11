@@ -44,6 +44,9 @@ class SpriteStripAnimator(object):
             self.f = self.frames
         return image
 
+    def at_end(self):
+        return self.i >= len(self.images)
+
     def __add__(self, ss):
         self.images.extend(ss.images)
         return self

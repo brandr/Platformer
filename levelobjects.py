@@ -19,7 +19,8 @@ class LevelObjects(object):
 		self.entities.append(player)
 
 	def remove(self, entity):
-		self.entities.remove(entity)
+		if entity in self.entities:
+			self.entities.remove(entity)
 
 	def removePlayer(self):
 		self.entities.remove(self.player)

@@ -44,6 +44,10 @@ class MainGameControls(Controls):
 	def press_x(self, key, toggle):
 		self.player.x = toggle
 
+	def press_z(self, key, toggle):
+		if toggle:
+			self.player.temp_z_method()
+
 	def pause(self, key, toggle):
 		if(toggle):
 			self.player.pause_game()
@@ -57,6 +61,7 @@ move_space = MainGameControls.move_space
 move_control = MainGameControls.move_control
 
 press_x = MainGameControls.press_x
+press_z = MainGameControls.press_z
 
 pause = MainGameControls.pause
 
@@ -64,5 +69,6 @@ MAIN_GAME_CONTROL_MAP = {
 	K_UP:move_up, K_DOWN:move_down, K_LEFT: move_left, K_RIGHT:move_right,
 	K_SPACE:move_space, K_LCTRL:move_control,
 	K_x:press_x,
+	K_z:press_z,
 	K_RETURN:pause
 }

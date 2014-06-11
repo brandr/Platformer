@@ -63,7 +63,10 @@ MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mechanics, etc.
 
 IMMEDIATE STUFF: most immediate
 
+# reintroduce mapped blocks given the new lighting system
 # figure out a combat system 
+    - maybe try making a sword? (be general though)
+    - NOTE: have to be careful how blitting works, because it might not work if I blit the sword outside the player's image.
 # figure out an item system
 
 
@@ -71,7 +74,7 @@ IMMEDIATE STUFF: most immediate
 
 IMMEDIATE STUFF: lighting system
 
-# fix the lag
+# fix the lag caused in the new system
 # consider a special case for lightdist == 1 because right now it looks weird.
 # could make it so lighting doesn't snap to tiles, if that looks better
 # there is a bug where the player can influence lighting even when not holding a lantern
@@ -82,7 +85,7 @@ IMMEDIATE STUFF: lighting system
 IMMEDIATE STUFF: screens and menus
 
 # make the map screen more sophisticated. (get feedback)
-    - consider how it should be centered (and how to scroll if there is not room for the entire explored area)
+    - consider how it should be centered (and how to scroll if there is not room for the entire explored area)o
     - consider making parts of the map fade with time 
 # make more panes to go with the map screen. (these should also be accessible via the pause menu)
     - one possible pane is inventory-- for this, make it possible to get the lantern as an upgrade, and have it contain oil which can be collected to increase light radius.
