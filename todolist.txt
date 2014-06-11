@@ -63,19 +63,20 @@ MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mechanics, etc.
 
 IMMEDIATE STUFF: most immediate
 
-# reintroduce mapped blocks given the new lighting system
+# reintroduce mapped blocks given the new lighting system.
 # figure out a combat system 
-    - maybe try making a sword? (be general though)
-    - NOTE: have to be careful how blitting works, because it might not work if I blit the sword outside the player's image.
+    - use sword as an example
+    - later, use gun/bow as example
+# consider making the lantern a subentity of the player that appears when the player is in the dark
 # figure out an item system
-
+    - remember that lantern/sword are items but work very differently
 
 -------------------------------------------------------------------
 
 IMMEDIATE STUFF: lighting system
 
 # fix the lag caused in the new system
-    - look for places in gameimage/entity/being that assume image is updated using the old system-- these may be causing unneccessary calls.
+    - currently negligible, but try to make things more efficient anyway.
 # consider a special case for lightdist == 1 because right now it looks weird.
 # could make it so lighting doesn't snap to tiles, if that looks better
 # there is a bug where the player can influence lighting even when not holding a lantern
