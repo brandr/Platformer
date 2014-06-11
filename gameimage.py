@@ -62,26 +62,14 @@ class GameImage(pygame.sprite.Sprite):
         self.direction_set = self.animation_set.set_in_direction(direction) 
 
     def updateimage(self, lightvalue = 0):  #this darkening system may be useless now that the lighting system is different.
-        if(lightvalue > 0): 
-            if(self.default_image != None):
-                self.image = self.default_image
-            self.image.set_alpha(lightvalue)
-        else: 
-            if(self.mapped):
-                self.fully_darken()
+        if(self.default_image != None):
+            self.image = self.default_image
 
     def updateAnimation(self, lightvalue = 0):
         if(self.animated):
             self.animate()
             return
         self.updateimage(lightvalue)
-
-    @staticmethod
-    def setLightLevel(image, light_value):
-        light_value = 255
-        dark = pygame.Surface(image.get_size(), 32)
-        dark.set_alpha(light_value, pygame.RLEACCEL)
-        image.blit(dark, (0, 0))
 
     def animate(self):
         self.image = self.animation.next()
@@ -90,11 +78,8 @@ class GameImage(pygame.sprite.Sprite):
         current_lightvalue = self.image.get_alpha()
         self.image.set_alpha(min(current_lightvalue, lightvalue))
 
-    def check_brightness(self):
-        brightness = self.image.get_alpha()
-        if(brightness == None):
-            return 0
-        return brightness
+    def check_brightness(self): #this method may be obsolete.
+        return 256
 
     def fully_darken(self):
         self.image = self.unseen_image

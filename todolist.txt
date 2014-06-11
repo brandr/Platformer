@@ -75,6 +75,7 @@ IMMEDIATE STUFF: most immediate
 IMMEDIATE STUFF: lighting system
 
 # fix the lag caused in the new system
+    - look for places in gameimage/entity/being that assume image is updated using the old system-- these may be causing unneccessary calls.
 # consider a special case for lightdist == 1 because right now it looks weird.
 # could make it so lighting doesn't snap to tiles, if that looks better
 # there is a bug where the player can influence lighting even when not holding a lantern

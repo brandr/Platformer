@@ -19,9 +19,6 @@ class Sword(SubEntity): #TODO: different inheritance system (maybe add an interm
 		sword_anim_set = Sword.load_sword_animation_set()
 
 		#TEMP
-		surface = image.load('./images/test_sword_right.bmp')
-		sword_image = surface.convert ()
-		#sword_animations = GameImage.still_animation_set(sword_image, Rect(0, 0, 32, 16))
 		SubEntity.__init__(self, player, sword_anim_set)
 		self.default_image = self.animation.images[0]
 		#TEMP
@@ -32,7 +29,7 @@ class Sword(SubEntity): #TODO: different inheritance system (maybe add an interm
 		filepath = './animations/'
 
 		sword_swinging_right = GameImage.load_animation(filepath, 'test_sword_swinging_right.bmp', sword_rect, -1)
-		sword_swinging_left = GameImage.load_animation(filepath, 'test_sword_swinging_left.bmp', sword_rect, -1)	#TODO: add left swing animation
+		sword_swinging_left = GameImage.load_animation(filepath, 'test_sword_swinging_left.bmp', sword_rect, -1)
 
 		animation_set = AnimationSet(sword_swinging_right)
 		animation_set.insertAnimation(sword_swinging_right, 'right', 'swinging')
