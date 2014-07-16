@@ -1,16 +1,14 @@
 """ A sword that the player can swing. Find a general class to describe this object in the long run.
 """
 
-from subentity import *
+from entityeffect import *
 
-from pygame import image #TEMP (give this to factory later, maybe)
+from pygame import image, Rect #TEMP (give this to factory later, maybe)
 
 class Sword(SubEntity): #TODO: different inheritance system (maybe add an intermediate "weapon" class and make sword not its own class?)
 	""" TODO: docstring """
 	
 	#TODO: implement:
-	# -swinging animation
-	# -swinging direction
 	# -collisions with other objects (like monsters)
 	# -damage
 
@@ -21,6 +19,7 @@ class Sword(SubEntity): #TODO: different inheritance system (maybe add an interm
 		#TEMP
 		SubEntity.__init__(self, player, sword_anim_set)
 		self.default_image = self.animation.images[0]
+		self.damage = 1
 		#TEMP
 
 	@staticmethod
@@ -40,9 +39,8 @@ class Sword(SubEntity): #TODO: different inheritance system (maybe add an interm
 	def activate(self, off_x = 0, off_y = 0, direction_id = RIGHT):
 
 		#TODO: 
-		# 1. make the sword animated with a swinging animation
-		# 2. pass direction_id into the SubEntity activate method
-		# 3. change where off_x is positive or negative based on L/R direction.
+		# make a "spark" appear if the sword hits a monster
+
 		self.direction_id = direction_id
 		if direction_id == 'left': off_x *= -1
 		self.changeAnimation('swinging', direction_id)
@@ -55,8 +53,41 @@ class Sword(SubEntity): #TODO: different inheritance system (maybe add an interm
 		#TODO: start swinging animation
 		self.active_count = 24 #TEMP
 
+		#TODO: check for collisions either here or in level class
 	def update(self):
 		SubEntity.update(self)
-		#SubEntity.timed_update(self)
 		SubEntity.single_animation_update(self)
 		SubEntity.follow_update(self)
+
+	def check_collisions(self):
+		#TEMP
+		# TODO: check things that block collisions with monsters BEFORE checking collisions with monsters
+		self.rect = Rect(self.rect.left, self.rect.top, 32, 32)
+		level = self.superentity.current_level
+		monsters = level.getMonsters()
+		for m in monsters:
+			if pygame.sprite.collide_rect(self, m):
+				if m.bounce_count <= 0:
+					self.mask = pygame.mask.from_surface(self.image)
+					m.mask = pygame.mask.from_surface(m.image)
+					if pygame.sprite.collide_mask(self, m):
+						self.collide_with_monster(m)
+						return
+		#TEMP
+
+	def collide_with_monster(self, monster):
+		
+		#TODO: the hit spark should be an entityeffect belonging to the player
+
+		relative_hit_coords = pygame.sprite.collide_mask(self, monster)
+		global_hit_coords = (relative_hit_coords[0] + self.rect.left - 8, relative_hit_coords[1] + self.rect.top - 8)
+		hit_spark = self.hit_spark(global_hit_coords)
+		self.superentity.add_entity_effect(hit_spark)
+		
+		monster.bounceAgainst(self)
+		monster.take_damage(self.damage) #TEMP
+
+	def hit_spark(self, coords):
+		hit_spark_animation = GameImage.load_animation('./animations', 'hit_spark_1.bmp', Rect(0, 0, 16, 16), -1, False, 6)
+		hit_spark_animation_set = AnimationSet(hit_spark_animation)
+		return EntityEffect(self.superentity, hit_spark_animation_set, coords[0], coords[1])

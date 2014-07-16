@@ -14,7 +14,6 @@ class Player(Being):
         self.default_image = self.animation.images[0]
         self.current_level = start_level
 
-        self.active_subentities = []
         self.active = True
         self.can_jump = True
         self.left, self.right, self.down, self.up, self.space, self.control, self.x = False, False, False, False, False, False, False
@@ -26,17 +25,11 @@ class Player(Being):
         self.sword = Sword(self)
         #TEMP
 
-    def temp_z_method(self):    #TODO: add sword to active subentities
+    def temp_z_method(self):    
         #TEMP
         #TODO: find some way to pass this directional check into the sword itself.
         self.sword.activate(32, 0, self.direction_id) 
-        #if self.direction_id == 'left':
-        #    self.sword.activate(-32, 32) 
-        #elif self.direction_id == 'right':
-        #    self.sword.activate(32, 32) 
-
         #TODO: make a sword-swinging animation for the player, and set it so that the player cannot face the other way if moving left while swinging right (i.e., he just walks backwards)
-
         #TEMP
 
     @staticmethod
@@ -47,11 +40,13 @@ class Player(Being):
         # could probably use the same system used for loading monster animations, and simply store
         # player animation keys in tiledata with the other keys.
         
-        player_idle_left = GameImage.load_animation(filepath, 'player_idle_left.bmp', player_rect, -1)
-        player_idle_right = GameImage.load_animation(filepath, 'player_idle_right.bmp', player_rect, -1)
+        # NOTE: change/add player sprites here.
+        
+        player_idle_left = GameImage.load_animation(filepath, 'player_1_idle_left.bmp', player_rect, -1)
+        player_idle_right = GameImage.load_animation(filepath, 'player_1_idle_right.bmp', player_rect, -1)
 
-        player_walking_left = GameImage.load_animation(filepath, 'player_walking_left.bmp', player_rect, -1)
-        player_walking_right = GameImage.load_animation(filepath, 'player_walking_right.bmp', player_rect, -1)
+        player_walking_left = GameImage.load_animation(filepath, 'player_1_walking_left.bmp', player_rect, -1, True, 6)
+        player_walking_right = GameImage.load_animation(filepath, 'player_1_walking_right.bmp', player_rect, -1, True, 6)
 
         player_running_left = GameImage.load_animation(filepath, 'player_running_left.bmp', player_rect, -1, True, 5)
         player_running_right = GameImage.load_animation(filepath, 'player_running_right.bmp', player_rect, -1, True, 5)
@@ -105,11 +100,11 @@ class Player(Being):
             pass
 
         if left and not right:
-            self.xvel = -4
+            self.xvel = -3
             self.direction_id = 'left'
 
         if right and not left:
-            self.xvel = 4
+            self.xvel = 3
             self.direction_id = 'right'
 
         if space and self.onGround:
@@ -145,10 +140,10 @@ class Player(Being):
                 if(left == right):
                     self.xvel = 0
 
-    def bounce_move_update(self):#, tiles, light_map = None):
+    def bounce_move_update(self):
         self.bounce()
 
-    def ladder_move_update(self):#, tiles, light_map = None):
+    def ladder_move_update(self):
         #TODO: ladder climbing animations go here
         up, down, left, right, space, running, x = self.up, self.down, self.left, self.right, self.space, self.control, self.x
         self.xvel, self.yvel = 0, 0
@@ -197,7 +192,7 @@ class Player(Being):
         end_y = min(len(all_tiles), coords[1] + self.sight_dist() + 2)
 
         GameImage.updateAnimation(self, 256) 
-        for e in player_interactables:
+        for e in player_interactables:      #TODO: move this and other parts to a different method, since they have nothing to do with view.
             e.update(self)
         if(self.current_level.outdoors):
             return
@@ -212,13 +207,6 @@ class Player(Being):
         for f in far_light_sources:
        	    f.update_light(all_tiles, light_map)
         self.emit_light(self.sight_dist(), all_tiles, light_map, nearby_light_sources)
-
-    def add_subentity(self, subentity):
-        self.active_subentities.append(subentity)
-
-    def remove_subentity(self, subentity):
-        if subentity in self.active_subentities:
-            self.active_subentities.remove(subentity)
 
     def sight_dist(self):
         if self.lantern and not self.lantern.is_empty():
@@ -239,23 +227,23 @@ class Player(Being):
         y = p[1] + slope*(x - op[0])
         return (x, y)
 
-#TODO: collide could be an abstract method in the object we collide with
+    #TODO: collidewith could be an abstract method in the object we collide with
+    #TODO: could speed this method up by only collecting collidable objects near the player.
     def collide(self, xvel, yvel):
         level = self.current_level
         platforms = level.get_impassables() #TODO: remember that it might be possible to pass through some platforms in some directions.
         slopes = []
         default_platforms = []
         for p in platforms:
-            if p.is_sloped:
-                slopes.append(p)
-            else:
-                default_platforms.append(p)
-        for s in slopes:
-            if pygame.sprite.collide_mask(self, s):
-                Being.collideWith(self, xvel, yvel, s)
-        for p in platforms:
             if pygame.sprite.collide_mask(self, p) and p.is_solid:
-                Being.collideWith(self, xvel, yvel, p)
+                if p.is_sloped:
+                    slopes.append(p)
+                else:
+                    default_platforms.append(p)
+        for s in slopes:
+            Being.collideWith(self, xvel, yvel, s)
+        for p in default_platforms:
+            Being.collideWith(self, xvel, yvel, p)
         self.collideExits()
         self.collidePickups()
         self.collideLanterns() #might not need this with the new lantern system (if lantern is obtained  from a chest or something)
@@ -309,25 +297,26 @@ class Player(Being):
         monsters = level.getMonsters()
         for m in monsters:
             if pygame.sprite.collide_rect(self, m):
-                if(self.rect.left < m.rect.left):
-                    x_direction_sign = -1
-                if(self.rect.top < m.rect.top):
-                    y_direction_sign = -1
-                new_xvel = 4*x_direction_sign
-                new_yvel = y_direction_sign
-                self.xvel = new_xvel
-                self.yvel = new_yvel 
-                self.movement_state = BOUNCING_MOVEMENT_STATE
-                self.bounce_count = 15
-                m.bounceAgainst(self)
-                break #makes sure the player can only collide with one monster per cycle
+                self.mask = pygame.mask.from_surface(self.image)
+                m.mask = pygame.mask.from_surface(m.image)
+                if pygame.sprite.collide_mask(self, m):
+                    if(self.rect.left < m.rect.left):
+                        x_direction_sign = -1
+                    if(self.rect.top < m.rect.top):
+                        y_direction_sign = -1
+                    new_xvel = 4*x_direction_sign
+                    new_yvel = y_direction_sign
+                    self.xvel = new_xvel
+                    self.yvel = new_yvel 
+                    self.movement_state = BOUNCING_MOVEMENT_STATE
+                    self.bounce_count = 15
+                    m.bounceAgainst(self)
+                    break #makes sure the player can only collide with one monster per cycle
 
-    def bounce(self): #, tiles, light_map):
+    def bounce(self):
         if(self.bounce_count <= 0): 
             self.movement_state = DEFAULT_MOVEMENT_STATE
             return
-        self.collide(self.xvel,self.yvel)
-        self.updatePosition()
         self.bounce_count -= 1
 
     def light_distance(self):

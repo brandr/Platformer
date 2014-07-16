@@ -5,6 +5,7 @@ from ladder import *
 from lantern import *
 from exitblock import *
 from monster import *
+from sign import *
 from npcfactory import *
 from roomdata import *
 
@@ -54,7 +55,7 @@ class EntityFactory(object):
 	def initSlopingPlatform(platform, arg):
 		platform.is_sloped = True
 		platform.is_square = False
-		platform.is_solid = False # this might not be correct in the long run.
+		platform.is_solid = True # this might not be correct in the long run.
 
 ENTITY_BUILD_MAP = {
 	SLOPING_PLATFORM:EntityFactory.initSlopingPlatform,

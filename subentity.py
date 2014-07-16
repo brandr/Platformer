@@ -28,6 +28,14 @@ class SubEntity(Being): #NOTE: should lanterns be a subentity?
 
 	def update(self):
 		GameImage.updateAnimation(self, 256)
+		self.check_collisions()
+	
+	#TODO: consider checking collisions in a general way if subentities have enough commonality.
+	#for instance, many (but not all) subentities may copy Being's collide method for platforms.
+	#def check_collisions(self):
+	#	level = self.superentity.currrent_level
+	def check_collisions(self):
+		pass
 
 	def single_animation_update(self):
 		if self.active and self.animation.at_end():

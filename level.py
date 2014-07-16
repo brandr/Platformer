@@ -2,6 +2,9 @@ from room import *
 from entityfactory import *
 from effect import *
 
+BLACK = Color ("#000000")
+EXPLORED_GREY = Color("#222222")
+
 class Level(object):
 	#a level is built from a rectangular set of rooms.
 	#it copies all objects from the rooms into itself, and processes these objects as the game is running.
@@ -138,15 +141,15 @@ class Level(object):
 
 		for t in tiles[0]: #ceiling
 			if(t.passable()):
-				exit_tiles.append((t,(0,-1)))
+				exit_tiles.append((t, (0, -1)))
 		for t in tiles[y_tiles]: #floor
 			if(t.passable()):
-				exit_tiles.append((t,(0,1)))
+				exit_tiles.append((t, (0, 1)))
 		for row in tiles: #walls
 			if(row[0].passable()): #left wall
-				exit_tiles.append((row[0],(-1,0)))
+				exit_tiles.append((row[0], (-1, 0)))
 			if(row[x_tiles].passable()): #right wall
-				exit_tiles.append((row[x_tiles],(1,0)))
+				exit_tiles.append((row[x_tiles], (1, 0)))
 		for e in exit_tiles:
 			tile = e[0]
 			direction = e[1]
@@ -268,6 +271,8 @@ class Level(object):
 		self.getPlayer().activate()
 		for n in self.getNPCs():
 			n.set_active(True)
+		for m in self.getMonsters():
+			m.set_active(True)
 
 	def set_active(self, active):
 		if active:
@@ -280,6 +285,8 @@ class Level(object):
 		self.getPlayer().deactivate()	
 		for n in self.getNPCs():
 			n.set_active(False)
+		for m in self.getMonsters():
+			m.set_active(False)
 
 	def begin_cutscene(self, cutscene, instant = False):
 		self.current_event = cutscene
@@ -295,6 +302,11 @@ class Level(object):
 		bottom_bar = Effect(Effect.draw_black_rectangle_bottom, (bar_width, bar_height), (0, self.screen.get_height() - bar_height), not instant)
 		self.add_effect(top_bar)
 		self.add_effect(bottom_bar)
+
+	def add_hit_spark(self, offset):
+		pass #TODO: don't add the sprak to the effects layer
+		#spark = Effect(Effect.draw_hit_spark, (16, 16), offset, True)
+		#self.add_effect(spark)
 
 	def begin_event(self, event):
 		self.current_event = event
@@ -354,20 +366,43 @@ class Level(object):
 			for row in tiles:
 				for t in row:
 					self.screen.blit(t.image, self.level_camera.apply(t))
-			for e in self.getEntities():
-				self.screen.blit(e.image, self.level_camera.apply(e))
+			#for e in self.getEntities():
+			#	self.screen.blit(e.image, self.level_camera.apply(e))
+
+			# stationary update
+			for p in self.getPlatforms():
+				self.screen.blit(p.image, self.level_camera.apply(p))
+			for l in self.getLadders():
+				self.screen.blit(l.image, self.level_camera.apply(l))
+			for s in self.getSigns():
+				self.screen.blit(s.image, self.level_camera.apply(s))
+
+			# non-stationary update
+			for l in self.getLanterns():
+				self.screen.blit(l.image, self.level_camera.apply(l))
+			for n in self.getNPCs():
+				self.screen.blit(n.image, self.level_camera.apply(n))
+			for m in self.getMonsters():
+				self.screen.blit(m.image, self.level_camera.apply(m))
+
+			# TODO: blit subentites and then entity effects of non-player objects starting here
+
+			# light update
 			if light_map: self.update_light(light_map)
 			self.screen.blit(player.image, self.level_camera.apply(player))
 
 			#TEMP
 			player_subs = player.active_subentities
 			if player_subs:
-				#count = 0
 				for s in player_subs:
-					#count += 1
-					#print count
 					s.update()
-					self.screen.blit(s.image, self.level_camera.apply(s))				
+					self.screen.blit(s.image, self.level_camera.apply(s))	
+
+			player_effects = player.entity_effects
+			if player_effects:
+				for e in player_effects:
+					e.update()
+					self.screen.blit(e.image, self.level_camera.apply(e))				
 			#TEMP
 
 			if(self.has_effects): 
@@ -375,19 +410,29 @@ class Level(object):
 			pygame.display.update()
 
 	def update_light(self, light_map):	# TODO: make this method more efficient (probably by filtering out the tiles that are not onscreen)
+
+		#ambient_light = 36
+
 		origin_x, origin_y = self.level_camera.origin()
 		dark = Surface((32, 32))	
 		for y in xrange(len(light_map)):
 			for x in xrange(len(light_map[y])):
-				light_value = light_map[y][x]
+				grey_flag = False
 				x1 = x*32 + origin_x
 				y1 = y*32 + origin_y
 				x_check = x1 >= -32 and x1 < WIN_WIDTH + 32
 				y_check = y1 >= -32 and y1 < WIN_HEIGHT + 32
 				if x_check and y_check:
-					
+					light_value = light_map[y][x]
+					check_tile = self.getTiles()[y][x]
+					if light_value == 0 and check_tile.mapped and not check_tile.passable():
+						dark.fill(EXPLORED_GREY)
+						grey_flag = True
 					dark.set_alpha(256 - light_value)
-					self.screen.blit(dark, (x1, y1))				
+					#dark.set_alpha(256 - ambient_light - light_value)
+					self.screen.blit(dark, (x1, y1))
+					if grey_flag:
+						dark.fill(BLACK)				
 		self.current_light_map = light_map
 
 	def empty_light_map(self):

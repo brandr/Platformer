@@ -11,8 +11,8 @@ class Lantern(Entity):	#lantern which can help the player see
         self.flicker_index = 0
 
         # TODO: figure out a good oil system
-        self.oil_meter = [3999, 3999]
-        self.light_multiplier = 4
+        self.oil_meter = [5999, 5999]
+        self.light_multiplier = 6
 
     def update(self, player):
         self.flicker_update()

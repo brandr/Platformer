@@ -3,6 +3,8 @@
 
 # Bats can fly outside the level and disappear.
 
+# This can happen to frogs, too. (though they have to be knocked out of the level)
+
 # player can end up in a "None" level (and crash game) when leaving a level.
     #this can occur with certain combinations of sprinting/jumping while leaving the level.
     #so far it seems to only happen when leaving the level horizontally while jumping and
@@ -63,13 +65,32 @@ MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mechanics, etc.
 
 IMMEDIATE STUFF: most immediate
 
-# reintroduce mapped blocks given the new lighting system.
+# IDEA: try having the main character's idle animation be completely still to see if I like it better.
+
+# TODO: make the "hit spark" better (and possibly more general)
+    - consider other ways to show that something is being damaged
+
+# show that the player is being damaged (may want to make new, human sprites first so as not to waste more time with test sprites)
+
+# fix the bug where the frog (and presumably the bat) can be knocked off the screen
 # figure out a combat system 
+    - may have to tweak some of the being/monster bounce system 
+        * consider implementing knockback that affects both the monster attacking and the target
+    - be extensible
     - use sword as an example
     - later, use gun/bow as example
 # consider making the lantern a subentity of the player that appears when the player is in the dark
 # figure out an item system
     - remember that lantern/sword are items but work very differently
+
+# generalize subentities/entityeffects so that they can apply to monsters and NPCs
+
+# implement "triggers" to traverse between dungeons
+    - may want to first implement a system to allow saving dungeons by name via the dungeon editor
+
+# implement a cutscene system and ways to trigger cutscenes
+
+# make some sprites for the main character, archaeologist, sorceress, and the immortal
 
 -------------------------------------------------------------------
 
@@ -87,7 +108,7 @@ IMMEDIATE STUFF: lighting system
 IMMEDIATE STUFF: screens and menus
 
 # make the map screen more sophisticated. (get feedback)
-    - consider how it should be centered (and how to scroll if there is not room for the entire explored area)o
+    - consider how it should be centered (and how to scroll if there is not room for the entire explored area)
     - consider making parts of the map fade with time 
 # make more panes to go with the map screen. (these should also be accessible via the pause menu)
     - one possible pane is inventory-- for this, make it possible to get the lantern as an upgrade, and have it contain oil which can be collected to increase light radius.
@@ -195,15 +216,12 @@ IMMEDIATE STUFF: cutscenes
 
     # REDUCING LAG
 
-# IDEA to reduce lag: make level blit directly onto a pygame screen and simply change this screen when necessary using the screemanager.
-    - Currently, the level blits onto an image which is then blitted onto a main screen, which is twice as much blitting as we really need.
-
-# IDEA to reduce lag: instead of immediately updating the lightvalues as light is spread by tiles, simply update some "lightmap" (or return it?)
-    and somehow apply it to each tile after the entity images have been blitted (this solves a couple other problems, as well)
 
 # IDEA to reduce lag: instead of having the level constantly check for up-interacatbles, simply generate a list stored in levelobjects
-when the level is created
+    when the level is created
     - do this for all the indivdual object types (monsters, platforms, etc) as well.
+
+# IDEA: make sure the level only bothers to render the images of onscreen enemies
 
     #SPRITE STUFF
 
@@ -222,6 +240,8 @@ when the level is created
 
 #TODO: make the "platform" system more complex, possibly with inheritance/factory
 # consider platforms that  the player can jump up through and/or fall through  by tapping down
+# consider platforms that hurt the player when touched
+# consider moving platforms (might not fit into the existing tile -> block system, and therefore might not inherit from Platform)
 
     # MISC STUFF
 
@@ -233,10 +253,11 @@ when the level is created
 
     # LONG-TERM STUFF
 
+# change the player sprites to match my concept art
 # since being in the dark with no light could make it extremely tedious to get out, make a "suicide" option and ensure that death
     has siginficant pentalties and sends the player back to a save point where they are guaranteed to have access to light
         - want to structure the game partly around this system
 # make it possible for the player to save the game
-#TODO: think up lots of cool easter eggs 
+# think up lots of cool easter eggs 
 # when actually implementing the game, make sure that at some point the player is forced to go through dark areas with no lantern/empty lantern
     so that they know what it's like.   

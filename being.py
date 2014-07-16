@@ -45,6 +45,8 @@ class Being(Entity):
         self.sightdist = 5
         self.max_speed = 10 # doesn't apply to player yet, but could
         self.bounce_count = 0
+
+        self.hit_points = None
         #TODO: if methods/data from monster/player are universal, move them to this class.
 
     def update(self, player):
@@ -90,7 +92,7 @@ class Being(Entity):
         """
         if(collide_objects == None):
             level = self.current_level
-            collide_objects = level.getPlatforms()
+            collide_objects = level.get_impassables()
         for c in collide_objects:
             self.collideWith(xvel, yvel, c)
 
@@ -101,13 +103,16 @@ class Being(Entity):
         it will become flush with that platform no matter what its velocity is, and be unable 
         to move in the direction of that platform. (i.e., through the platform.)
         """
-        if pygame.sprite.collide_mask(self, collide_object): 
+        if pygame.sprite.collide_rect(self, collide_object):  #may need collide_mask in some cases, not sure.
             if isinstance(collide_object, Platform) and collide_object.is_sloped:   #consider dict here instead of if statements if we are trying to deal with lag
                 self.collide_with_slope(xvel, yvel, collide_object)
                 return
             if isinstance(collide_object, Door):
                 self.collide_with_door(xvel, yvel, collide_object)
                 return
+            if isinstance(collide_object, Being):
+                if not pygame.spirte.collide_mask(self, collide_object):
+                    return
             if xvel > 0:
                 self.rect.right = collide_object.rect.left
             if xvel < 0:
@@ -179,6 +184,7 @@ class Being(Entity):
         new_yvel = 2 * y_direction_sign
         self.xvel = new_xvel
         self.yvel = new_yvel 
+        self.collide(self.xvel, self.yvel)
         self.bounce_count = 40
 
     def bounce(self):
@@ -189,6 +195,6 @@ class Being(Entity):
         """
         if(self.bounce_count <= 0): 
             return
-        self.collide(self.xvel,self.yvel)
-        self.updatePosition()
+        #self.collide(self.xvel, self.yvel)
+        #self.updatePosition()
         self.bounce_count -= 1

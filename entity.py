@@ -8,8 +8,24 @@ class Entity(GameImage):
         self.mapped = False
         self.x_interactable = False
         self.current_level = None
+        self.active_subentities = []
+        self.entity_effects = []
 
-    def in_interact_range(self, player):
+    def add_subentity(self, subentity):
+        self.active_subentities.append(subentity)
+
+    def remove_subentity(self, subentity):
+        if subentity in self.active_subentities:
+            self.active_subentities.remove(subentity)
+
+    def add_entity_effect(self, effect):
+        self.entity_effects.append(effect)
+
+    def remove_entity_effect(self, effect):
+        if effect in self.entity_effects:
+            self.entity_effects.remove(effect)
+
+    def in_interact_range(self, other):
         return False
 
     def execute_x_action(self, level, player):
