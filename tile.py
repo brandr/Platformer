@@ -4,6 +4,10 @@ from math import *
 from gameimage import *
 
 class Tile(GameImage):
+    """
+    Tile( AnimationSet, int, int ) -> Tile
+    
+    """
     def __init__(self, tile_sprites, x , y): 
         GameImage.__init__(self, tile_sprites)#Rect(0, 0, 32, 32)) #TODO: replace with some getter (or arg) representing the tile's sprite.
         self.unseen_color = Color("#000000")

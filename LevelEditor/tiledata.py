@@ -131,9 +131,18 @@ class TileData(object):
 	"""docstring for TileData"""
 	def __init__(self, key, filepath, filepath_start = "./"):
 		self.entity_key = key #could also set some values using this
-		self.image_filepath = filepath
+		self.image_filepath = self.fixed_filepath(filepath)
 		self.width, self.height = 1, 1
 		self.setDimensions(filepath_start)
+
+	def fixed_filepath(self, filepath):
+		fixed_path = ""
+		for i in range(len(filepath)):
+			if filepath[i] == "\\": 
+				fixed_path += "/"
+			else:
+				fixed_path += filepath[i]
+		return fixed_path
 
 	def create_copy(self):
 		return TileData(self.entity_key, self.image_filepath)

@@ -51,13 +51,13 @@ class RoomData(object):
 				next_data = None
 				next_room = formatted_data[y][x]
 				if next_room != None:
-					next_data = RoomData.deformatted_room(next_room,filepath)
+					next_data = RoomData.deformatted_room(next_room, filepath)
 				rooms[y].append(next_data)
 		return rooms
 
 	@staticmethod
 	def deformatted_room(formatted_data, filepath = "./"):	
-		x, y = formatted_data[0],formatted_data[1]
+		x, y = formatted_data[0], formatted_data[1]
 		tile_set = RoomData.deformatted_tile_set(formatted_data[2], filepath) #have to deformat tiles before returning the room_data.
 		width,height = len(tile_set[0]), len(tile_set) #might need a None exeception handler
 		room_data = RoomData(width, height, x, y)
@@ -96,7 +96,7 @@ class RoomData(object):
 		entity_key = formatted_data[0]
 		tile_data = None
 		if entity_key in TILE_INIT_MAP:
-			init_function = TILE_INIT_MAP[entity_key] #TODO: get a constructor from a map
+			init_function = TILE_INIT_MAP[entity_key] 
 			tile_data = init_function(formatted_data, filepath)
 		else:
 			tile_data = TileData(formatted_data[0], formatted_data[1], filepath)

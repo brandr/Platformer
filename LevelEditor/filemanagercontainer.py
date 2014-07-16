@@ -22,10 +22,10 @@ DEFAULT_FILE_COUNT = 10
 
 class FileManagerContainer(Box):
 	"""docstring for FileManagerContainer"""
-	def __init__(self, level_select_container,dungeon_grid_container,position,dimensions):
+	def __init__(self, level_select_container, dungeon_grid_container, position, dimensions):
 		#init basic attributes
-		Box.__init__(self,dimensions[0],dimensions[1])
-		self.topleft = (position[0],position[1])
+		Box.__init__(self, dimensions[0], dimensions[1])
+		self.topleft = (position[0], position[1])
 		
 		#init data specific to this container
 		self.level_select_container, self.dungeon_grid_container = level_select_container,dungeon_grid_container
