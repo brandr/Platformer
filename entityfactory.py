@@ -42,6 +42,7 @@ class EntityFactory(object):
 	@staticmethod
 	def initMonster(monster, name):
 		monster.name = name
+		monster.monster_init(name)
 
 	@staticmethod
 	def initNPC(npc, name):

@@ -5,8 +5,24 @@ from being import *
 # It may have some commonalities with player. these should be moved up to Being where appropriate.
 # It may even make sense to make player inherit from monster. Not sure yet, though.
 
+DEFAULT = "default"
+BAT = "bat"
+GIANT_FROG = "giant_frog"
+HIT_POINTS = "hit_points"
+
+MONSTER_DATA_MAP = { 
+    DEFAULT:
+        {
+        HIT_POINTS:1
+        },
+    GIANT_FROG:
+        {
+        HIT_POINTS:3
+        }
+}
+
 class Monster(Being):
-    def __init__(self, animations, x, y):#name, x, y): 
+    def __init__(self, animations, x, y): 
         Being.__init__(self,animations, x, y)
         # self.name = name	#not yet sure how useful a monster name will be. It seems reasonable enough though.
         self.name = None
@@ -19,7 +35,16 @@ class Monster(Being):
         self.changeAnimation('idle','left')
 
         self.wait_count = 20        # TEMP. As monster behavior gets more complex, find other ways to set timers.
-        self.hit_points = [3, 3]    # TEMP
+        self.hit_points = None
+       # self.hit_points = [3, 3]    # TEMP
+
+    def monster_init(self, name):
+        if name in MONSTER_DATA_MAP:
+            monster_map = MONSTER_DATA_MAP[name]
+        else:
+            monster_map = MONSTER_DATA_MAP[DEFAULT]
+        start_hp = monster_map[HIT_POINTS]
+        self.hit_points = [start_hp, start_hp]
 
     #TODO: make this general in the long run, so that monsters can interact with each other as well as with the player.
         #  in particular, consider having monsters "collide" with each other (they probably shouldn't bounce but I'm not sure.)

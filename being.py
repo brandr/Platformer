@@ -50,10 +50,14 @@ class Being(Entity):
         #TODO: if methods/data from monster/player are universal, move them to this class.
 
     def update(self, player):
+        """ b.update( Player ) -> None
+
+        Calls the updateAnimation method below.
+        """
         self.updateAnimation()
 
     def updateAnimation(self, light_value = None): #
-        """ updateAnimation ( int ) -> None
+        """ b.updateAnimation ( int ) -> None
 
         Updates the animation and image of the Being based on the light that is on it. Differs from usual 
         updateImage in that we must find this being's current tile because it can change a lot.
@@ -61,16 +65,12 @@ class Being(Entity):
         completely for a value of 0 if this works well for the gameplay.
         """
         if self.currenttile() == None: return
-        #if(light_value == None):
-        #    light_value = self.currenttile().check_brightness()
-        #IDEA: if light value is 0 at this point, set the animation either to complete darkness or to some "darkened" animation. 
-        #(i.e., the bat's darkened animation appears only as two red eyes. )
-        GameImage.updateAnimation(self, 256) #TEMP
+        GameImage.updateAnimation(self, 256) 
 
     def updatePosition(self):
-        """ updatePosition () -> None
+        """ b.updatePosition () -> None
 
-        Updates the Being's position on the screen based on its current velocities.
+        Updates the Being's pixel coordinate position on the screen based on its current velocities.
         """
         # increment in x direction
         self.rect.left += self.xvel
@@ -85,7 +85,7 @@ class Being(Entity):
 
     #TODO: consider having bounce take effect here, like in player.
     def collide(self, xvel, yvel, collide_objects = None):
-        """ collide (double, double, [Platform]) -> None
+        """ b.collide (double, double, [Platform]) -> None
 
         Collide with all solid platforms using the collideWith method also found in Being.
         Collisions with non-platform objects are handled by other methods.
@@ -97,7 +97,7 @@ class Being(Entity):
             self.collideWith(xvel, yvel, c)
 
     def collideWith(self, xvel, yvel, collide_object):
-        """ collideWith (double, double, Platform) -> None
+        """ b.collideWith (double, double, Platform) -> None
 
         If the Being is "up against" a platform (based on pygame's built-in collide method), 
         it will become flush with that platform no matter what its velocity is, and be unable 
@@ -125,6 +125,10 @@ class Being(Entity):
                 self.rect.top = collide_object.rect.bottom
 
     def collide_with_slope(self, xvel, yvel, slope): #NOTE: this only works for slopes on the ground, not on the ceiling.
+        """ b.collide_with_slope( double, double, Block ) -> None
+
+        A special method that uses a more expensive collision check for slopes.
+        """
         if yvel == 0:
             while pygame.sprite.collide_mask(self, slope):
                 self.rect.bottom -= 1
@@ -142,6 +146,11 @@ class Being(Entity):
                     self.rect.top += 1
 
     def collide_with_door(self, xvel, yvel, door):
+        """ b.collide_with_door( double, double, Door ) -> None
+
+        A special method used to collide with doors. It ensures that the being's
+        sprite can be flush with the edge of the door.
+        """
         if xvel >= 0:
             while pygame.sprite.collide_mask(self, door):
                 self.rect.right -= 1
@@ -150,7 +159,7 @@ class Being(Entity):
                 self.rect.left += 1
 
     def moveTowards(self, destination):
-        """ moveTowards (GameImage) -> None
+        """ moveTowards ( GameImage ) -> None
 
         Move towards some destination, assuming the Being is not currently bouncing.
         I'm not sure I like this structure. Beings should probably just collide first,
@@ -168,7 +177,7 @@ class Being(Entity):
         self.yvel = dist_ratio*self.y_dist_from(destination, False)/32
 
     def bounceAgainst(self, other): #this is used for a monster colliding with the player, and may be useful in other cases.
-        """ bounceAgainst (Being) -> None
+        """ bounceAgainst ( Being ) -> None
 
         Bounce against another being, starting the bounce counter so that this being cannot
         take other actions until the counter runs out.
@@ -195,6 +204,4 @@ class Being(Entity):
         """
         if(self.bounce_count <= 0): 
             return
-        #self.collide(self.xvel, self.yvel)
-        #self.updatePosition()
         self.bounce_count -= 1

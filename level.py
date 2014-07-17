@@ -359,7 +359,7 @@ class Level(object):
 		light_map = self.empty_light_map()
 		if(player != None):
 			self.update_explored()
-			self.level_camera.update(player)
+			self.level_camera.update(player)						# try calling this at the end of this method if there are weird visual effects.
 			player.update(all_tiles, light_map)
 			platforms = self.getPlatforms()
 			# TODO: fix the lag that occurs somewhere around here
@@ -376,6 +376,8 @@ class Level(object):
 				self.screen.blit(l.image, self.level_camera.apply(l))
 			for s in self.getSigns():
 				self.screen.blit(s.image, self.level_camera.apply(s))
+			for d in self.getDoors():
+				self.screen.blit(d.image, self.level_camera.apply(d))
 
 			# non-stationary update
 			for l in self.getLanterns():

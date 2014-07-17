@@ -65,7 +65,6 @@ MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mechanics, etc.
 
 IMMEDIATE STUFF: most immediate
 
-# IDEA: try having the main character's idle animation be completely still to see if I like it better.
 
 # TODO: make the "hit spark" better (and possibly more general)
     - consider other ways to show that something is being damaged
@@ -74,6 +73,7 @@ IMMEDIATE STUFF: most immediate
 
 # fix the bug where the frog (and presumably the bat) can be knocked off the screen
 # figure out a combat system 
+    - IDEA for hp/other stats: have a double dict of {MONSTER_NAME: {MONSTER DICT }, DEFAULT: {DEFAULT DICT} }
     - may have to tweak some of the being/monster bounce system 
         * consider implementing knockback that affects both the monster attacking and the target
     - be extensible

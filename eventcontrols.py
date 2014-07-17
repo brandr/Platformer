@@ -4,9 +4,9 @@
 from controls import *
 
 class EventControls(Controls):
-	""" EventControls( Event ) -> EventControls
+	""" EventControls( GameEvent, Player ) -> EventControls
 
-	Can handle various contexts related to events.
+	Can handle various contexts related to special ingame events, like cutscenes.
 
 	Attributes:
 
