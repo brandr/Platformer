@@ -1,8 +1,23 @@
+""" An item the player can acquire to light the area around him.
+"""
+
 from entity import *
 
 FLICKER_CONSTANT = 80
 
 class Lantern(Entity):	#lantern which can help the player see
+    """ Lantern( AnimationSet, int, int ) -> Lantern
+
+    
+
+    Attributes:
+
+    flicker_index:
+
+    oil_meter:
+
+    light_multiplier:
+    """
     def __init__(self, animations, x, y):
         Entity.__init__(self, animations)
         self.rect.centerx += x

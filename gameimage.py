@@ -1,3 +1,6 @@
+""" The most abstract type of object that can appear in the game.
+"""
+
 import os
 from gameevent import *
 from animationset import *
@@ -9,6 +12,32 @@ BACKGROUND_COLOR = Color("#000000")
 DEF_COLORKEY = Color("#FF00FF")
 
 class GameImage(pygame.sprite.Sprite):
+    """ GameImage( AnimationSet ) -> GameImage
+
+    A GameImage inherits from pygame sprite. You can look at its documentation to see what methods can be called on a GameImage.
+
+    Attributes:
+
+    unseen_image: This is how the GameImage appears in complete darkness.
+
+    mapped: Flags whether the player has seen this thing.
+
+    animated: Flags whether the GameImage's appearance changes each frame.
+
+    animation_set: An object containing possible animations for this object.
+
+    animation: This GameImage's current animation.
+
+    direction_id and animation_id are keys used to determine the GameImage's current animation.
+
+    default_image: The default image that this GameImage reverts to if it isn't animated or doesn't know what to do.
+
+    image: The current image that this GameImage appears as on the level.
+
+    rect: A pygame Rect representing the space this GameImage occupies.
+
+    mask: A pygame Mask used to detect collisions in some cases. (For simple collisions, rect is used.)
+    """
     def __init__(self, animations):
         pygame.sprite.Sprite.__init__(self)
 
@@ -29,18 +58,39 @@ class GameImage(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
 
     def coordinates(self):
+        """ gi.coordinates -> ( int, int )
+
+        Returns the tile coordinates of this GameImage's upper-left corner.
+        """
         return (self.rect.left/32, self.rect.top/32)
 
     def rect_coords(self):
+        """ gi.rect_coords -> ( int, int )
+
+        Returns the pixel coordinates of this GameImage's upper-left corner.
+        """
         return (self.rect.left, self.rect.top)
 
     def tile_dimensions(self):
+        """ gi.tile_dimensions -> int, int 
+
+        Returns the width and height of this GameImage in tiles.
+        """
         return self.image.get_width()/32, self.image.get_height()/32
 
     def moveTo(self, coords):
+        """ gi.moveTo( int, int ) -> None
+
+        Move this GameImage to the given tile coordinates.
+        """
         self.moveRect(coords[0]*32, coords[1]*32, True)
 
     def moveRect(self, x_offset, y_offset, absolute = False):
+        """ gi.moveRect( int, int, bool ) -> None
+
+        Move this GameImage by the given tile coordinates.
+        If absolute is true, move it *to* those coordinates.
+        """
         if(absolute):
             self.rect.left = x_offset
             self.rect.top = y_offset
@@ -49,6 +99,10 @@ class GameImage(pygame.sprite.Sprite):
         self.rect.top += y_offset
 
     def changeAnimation(self, ID, direction):
+        """ gi.changeAnimation( str, str ) -> None
+
+        Change the current animation using the given string keys.
+        """
         if(self.animation_id[0] == (ID)):
             if(direction == None or self.animation_id[1] == direction):
                return
@@ -59,38 +113,59 @@ class GameImage(pygame.sprite.Sprite):
         self.animation_id = (ID,direction)
 
     def changeDirection(self, direction):
+        """ gi.changeDirection( str ) -> None
+
+        Change the current animation to face in the given direction.
+        """
         self.direction_set = self.animation_set.set_in_direction(direction) 
 
     def updateimage(self, lightvalue = 0):  #this darkening system may be useless now that the lighting system is different.
+        """ gi.updateimage( int ) -> None
+
+        Revert the current image to this object's default image.
+        """
         if(self.default_image != None):
             self.image = self.default_image
 
     def updateAnimation(self, lightvalue = 0):
+        """ gi.updateAnimation( int ) -> None
+
+        Update the current image by advancing the animation to the next frame.
+        """
         if(self.animated):
             self.animate()
             return
         self.updateimage(lightvalue)
 
     def animate(self):
+        """ gi.animate( ) -> None
+
+        Advance the current animation to its next frame, looping it if necessary.
+        """
         self.image = self.animation.next()
 
-    def darkenTo(self, lightvalue):
-        current_lightvalue = self.image.get_alpha()
-        self.image.set_alpha(min(current_lightvalue, lightvalue))
-
-    def check_brightness(self): #this method may be obsolete.
-        return 256
-
     def fully_darken(self):
+        """ gi.fully_darken( ) -> None
+
+        Set this object to whatever it should look like in complete darkness.
+        """
         self.image = self.unseen_image
 
     @staticmethod
     def still_animation_set(still_image, rect = Rect(0, 0, 32, 32), colorkey = DEF_COLORKEY):
+        """ still_animation_set( Surface, Rect, str ) -> AnimationSet
+
+        Return an "animation set" containing only one image.
+        """
         still_animation = SpriteStripAnimator(still_image, rect, 1, colorkey, False, 1)
         return AnimationSet(still_animation)
 
     @staticmethod
     def load_animation_set(tile_data, tile_size, colorkey = -1):
+        """ load_animation_set( TileData, int, int ) -> AnimationSet
+
+        Build an animation set from a TileData object.
+        """
         image_pixel_width = tile_size*tile_data.width
         image_pixel_height = tile_size*tile_data.height
         image_rect = Rect(0, 0, image_pixel_width, image_pixel_height)
@@ -121,12 +196,20 @@ class GameImage(pygame.sprite.Sprite):
 
     @staticmethod
     def load_animation(filepath, filename, rect, colorkey = None, loop = True, frames = 10): #change frames to 50 if necessary for testing
-        animation_strip = GameImage.load_image_file("./animations", filename) #TEMP
-        count = animation_strip.get_width()/rect.width #assume that the animation strip is wide only, not long
+        """ load_animation( str, str, Rect, str, bool, int ) -> SpriteStripAnimator
+        
+        Load an animation given two parts of a filepath and some other data.
+        """
+        animation_strip = GameImage.load_image_file("./animations", filename)   # TEMP
+        count = animation_strip.get_width()/rect.width                          # assume that the animation strip is wide only, not long
         return SpriteStripAnimator(animation_strip, rect, count, colorkey, loop, frames)
 
     @staticmethod
     def load_image_file(path, name, colorkey = None):
+        """ load_image_file( str, str, str ) -> Surface
+
+        Load an image from a filepath.
+        """
         fullname = os.path.join(path, name)
         try:
             image = pygame.image.load(fullname)

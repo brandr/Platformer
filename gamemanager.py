@@ -62,9 +62,13 @@ class GameManager:
 			self.draw_screen(screen_manager)
 			pygame.display.update()
 
-	@staticmethod	#TEMP FOR TESTING
+	@staticmethod	#TEMP FOR TESTING (therefore, no docstring)
 	def temp_player_right(arg, player):
 		player.right = True
 
 	def draw_screen(self, screen_manager):
+		""" gm.draw_screen( ScreenManager) -> None
+
+		Tell the screen manager to draw whatever should be onscreen.
+		"""
 		screen_manager.draw_screen()
