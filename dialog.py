@@ -15,13 +15,37 @@ DIALOG_BOX_WIDTH = WIN_WIDTH - 32
 DIALOG_BOX_HEIGHT = WIN_HEIGHT/6
 
 class Dialog(Effect):
-	def __init__(self, source, text = "", portrait_filename = None, dimensions = (0, 0), scrolling = False, font_color = BLACK): #TODO: consider an arg just for the font.
+	""" Dialog( str, str, str, (int, int), bool, Color ) -> Dialog
+
+	A type of ingame effect that appears as a box at the top of the screen, containing text.
+
+	Attributes:
+
+	next_actions: The next set of actions to be executed (simultaneously). Each action contains a reference to the action that comes after it, if there is one.
+
+	index: A measure of how far this dialog has progressed (and therefore how many letters of text should be shown).
+
+	draw_pane: The pane containing the text.
+
+	text: The text to be displayed in this dialog.
+
+	portrait_filename: None if there is no portrait. Otherwise, holds the filename of the portrait image that should be used for the character that is curretly speaking.
+
+	dimensions: width and height of this dialog.
+
+	scrolling: if true, then the text gradually scrolls.
+
+	font_color: the color of the text in this dialog.
+
+	offset: The offset of the dialog box on the screen.
+	"""
+	def __init__(self, source_type, text = "", portrait_filename = None, dimensions = (0, 0), scrolling = False, font_color = BLACK): #TODO: consider an arg just for the font.
 		Effect.__init__(self, Dialog.draw_image)
 		self.next_actions = []
 		self.index = 0
 		self.draw_pane = None
-		if source in PANE_MAP:
-			self.draw_pane = PANE_MAP[source]
+		if source_type in PANE_MAP:
+			self.draw_pane = PANE_MAP[source_type]
 		self.text = text
 		self.portrait_filename = portrait_filename
 		self.dimensions = dimensions
@@ -30,11 +54,19 @@ class Dialog(Effect):
 		self.offset = (12, 12) #TEMP
 
 	def process_key(self, key):
+		""" d.process_key( str ) -> None
+
+		An abstract method that does nothing for dialogs. I think keyboard input is still handled somewhere else, though.
+		"""
 		pass
 
 		#NOTE: is the source arg really necessary?
 
 	def draw_text_image(self):
+		""" d.draw_text_image( ) -> Surface
+
+		Returns a text image representing this dialog.
+		"""
 		current_text = self.text[0:int(self.index/SCROLL_CONSTANT)] 
 		text_lines = [s.strip() for s in current_text.splitlines()]
 		text_font = font.Font("./fonts/FreeSansBold.ttf", 20)	#TEMP
@@ -47,6 +79,10 @@ class Dialog(Effect):
 		return text_image
 
 	def draw_image(self, level):
+		""" d.draw_image( Level ) -> Surface, (int, int)
+
+		Returns the image of the dialog, along with its offset.
+		"""
 		pane_image = self.draw_pane(self)
 		text_image = self.draw_text_image()
 		sign_image = pane_image
@@ -59,11 +95,19 @@ class Dialog(Effect):
 		return sign_image, (0, 0)
 
 	def load_portrait_image(self):
+		""" d.load_portrait_image( ) -> Surface
+
+		Returns the image for this dialog's associated portrait, if there is one.
+		"""
 		if self.portrait_filename:
 			return Dialog.load_image_file("./portraits/", self.portrait_filename)
 		return None
 
 	def sign_pane_image(self):
+		""" d.sign_pane_image( ) -> Surface
+
+		Returns the default image for a sign's dialog pane.
+		"""
 		pane = Surface(self.dimensions) #TEMP. make it cuter.
 		pane.fill(WHITE)
 		return pane
@@ -71,9 +115,18 @@ class Dialog(Effect):
 	#even though dialog inherits from effect, it shares some methods with GameAction.
 
 	def add_next_action(self, action):
+		""" d.add_next_action( GameAction ) -> None
+
+		Adds an action that is about to occur.
+		"""
 		self.next_actions.append(action)
 
 	def continue_action(self, event, level):
+		""" d.continue_action( GameEvent, Level ) -> bool
+
+		This method is called when the player presses X and determines whether the dialog
+		box should advance to the next dialog. It also advances the text if it is not done scrolling.
+		"""
 		if(self.index/SCROLL_CONSTANT <= len(self.text)):
 			self.index = int(SCROLL_CONSTANT * len(self.text))
 			return True
@@ -87,13 +140,26 @@ class Dialog(Effect):
 		return False
 
 	def execute(self, level):
+		""" d.execute( Level ) -> None
+
+		A method shared by GameAction. In the dialog's case, it causes the dialog to display onscreen.
+		"""
 		level.display_dialog(self)
 
 	def update(self, event, level):
+		""" d.update( GameEvent, Level ) -> None
+
+		Updates the dialog's index, effectively making the text scroll.
+		"""
 		self.index += 1
 
 	@staticmethod
 	def load_image_file(path, name, colorkey = None):
+		""" load_image_file( str, str, str ) -> Surface
+
+		If a valid filepath is given, loads an image from it.
+		This is used to load portraits.
+		"""
 		fullname = os.path.join(path, name)
 		try:
 			image = pygame.image.load(fullname)
@@ -110,16 +176,3 @@ class Dialog(Effect):
 PANE_MAP = {
 	SIGN:Dialog.sign_pane_image
 }
-
-	#def display(self, level):
-	#	screen = level.screen
-	#	text_font = font.Font(None, 30)	#TEMP
-	#	text_image = text_font.render(self.text, 1, self.font_color)
-		#text_image = Surface((50, 50))
-	#	text_image.convert()
-
-	#	screen.blit(text_image, (16, 16))
-
-#TODO: finish making signs.
-#TODO: set up screen layer system. 
-#TODO: set up controls system based on roguelikeself

@@ -70,16 +70,16 @@ class Monster(Being):
         if self.bounce_count > 0:   #TEMP
             self.bounce()
             return
-        target = player.currenttile()
+        target = player.current_tile()
         if(target != None):
-            self.moveTowards(player.currenttile())
+            self.moveTowards(player.current_tile())
 
     def frogUpdate(self, player):
         self.gravityUpdate()
         if self.bounce_count > 0:   #TEMP
             self.bounce()
             return
-        self.faceTowards(player.currenttile())
+        self.faceTowards(player.current_tile())
         if self.onGround:
             self.changeAnimation('idle', self.direction_id)
             self.xvel = 0
@@ -128,7 +128,7 @@ class Monster(Being):
         self.onGround = False
 
     def faceTowards(self, target):
-        current_tile = self.currenttile()
+        current_tile = self.current_tile()
         if(target and current_tile):
             x_dist = target.coordinates()[0] - current_tile.coordinates()[0]
             if x_dist == 0: return

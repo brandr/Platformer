@@ -46,7 +46,7 @@ class NonPlayerCharacter(Being):
 
 	def face_towards(self, target):
 		if(target != None):
-			x_dist = target.coordinates()[0] - self.currenttile().coordinates()[0]
+			x_dist = target.coordinates()[0] - self.current_tile().coordinates()[0]
 			if x_dist == 0: return
 			self.direction_val = x_dist/abs(x_dist)
 			if self.direction_val == -1:

@@ -323,7 +323,7 @@ class Player(Being):
     	return self.sight_dist()
 
     def exitLevelCheck(self):
-        if(self.currenttile() == None):
+        if(self.current_tile() == None):
             #a bug can sometimes occur here, crashing the game. (this is rare however.)
             self.exitLevel(self.coordinates())
             return True

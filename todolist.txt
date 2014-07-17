@@ -65,6 +65,8 @@ MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mechanics, etc.
 
 IMMEDIATE STUFF: most immediate
 
+# fix the problem where the player bounces up and down on stairs.
+# this may be related to another issue where the player collides with doors wrong.
 
 # TODO: make the "hit spark" better (and possibly more general)
     - consider other ways to show that something is being damaged

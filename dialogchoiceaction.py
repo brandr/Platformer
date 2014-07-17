@@ -1,11 +1,10 @@
 """ A specific type of gameaction to be used when the player is given a dialog choice.
+NOTE: this may be outdated. Not sure if it's used anywhere.
 """
 
 from gameaction import *
 
 class DialogChoiceAction(GameAction):
-	""" TODO: docstring
-	"""
 
 	def __init__(self, choice_data):
 		#IDEA: could make this inherit from dialog instead of gameaction

@@ -64,7 +64,7 @@ class Being(Entity):
         Currently, Beings cannot be shaded based on light value, but we could probably have them be darkened
         completely for a value of 0 if this works well for the gameplay.
         """
-        if self.currenttile() == None: return
+        if self.current_tile() == None: return
         GameImage.updateAnimation(self, 256) 
 
     def updatePosition(self):
