@@ -19,6 +19,10 @@ class RoomFactory(object):
 
 	@staticmethod
 	def dungeon_rooms(dungeon, room_data_set):
+		""" rf.dungeon_rooms( Dungeon, [ [ RoomData ] ] ) -> [ [ Room ] ]
+
+		TODO
+		"""
 		rooms = []
 		x1, y1 = RoomFactory.origin(room_data_set)
 		x2, y2 = RoomFactory.lower_right(room_data_set)
