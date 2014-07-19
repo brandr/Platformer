@@ -6,10 +6,16 @@ from nonplayercharacter import *
 #about NPCs that appear in more than one area.
 
 class NPCFactory:
-	""" TODO: docstring
+	""" No constructor.
 	"""
 	@staticmethod
 	def init_NPC(npc, name):
+		""" init_NPC( NonPlayerCharacter, str ) -> None
+
+		Temporary method which initializes the NPC's dialog tree and name.
+		I'm not sure how I want dialog trees to be stored and assigned to NPCs.
+		They shouldn't have to be too complex, so it might be possible to just hardcode them.
+		"""
 		npc.name = name
 
 		#TEMP FOR TESTING
@@ -24,7 +30,7 @@ class NPCFactory:
 START = "start"
 TEST_KENSTAR_TIRED = "test_kenstar_tired"
 
-# for now, possible dialog trees go here.
+# for now, test dialog trees go here.
 
 TEST_KENSTAR_START_DIALOG_TREE = (
 	[

@@ -6,7 +6,23 @@ from gameevent import *
 from dialogchoice import *
 
 class NonPlayerCharacter(Being):
-	""" TODO: docstring
+	""" NonPlayerCharacter( AnimationSet, int, int ) -> NonPlayerCharacter
+
+	The player can talk to most NPCs. Since they are non-hostile by definition,
+	they generally sholudn't do much else unless they give the player an item or
+	are associated with some kind of quest.
+
+	Attributes:
+
+	x_interactable: Flags that the player can interact (talk) with the NPC by pressing X.
+
+	scrolling: Flags that text in the NPC's dialog box scrolls instead of appearing all at once.
+
+	name: A currently unused string represeting the NPC's name. Will probably be a key to access dialog trees at some point.
+
+	active: Causes the NPC to perform actions like pacing around or turning to face the player.
+
+	direction_id: String to determine the NPC's animation.
 	"""
 	def __init__(self, animations, x, y):
 		Being.__init__(self, animations, x, y)
@@ -21,15 +37,28 @@ class NonPlayerCharacter(Being):
 		self.right = False #TEMP
 
 	def get_name(self):
+		""" npc.get_name( ) -> str
+
+		A probably useless getter. (Durrr getters in python isshy geddit)
+		"""
 		return self.name
 
-	def get_source(self): # get_source is used to make dialog trees work properly.
+	def get_source(self): 
+		""" npc.get_source( ) -> NonPlayerCharacter
+
+		A general method used to make dialog trees work properly whether the source of the dialog is an NPC or a sign.
+		"""
 		return self
 
 	def update(self, player):
+		""" npc.update( Player ) -> None 
+
+		Updates the NPC's animation and make it face towards the player.
+		"""
 		self.changeAnimation('idle', self.direction_id)
 		if self.active:
 			self.NPC_update(player)
+
 		#TEMP	
 		if(self.right):
 			self.xvel = 4
@@ -41,10 +70,19 @@ class NonPlayerCharacter(Being):
 		Being.update(self, player)
 		Being.updatePosition(self)
 
-	def NPC_update(self, player):	#NOTE: might want some NPCs to walk around instead of doing this. Not sure.
+	def NPC_update(self, player):	
+		""" npc.NPC_update( Player ) -> None 
+
+		Makes the NPC face towards the player.
+		NOTE: might want some NPCs to walk around instead of doing this. Not sure.
+		"""
 		self.face_towards(player)
 
 	def face_towards(self, target):
+		""" npc.face_towards( Being ) -> None
+
+		Figure out if the player is to the left or to the right of this NPC, and face in that direction.
+		"""
 		if(target != None):
 			x_dist = target.coordinates()[0] - self.current_tile().coordinates()[0]
 			if x_dist == 0: return
@@ -55,15 +93,26 @@ class NonPlayerCharacter(Being):
 				self.direction_id = 'right'
 
 	def set_active(self, active):
+		""" npc.set_active( bool ) -> None
+
+		HERP DERP LOOK AT ME I USE SETTERS IN PYTHON XD XD 
+		(for real though, if something else should happen when the NPC becomes active then we'll have a use for this)
+		"""
 		self.active = active
 
 	def temp_stop_method(self, arg = None):
+		# no docstring because temp
 		self.left, self.right, self.up, self.down = False, False, False, False	
 
 	def temp_npc_right_method(self, arg = None): #TEMP for testing
+		# no docstring because temp
 		self.right = True
 
 	def init_dialogs(self, dialog_tree):
+		""" npc.init_dialogs( ? ) -> None
+
+		TODO: fill this out if we need to change the dialog system.
+		"""
 		start_dialog_set = self.build_dialog_set(dialog_tree[0])
 		start_action_data = dialog_tree[1]
 		if(start_action_data):
@@ -71,11 +120,19 @@ class NonPlayerCharacter(Being):
 		self.first_dialog = start_dialog_set[0]
 
 	def init_dialog_set(self, dialog_set, action_data):
+		""" npc.init_dialog_set( ?, ? ) -> None
+
+		TODO: fill this out if we need to change the dialog system.
+		"""
 		action_key = action_data[0]
 		build_method = BUILD_METHOD_MAP[action_key]
 		return build_method(self, dialog_set, action_data)
 
 	def build_dialog_choice_set(self, dialog_set, action_data):
+		""" npc.build_dialog_choice_set( ?, ? ) -> None
+
+		TODO: fill this out if we need to change the dialog system.
+		"""
 		start_choice_text_data = action_data[1]
 		start_choice_list = action_data[2]
 		portrait_filename = self.build_portrait_filename(start_choice_text_data[1])
@@ -85,6 +142,10 @@ class NonPlayerCharacter(Being):
 		return dialog_set
 
 	def add_dialog_set(self, start_dialog_set, add_dialog_data):
+		""" npc.add_dialog_set( ?, ? ) -> None
+
+		TODO: fill this out if we need to change the dialog system.
+		"""
 		next_dialog_data = add_dialog_data[1]
 		next_dialog_set = self.build_dialog_set(next_dialog_data)
 		next_action_data = add_dialog_data[2]
@@ -94,6 +155,10 @@ class NonPlayerCharacter(Being):
 		return start_dialog_set
 
 	def build_action_set(self, dialog_set, action_data):
+		""" npc.init_dialogs( ?, ? ) -> None
+
+		TODO: fill this out if we need to change the dialog system.
+		"""
 		action_data_set = action_data[1]
 		action_set = []
 		for a in action_data_set:
@@ -108,15 +173,27 @@ class NonPlayerCharacter(Being):
 		return dialog_set
 
 	def setup_next_dialog(self, dialog_set, action_data):	#no need to check for next action because this is done at the very end only.
+		""" npc.setup_next_dialog( ?, ? ) -> None
+
+		TODO: fill this out if we need to change the dialog system.
+		"""
 		dialog_key = action_data[1]
 		action = GameAction(NonPlayerCharacter.change_current_dialog, 0, self, dialog_key)
 		dialog_set[-1].add_next_action(action)
 		return dialog_set
 
 	def change_current_dialog(self, dialog_key):
+		""" npc.change_current_dialog( str ) -> None
+
+		Change the dialog that will appear if the player talks to the NPC, using a dict.
+		"""
 		self.dialog_tree = self.dialog_tree_map[dialog_key] #might want error checking here
 
 	def build_dialog_set(self, dialog_data):
+		""" npc.build_dialog_set( ? ) -> None
+
+		TODO: fill this out if we need to change the dialog system.
+		"""
 		dialog_set = []
 		for d in dialog_data:
 				portrait_filename = self.build_portrait_filename(d[1])
@@ -127,14 +204,26 @@ class NonPlayerCharacter(Being):
 		return dialog_set
 		
 	def execute_x_action(self, level, player):
+		""" npc.execute_x_action( Level, Player ) -> None
+
+		Execute this NPC's dialog event when the player presses X nearby.
+		"""
 		self.execute_event(level)
 
 	def execute_event(self, level):
+		""" npc.execute_event( Level ) -> None
+
+		Set up this NPC's dialogs and open the dialog box onscreen.
+		"""
 		self.init_dialogs(self.dialog_tree)
 		event = GameEvent([self.first_dialog])
 		event.execute(level)
 
 	def build_portrait_filename(self, key):
+		""" npc.build_portrait_filename( str ) -> str
+
+		Use the NPC's name concatenated with a string key (represeting a facial expression) to make the filename for the current portrait.
+		"""
 		if self.name == None:
 			return None
 		return "portrait_" + self.name + "_" + key + ".bmp"
