@@ -1,10 +1,14 @@
-# This class handles sprite sheets
-# This was taken from www.scriptefun.com/transcript-2-using
-# sprite-sheets-and-drawing-the-background
-# I've added some code to fail if the file wasn't found..
-# Note: When calling images_at the rect is the format:
-# (x, y, x + offset, y + offset)
- 
+"""
+NOTE: not written by me (Robert).
+
+This class handles sprite sheets
+This was taken from www.scriptefun.com/transcript-2-using
+sprite-sheets-and-drawing-the-background
+I've (not Robert) added some code to fail if the file wasn't found..
+Note: When calling images_at the rect is the format:
+(x, y, x + offset, y + offset)
+"""
+
 import pygame
 import copy
  
@@ -36,6 +40,6 @@ class SpriteSheet(object):
     # Load a whole strip of images
     def load_strip(self, rect, image_count, colorkey = None):
         "Loads a strip of images and returns them as a list"
-        tups = [(rect[0]+rect[2]*x, rect[1], rect[2], rect[3])
+        tups = [(rect[0] + rect[2]*x, rect[1], rect[2], rect[3])
                 for x in range(image_count)]
         return self.images_at(tups, colorkey)

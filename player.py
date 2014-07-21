@@ -1,3 +1,6 @@
+""" The only being directly controlled by the person playing the game.
+"""
+
 from being import *
 from lantern import *
 from exitblock import *
@@ -6,6 +9,23 @@ from platform import *
 from sword import * #TEMP
 
 class Player(Being):
+    """ Player( AnimationSet, Level ) -> Player
+
+    The player's inheritance from Being handles most, but not all of the physics that apply to it.
+    A lot of mechanics like inventory and health have not been implemented for the player yet.
+
+    Attributes:
+
+    active: This flags whether the player is affected by gravity and keyboard input.
+
+    can_jump: This flags whether pressing space will make the player jump.
+
+    left, right, down, up, space, control, x: these represent keyboard inputs that make the player move.
+
+    movement_state: a string key used to map the player's current conditions to the proper physics that should affect him.
+
+    lantern: Currently represents the player's lantern, if he has one. This may be wrapped in inventory later on.
+    """
     def __init__(self, player_animations, start_level):
         Being.__init__(self, player_animations)
         self.changeAnimation('idle','right')
@@ -26,7 +46,7 @@ class Player(Being):
         #TEMP
 
     def temp_z_method(self):    
-        #TEMP
+        #TEMP (no docstring)
         #TODO: find some way to pass this directional check into the sword itself.
         self.sword.activate(32, 0, self.direction_id) 
         #TODO: make a sword-swinging animation for the player, and set it so that the player cannot face the other way if moving left while swinging right (i.e., he just walks backwards)
@@ -34,6 +54,10 @@ class Player(Being):
 
     @staticmethod
     def load_player_animation_set():
+        """ load_player_animation_set( ) -> AnimationSet
+
+        Load all animations that the player can use and put them into an AnimationSet object.
+        """
         player_rect = Rect(0, 0, 32, 64)
         filepath = './LevelEditor/animations/player/'
         
@@ -73,21 +97,46 @@ class Player(Being):
         return animation_set
 
     def deactivate(self):
+        """ p.deactivate( ) -> None
+
+        Make the player unable to move, as for a cutscene.
+        """
         self.active = False
         self.up, self.down, self.left, self.right, self.space, self.control, self.x = False, False, False, False, False, False, False
 
     def activate(self):
+        """ p.activate( ) -> None
+
+        >setters in python
+        >2014
+        """
         self.active = True
 
     def update(self, tiles, light_map):
+        """ p.update( [ [ Tile ] ], [ [ double ] ]) -> None
+
+        Exit the level if the player is outside its boundaries.
+        Otherwise, figure out the current movement state and apply physics accordingly.
+        All entities that "care" about the player (monsters, NPCs, etc.) then act.
+        Afterwards, update the player's view (indirectly updating the screen).
+        """
         if(self.exitLevelCheck()): return
         update_method = MOVEMENT_STATE_MAP[self.movement_state]
         update_method(self)
         self.lantern_update()
         Being.updatePosition(self)
+        player_interactables = self.current_level.player_interactables()
+        for e in player_interactables:      
+            e.update(self)
         self.updateView(tiles, light_map)
 
-    def default_move_update(self):#, tiles, light_map = None):   #consider separating midair update into its own method if this gets too complex.
+
+    def default_move_update(self):  #consider separating midair update into its own method if this gets too complex.
+        """ p.default_move_update( ) -> None
+
+        Check which buttons are currently being pressed and move the player accordingly.
+        This is a little complicated, so I can go more in-depth if necessary.
+        """
         up, down, left, right, space, running, x = self.up, self.down, self.left, self.right, self.space, self.control, self.x
         self.xvel = 0
         if x:
@@ -141,9 +190,18 @@ class Player(Being):
                     self.xvel = 0
 
     def bounce_move_update(self):
+        """ p.bounce_move_update( ) -> None
+
+        Calls the player's bounce method. This is generally done if the player has just been knocked back by an enemy.
+        """
         self.bounce()
 
     def ladder_move_update(self):
+        """ p.ladder_move_update( ) -> None
+
+        This update is called if the player is grabbing onto a ladder. Note that this doesn't happen if the player is in collision with the ladder,
+        only if he actually "grabs" it by pressing up.
+        """
         #TODO: ladder climbing animations go here
         up, down, left, right, space, running, x = self.up, self.down, self.left, self.right, self.space, self.control, self.x
         self.xvel, self.yvel = 0, 0
@@ -166,10 +224,19 @@ class Player(Being):
             self.direction_id = 'right'
 
     def lantern_update(self):
+        """ p.lantern_update( ) -> None
+
+        Update the player's lantern (draining oil) if the player is underground and holding a lantern.
+        """
         if self.lantern and self.active and not self.current_level.outdoors:
             self.lantern.oil_update()
 
     def x_action_check(self):
+        """ p.x_action_check( ) -> None
+
+        If the player presses x, the first thing he is found to be in range of is activated.
+        This includes doors, signs, and NPCs.
+        """
         x_interactables = self.current_level.x_interactable_objects()
         for x in x_interactables:
             if x.in_interact_range(self) or pygame.sprite.collide_rect(self, x):
@@ -177,12 +244,20 @@ class Player(Being):
                 return
 
     def x_interact(self, interactable):
+        """ p.x_interact( ? ) -> None
+
+        This is an extension of x_action_check.
+        """
         interactable.execute_x_action(self.current_level, self)
      
      #this gets laggy when there is too much light. try to fix it. (might have to fix other methods instead)
     def updateView(self, all_tiles, light_map): #note: this is only to be used in "cave" settings. for areas that are outdoors, use something else.
+        """ p.updateView( [ [ Tile ] ], [ [ double ] ]) -> None
+
+        Use the given light map of the level to figure out how bright each tile should be (assuming the player is underground).
+        This updates the player's view and makes visible light sources emit light.
+        """
         level = self.current_level
-        player_interactables = level.player_interactables()
         lanterns = level.getLanterns()
 
         coords = self.coordinates()
@@ -192,15 +267,14 @@ class Player(Being):
         end_y = min(len(all_tiles), coords[1] + self.sight_dist() + 2)
 
         GameImage.updateAnimation(self, 256) 
-        for e in player_interactables:      #TODO: move this and other parts to a different method, since they have nothing to do with view.
-            e.update(self)
+        
         if(self.current_level.outdoors):
             return
         nearby_light_sources = []
         far_light_sources = []
         for l in lanterns:
             l.update(self)
-            if self.invisionrange(l):
+            if self.in_vision_range(l):
                 nearby_light_sources.append(l)
             else:
                 far_light_sources.append(l)
@@ -209,27 +283,41 @@ class Player(Being):
         self.emit_light(self.sight_dist(), all_tiles, light_map, nearby_light_sources)
 
     def sight_dist(self):
+        """ p.sight_dist( ) -> int 
+
+        Returns the radius of light that the player's lantern should emit.
+        """
         if self.lantern and not self.lantern.is_empty():
             return self.lantern.light_distance()
-        return 0 #TODO: get sight_dist from self.lantern
+        return 0 
 
-    def invisionrange(self, other):	#checks if the player can see a platform
+    def in_vision_range(self, other):	
+        """ p.in_vision_range( ? ) -> bool 
+
+        Checks if the player can see the given object in the dark.
+        """
         if(self.withindist(other, self.sight_dist() + other.light_distance())):
             return True
         else:
             return False 
 
             #this could probably be moved up in inheritance
-    def getpoint(self, start, end, slope, x):
+    def get_point(self, start, end, slope, x):
+        # this seems to be unused, but I don't want to get rid of it unless I'm sure.
         p = start
         if(start[0] > end[0]): 
             p = end
-        y = p[1] + slope*(x - op[0])
+        y = p[1] + slope*(x - p[0])
         return (x, y)
 
     #TODO: collidewith could be an abstract method in the object we collide with
-    #TODO: could speed this method up by only collecting collidable objects near the player.
+    #TODO: could speed this method up by only checking collidable objects near the player.
     def collide(self, xvel, yvel):
+        """ p.collide( int, int ) -> None
+
+        The player collides with any adjacent objects that he is in contact with.
+        This includes stopping against platforms, being hit by monsters, absorb pickups, etc.
+        """
         level = self.current_level
         platforms = level.get_impassables() #TODO: remember that it might be possible to pass through some platforms in some directions.
         slopes = []
@@ -250,7 +338,12 @@ class Player(Being):
         if(self.bounce_count <= 0):
             self.collideMonsters(xvel, yvel)
 
-    def collide_ladder(self): #note that this is a boolean, not an action. (might be a more general and efficient way to implement the check for what object(s) the player is currently colliding with)
+    def collide_ladder(self): #
+        """ p.collide_ladder( ) -> bool
+
+        Note that this is a boolean, not an action. (might be a more general and efficient way to implement the check for what object(s) the player is currently colliding with.)
+        This is called if the player presses up, and checks to see whether the player grabs onto a ladder.
+        """
         ladders = self.current_level.getLadders()
         for l in ladders:
             if pygame.sprite.collide_rect(self, l):
@@ -258,6 +351,11 @@ class Player(Being):
         return False
 
     def collideExits(self):
+        """ p.collideExits( ) -> None
+
+        Check if the player should leave the level.
+        The way this method is written sort of confuses me, because the exit blocks are supposed to stop the player from leaving the level.
+        """
         exits = self.current_level.get_exit_blocks()
         for e in exits:
             if pygame.sprite.collide_rect(self, e):
@@ -265,6 +363,10 @@ class Player(Being):
                 return
 
     def collidePickups(self):
+        """ p.collidePickups( ) -> None
+
+        The player absorbs any pickups he is in contact with.
+        """
         level = self.current_level
         pickups = level.getPickups()
         for p in pickups:
@@ -273,6 +375,11 @@ class Player(Being):
                 return
 
     def collideLanterns(self):
+        """ p.collideLanterns( ) -> None
+
+        The player picks up any lanterns he is touching.
+        This may change if the player instead gets lanterns from a chest, has to press a button to pick them up, etc.
+        """
         level = self.current_level
         lanterns = level.getLanterns()
         for l in lanterns:
@@ -281,16 +388,24 @@ class Player(Being):
                 return
 
     def pick_up(self, pickup):
+        """ p.pick_up( Pickup ) -> None
+
+        The player absorbs a pickup, removing it from the level.
+        """
         pickup.delete()
         pickup.take_effect(self)
 
-        #TEMP METHOD
+        #TEMP METHOD (therefore no docstring)
     def pick_up_lantern(self, lantern):
         lantern.delete()
         self.lantern = lantern
         #TEMP METHOD
 
     def collideMonsters(self, xvel, yvel):
+        """ p.collideMonsters( int, int ) -> None
+
+        If the player is touching any monsters, he gets hurt and bounces off of them.
+        """
         x_direction_sign = 1
         y_direction_sign = 1
         level = self.current_level
@@ -314,15 +429,27 @@ class Player(Being):
                     break #makes sure the player can only collide with one monster per cycle
 
     def bounce(self):
+        """ p.bounce( ) -> None
+
+        The player performs one frame of being bounced away from an enemy.
+        """
         if(self.bounce_count <= 0): 
             self.movement_state = DEFAULT_MOVEMENT_STATE
             return
         self.bounce_count -= 1
 
     def light_distance(self):
+        """ p.light_distance( ) -> int
+
+        Returns the radius of light emitted by the player in darkness.
+        """
     	return self.sight_dist()
 
     def exitLevelCheck(self):
+        """ p.exitLevelCheck() -> bool
+
+        Checks whether the player is outside the level and send him to the adjacent level in that direction if necessary.
+        """
         if(self.current_tile() == None):
             #a bug can sometimes occur here, crashing the game. (this is rare however.)
             self.exitLevel(self.coordinates())
@@ -330,15 +457,32 @@ class Player(Being):
         return False
 
     def exitLevel(self, coords):
+        """ p.exitLevel( ( int, int ) ) -> None 
+
+        Move the player to the proper adjacent level.
+        This is called if the player is outside the current level.
+        """
         self.current_level.movePlayer(coords)
 
     def pause_game(self):
+        """ p.pause_game( ) -> None
+
+        Pause the game and open the pause screen (which is currently the map screen).
+        """
         self.current_level.pause_game(self)
 
     def unpause_game(self):
+        """ p.unpause_game( ) -> None
+
+        Resume normal gameplay.
+        """
         self.current_level.unpause_game(self)
 
     def get_lantern(self):
+        """ p.get_lantern( ) -> Lantern
+
+        AHAHAHAHAHAHAHAHA oh wait you're serious
+        """
         return self.lantern
 
 DEFAULT_MOVEMENT_STATE = "default_movement_state"

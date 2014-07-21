@@ -9,10 +9,16 @@ PICKUP_CONSTRUCTOR_MAP = {
 }
 
 class PickupFactory:
-	""" TODO: docstring"""
+	""" No constructor.
+	"""
 
 	@staticmethod
 	def build_entity(raw_pickup_image, pickup_rect, pickup_data, x, y):
+		""" build_entity( Surface, Rect, TileData, int, int ) -> Pickup
+
+		Use the pickup's entity key to figure out what type of pickup it is, then build it with the appropriate constructor.
+		Deciding between animated and still animations is important, though I think animated makes more sense.
+		"""
 		still_entity_image = GameImage.still_animation_set(raw_pickup_image, pickup_rect)	#TEMP (change to animated once this simpler version works, or allow both animated and still)
 		pickup_key = pickup_data.entity_key
 		constructor = PICKUP_CONSTRUCTOR_MAP[pickup_key]

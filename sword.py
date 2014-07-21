@@ -6,7 +6,8 @@ from entityeffect import *
 from pygame import image, Rect #TEMP (give this to factory later, maybe)
 
 class Sword(SubEntity): #TODO: different inheritance system (maybe add an intermediate "weapon" class and make sword not its own class?)
-	""" TODO: docstring """
+	""" No docstrings since this class is probably temporary. 
+	"""
 	
 	#TODO: implement:
 	# -collisions with other objects (like monsters)

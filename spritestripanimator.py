@@ -1,3 +1,6 @@
+""" NOTE: this class was not written by Robert.
+"""
+
 from spritesheet import *
  
 class SpriteStripAnimator(object):

@@ -1,8 +1,20 @@
+""" A factory used to build tiles. Not done yet.
+"""
 from gameimage import *
 
 class TileFactory(object):
+	""" TileFactory( Surface, ( int, int ) ) -> TileFactory
 
-	#this setup might be useful for reading in an entire level of tiles, which in turn is read in from an image.
+	Currently just takes an image showing one or two tiles and fills a 2D list with them. So far, it's only used to 
+	store a sky tile and a cave tile.
+	However, this setup might be useful for reading in an entire level of tiles, which in turn is read in from an image.
+	It would be necessary in this case to make images representing the background of every level, though this might be an
+	added functionality for the leveleditor.
+	
+	Attributes:
+
+	tile_images: A 2D grid of tile images.	
+	"""
 	def __init__(self, tile_sheet_image, dimensions):
 		self.tile_images = []
 		default_rect = Rect(0, 0, 32, 32)
@@ -16,8 +28,16 @@ class TileFactory(object):
 				self.tile_images[y].append(image)
 
 	def image_at(self, coords):
+		""" tf.image_at( ( int, int ) ) -> Surface
+
+		Return the tile image at the given coordinates.
+		"""
 		return self.tile_images[coords[1]][coords[0]]
 	
 	def tile_at(self, coords):
+		""" tf.tile_at( ( int, int ) ) -> AnimationSet
+
+		Return an AnimationSet (though it's not animated) for the tile at the given coordinates.
+		"""
 		tile_image = self.image_at(coords)
 		return GameImage.still_animation_set(tile_image)

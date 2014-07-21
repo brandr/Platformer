@@ -1,36 +1,73 @@
+""" A data object used to generate a room.
+"""
+
 from signdata import *
 
 ROOM_WIDTH = 28
 ROOM_HEIGHT = 20
 
 class RoomData(object):
-	"""docstring for RoomData"""
+	""" RoomData( int, int, int, int ) -> RoomData
+
+	A roomdata defines a room full of tiledatas as a cell in a 2D gird representing the dungeon.
+	It is initialzied with an empty tiledata set.
+
+	Attributes:
+
+	x, y: The coordinates of the room in the dungeon.
+
+	tiles: The grid of tiledatas in the room.
+	"""
 	def __init__(self, width, height, x, y):
 		self.global_x, self.global_y = x, y
 		self.tiles = RoomData.empty_tile_set(width, height)
 	
 	def empty(self):
+		""" rd.empty( ) -> bool
+
+		Return True if there is anything in the room besides empty tiles.
+		"""
 		for row in self.tiles:
 			for t in row:
 				if t != None: return False #NOTE: because of this, if we make it possible to clear tiles, doing so should set those tiles to None.
 		return True
 
-	def tile_at(self,x,y):
+	def tile_at(self, x, y):
+		""" rd.tile_at( int, int ) -> TileData
+
+		Returns the tiledata at the given coordinates.
+		"""
 		return self.tiles[y][x]
 
 	def setAllTiles(self, tile_set):
+		""" rd.setAllTiles( [ [ TileData ] ] ) -> None
+
+		Take a 2D list of tiledatas and set the tiledatas in this roomdata's list to the ones given.
+		"""
 		rows, cols = len(tile_set),len(tile_set[0])
 		for y in xrange(rows):
 			for x in xrange(cols):
 				self.tiles[y][x] = tile_set[y][x]
 	
 	def set_tile(self, tile_data, col, row):
+		""" rd.set_tile( TileData, int, int ) -> None
+
+		Set the tile at the given coordinates to the given tiledata.
+		"""
 		self.tiles[row][col] = tile_data #might benefit from a special setter if tiledata becomes more complex.
 
 	def formatted_data(self):
+		""" rd.formatted_data( ) -> ( int, int, [ [ ( str, str, int, int ) ] ] ) 
+
+		Converts this RoomData into primitive types for the purpose of saving to a file.
+		"""
 		return (self.global_x, self.global_y, self.formatted_tile_set()) #might need to format tiles
 
 	def formatted_tile_set(self):
+		""" rd.formatted_tile_set( ) -> [ [ ( str, str, int, int )  ] ]
+
+		Converts the tiledatas into primitive types for the purpose of saving to a file.
+		"""
 		tiles = []
 		for y in xrange (len(self.tiles)):
 			tiles.append([])
@@ -44,6 +81,10 @@ class RoomData(object):
 
 	@staticmethod
 	def deformatted_room_set(formatted_data, filepath = "./"):	
+		""" deformatted_room_set( [ [ ( int, int, [ [ ( str, str, int, int ) ] ] ) ] ], str ) -> [ [ RoomData ] ]
+
+		Takes a list of formatted RoomDatas (loaded from a file) and converts them into usable RoomData objects.
+		"""
 		rooms = []
 		for y in xrange (len(formatted_data)):
 			rooms.append([])
@@ -57,6 +98,11 @@ class RoomData(object):
 
 	@staticmethod
 	def deformatted_room(formatted_data, filepath = "./"):	
+		""" deformatted_room( ( int, int, [ [ ( str, str, int, int ) ] ] ) ) -> RoomData 
+
+		Takes a formatted RoomData (loaded from a file) and converts it into a usable RoomData object.
+		This is effectively a reversal of the formatted_data() method.
+		"""
 		x, y = formatted_data[0], formatted_data[1]
 		tile_set = RoomData.deformatted_tile_set(formatted_data[2], filepath) #have to deformat tiles before returning the room_data.
 		width, height = len(tile_set[0]), len(tile_set) #might need a None exeception handler
@@ -66,6 +112,10 @@ class RoomData(object):
 
 	@staticmethod
 	def deformatted_tile_set(formatted_data, filepath = "./"):
+		""" deformatted_tile_set( [ [ ( str, str, int, int ) ] ] , str ) -> [ [ TileData ] ]
+
+		Builds a grid of tiledatas for a roomdata using a grid of data loaded from a file. 
+		"""
 		tiles = []
 		for y in xrange (len(formatted_data)):
 			tiles.append([])
@@ -81,6 +131,12 @@ class RoomData(object):
 
 	@staticmethod
 	def addTiles(tiles, formatted_data, x_pos, y_pos, filepath = "./"):
+		""" addTiles( [ [ TileData ], ( str, str, int, int ), int, int, str ] ) -> None
+
+		Use the formatted tiledata (from file) to build a usable TileData object and place it in the given "tiles"
+		grid, expanding the grid if necessary. Note that this will also look at the dimensions of the TileData objects and
+		mark tile slots that they will block.
+		"""
 		width = formatted_data[2]
 		height = formatted_data[3]
 		origin_tile = RoomData.deformatted_tile(formatted_data, filepath)
@@ -92,7 +148,11 @@ class RoomData(object):
 				tiles[y][x] = BlockedTileData(origin_tile, x_pos, y_pos)
 
 	@staticmethod
-	def deformatted_tile(formatted_data, filepath = "./"):	#this will need to change as this class's constructor does.
+	def deformatted_tile(formatted_data, filepath = "./"):	#this will need to change as the tiledata's constructor does.
+		""" deformatted_tile( ( str, str, int, int ) ) -> TileData
+
+		Take a tuplet of primitive data loaded from a file and turn it into a usable TileData object.
+		"""
 		entity_key = formatted_data[0]
 		tile_data = None
 		if entity_key in TILE_INIT_MAP:
@@ -104,12 +164,20 @@ class RoomData(object):
 
 	@staticmethod
 	def deformatted_sign(formatted_data, filepath):	#this will need to change as this class's constructor does.
+		""" deformatted_sign( ( str, str, int, int, [ str ] ), str ) -> SignData
+
+		Take a tuplet of primitive data loaded from a file and turn it into a usable SignData object.
+		"""
 		sign_data = SignData(formatted_data[0], formatted_data[1], filepath)
 		sign_data.text_panes = formatted_data[4]
 		return sign_data
 
 	@staticmethod
 	def empty_tile_set(width, height):
+		""" empty_tile_set( int, int ) -> [ [ None ] ]
+
+		Builds a 2D list of the given dimensions. This list is then used to store TileDatas.
+		"""
 		tiles = []
 		for y in xrange(height):
 			tiles.append([])

@@ -5,7 +5,19 @@ from gamescreen import *
 from mappane import *
 
 class PauseScreen(GameScreen):
-	""" TODO: docstring """
+	""" PauseScreen( ControlManager, Player) -> PauseScreen
+
+	Currently, the pause screen only shows the map pane. If there are multiple screens then this class
+	will need to be restructured.
+
+	Attributes:
+
+	player: The player whose location is shown on the map pane.
+
+	pause_panes: The set of panes shown onscreen while the game is paused.
+
+	current_pane: The pane being shown right now.
+	"""
 	def __init__(self, control_manager, player):
 		GameScreen.__init__(self, control_manager) #TODO
 		self.player = player

@@ -61,7 +61,7 @@ class Monster(Being):
         self.changeAnimation('idle','left')
 
         self.wait_count = 20        # TEMP. As monster behavior gets more complex, find other ways to set timers.
-        self.hit_points = Nones
+        self.hit_points = None
 
     def monster_init(self, name):
         """ m.monster_init( str ) -> None

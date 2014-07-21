@@ -22,51 +22,19 @@
 
     remaining classes to docstring:
 
-    being
-    camera
-    dungeon
-    dungeonfactory
-    entity
-    entityfactory
-
-    (delete entityimage.pyc)
-
-    exitblock
-    gameimage
-    lantern
-    level
-    levelfactory
-    levelobjects
-
-    (delete levelselectcell.py)
-
-    monster
-    platform
-    platformfactory
-    player
-
-    (delete pygame2exe.py and pythontest.py)
-
-    room
-    roomfactory
-    spritesheet
-    spritestripanimator (I think someone else wrote it)
-    tile
-    tilefactory
-
-    (some classes are not listed here)
-    (Also do this for all LevelEditor classes)
+    (all LevelEditor classes)
 
 MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mechanics, etc. once all immediate stuff is finished.
     - the next demo should include inventory screen and lantern mechanics based on fading light/oil
-
 
 -------------------------------------------------------------------
 
 IMMEDIATE STUFF: most immediate
 
+# figure out how tile images will be loaded. (Look at tilefactory for the general structure I'll work.)
+
 # fix the problem where the player bounces up and down on stairs.
-# this may be related to another issue where the player collides with doors wrong.
+    - this may be related to another issue where the player collides with doors wrong.
 
 # TODO: make the "hit spark" better (and possibly more general)
     - consider other ways to show that something is being damaged

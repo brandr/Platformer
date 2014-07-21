@@ -1,34 +1,57 @@
+""" A single square on a level that has an image on it and may contain a block.
+"""
+
 import pygame
 from pygame import Rect, Color, Surface
 from math import *
 from gameimage import *
 
 class Tile(GameImage):
-    """
-    Tile( AnimationSet, int, int ) -> Tile
-    
+    """ Tile( AnimationSet, int, int ) -> Tile
+
+    A tile does not keep track of all entities that pass through it, since they do not lock to tiles.
+    However, it does keep track of blocks such as platforms, ladders, and doors.
+
+    Attributes:
+
+    unseen_color: The color the tile will appear as in complete darkness.
+
+    block: The object that is locked to this tile. It generally cannot move and can only be removed.
+
+    mapped: Marks whether the Tile has been seen by the player. This is generally only relevant if there is a block in the tile.
     """
     def __init__(self, tile_sprites, x , y): 
-        GameImage.__init__(self, tile_sprites)#Rect(0, 0, 32, 32)) #TODO: replace with some getter (or arg) representing the tile's sprite.
+        GameImage.__init__(self, tile_sprites) #TODO: replace with some getter (or arg) representing the tile's sprite. (Note: what did I mean when I wrote this)
         self.unseen_color = Color("#000000")
         self.rect = Rect(x, y, 32, 32)
         self.block = None
         self.mapped = False
 
     def changeImage(self, image = None):
+        """ t.changeImage( Surface ) -> None
+
+        Change the image displayed on the tile. Note that this will not affect the block's image if there is a block.
+        """
         if(image != None):
             self.default_image = image
             self.image = image
 
     def reset(self):
+        """ t.reset( ) -> None
+
+        Refresh the tile so that it is empty and shows its default image properly.
+        """
         brightness = self.image.get_alpha()
-        tile_image = self.default_image
-        self.image = tile_image
+        self.image = self.default_image
         self.image.set_alpha(brightness)
         self.image.convert()
         self.block = None
 
     def updateimage(self, lightvalue = 0):
+        """ t.updateimage( int ) -> None
+
+        Updates the tile image as a black square with this tile's block behind it, or just set this tile's image to the default image if there's no block.
+        """
         if(self.block != None): 
             self.image = Surface((32, 32))
             self.image.blit(self.block.image, (0, 0))
@@ -36,20 +59,13 @@ class Tile(GameImage):
             if self.block.is_square:        #TODO: if people are bothered by the effect, make it so non-square blocks are not transparent in caves.
                 return
         GameImage.updateimage(self, lightvalue)
-        #self.image.set_alpha(lightvalue) #TEMP
-
-    def darkenTo(self, lightvalue):
-        GameImage.darkenTo(self, lightvalue)
-        if(self.block != None): 
-            self.block.darkenTo(0)
-
-    def fullyDarken(self):
-        GameImage.fully_darken(self)
-        if(self.block != None):
-            self.block.fully_darken()
-    #emit_light: light is emitted in a circle from the tile, stopping at solid walls.
 
     def emit_light(self, dist, tiles, light_map, otherlights = []):
+        """ emit_light( int, [ [ Tile ] ], [ [ double ] ], [ ? ]) -> None
+
+        Light is emitted in a circle from the tile, stopping at solid walls.
+        This is a very complicated algortihm so hopefully we won't have to change it.
+        """
     	if otherlights != None:
     	    for o in otherlights:
     		    o.update_light(tiles, light_map)
@@ -62,7 +78,33 @@ class Tile(GameImage):
             if nexttile != None:
                 nexttile.spreadlight(dist - 1, tiles, light_map, 1, (d[0], d[1]), False, None, otherlights)
 
-    def spreadlight(self, dist, tiles, light_map, iteration = 0, direction = None, lineflag = False, brightness = None, otherlights = []):#might be more efficienct  ways to do this
+    def spreadlight(self, dist, tiles, light_map, iteration = 0, direction = None, lineflag = False, brightness = None, otherlights = []):
+        """ t.spreadlight( int, [ [ Tile ] ], [ [ double ] ], int, ( int, int ), bool, int, [ ? ] ) -> None
+
+        After many iterations, this is the most efficient algortihm I have come up with to handle light spreading. 
+        Note that emit_light is called on the center tile, which calls this on adjacent tiles.
+        This method is recursive, spreading slightly dimmer light the further it goes from the center tile.
+         
+        The dist arg represents the remaining distance a "ray" of light can travel. From the center, it starts at the light
+        radius for whatever light source is in the tile, and decrements by 1 for each unit it travels away from the center.
+ 
+        The tiles and light_map args both represent the tiles that the light is spreading across, but light_map represents only
+        the brightness values at each tile as a double between 0 and 256.
+
+        The iteration arg represents how many times an instance of this method has recursed. A higher iteration means the 
+        brightness is lower.
+
+        The direction arg is a tuplet representing the direction the light is traveling in as ( x direction, y direction ).
+        For example, (-1, 0) is left, (1, 0) is right, (0, -1) is up, and (0, 1) is down.
+
+        The lineflag arg, if true, indicates that the light should only travel in a straight line. This is done for
+        rays of light that shine perpendicular to each of the 4 rays that shine from the center, forming a circular pattern.
+
+        The brightness arg (if it is not None, which is a value used to trigger certain cases) is a value between 0 and 256 setting
+        how bright this tile should be. Brightness decreases with each iteration.
+
+        The otherlights arg is a list of other nearby light sources that may intersect with the light being spread in this method.
+        """
         coords = self.coordinates()
         self.map()
         if brightness == None:
@@ -73,7 +115,6 @@ class Tile(GameImage):
                 if o.withindist(self, o.light_distance()):
                     checkbrightness = o.calculate_brightness(coords, tiles)
                     maxbrightness = max(checkbrightness, brightness)
-        #self.updateimage(maxbrightness)  #update the current image based on light level
         light_map[coords[1]][coords[0]] = maxbrightness
         if dist <= 0:
             return               #once the light reaches its max distance, stop
@@ -105,31 +146,40 @@ class Tile(GameImage):
         if nexttile2 != None:
             nexttile2.spreadlight(nextdist, tiles, light_map, iteration + 1, d2, True, None, otherlights)
 
-    def castShadow(self, tiles, brightness):
-        pass
- 
     def relativetile(self, coords, tiles):
+        """ t.relativetile( ( int, int ), [ [ Tile ] ] ) -> Tile
+
+        From the given 2D grid of tiles, grab the tile at the given coordinates.
+        """
         startcoords = self.coordinates()
         tilecoords = (startcoords[0] + coords[0], startcoords[1] + coords[1])
         if Tile.validcoords(tilecoords, tiles):
             return Tile.tileat((tilecoords[0], tilecoords[1]), tiles)
         return None
 
-    #might be unnecessary
-    def coordinates(self):
-        return GameImage.coordinates(self)
-
     def map(self):
+        """ t.map( ) -> None
+
+        Mark that the player has seen this tile, meaning that if it contains a block, then it will appear in darkness.
+        """
         if(self.mapped): return
         self.mapped = True 
         if(self.block != None):
             self.block.map()
 
     def passable(self):
+        """ t.passable( ) -> bool
+
+        Returns whether Entities can pass through this tile.
+        """
         return self.block == None or (not self.block.is_solid) #TODO: change this if some blocks are passable. (might already be necessary for signs and ladders)
 
     @staticmethod
-    def validcoords(coords, tiles): #checks if a set of tile coords correspond to an actual tile on the level.
+    def validcoords(coords, tiles): 
+        """ validcoords( ( int, int ), [ [ Tile ] ] ) -> bool
+
+        Checks if a set of tile coords correspond to an actual tile on the level.
+        """
         if(coords == None or coords[0] == None or coords[1] == None):
             return False
         minuscheck = coords[0] >= 0 and coords[1] >= 0
@@ -139,7 +189,11 @@ class Tile(GameImage):
         return minuscheck and pluscheck
 
     @staticmethod
-    def tileat(coords, tiles):	#the tile on the level at a set of coords
+    def tileat(coords, tiles):	
+        """ tileat( ( int, int ), [ [ Tile ] ] ) -> Tile 
+
+        The tile on the level at a set of coords.
+        """
         if(Tile.validcoords(coords, tiles)):
             return tiles[coords[1]][coords[0]]
         return None
