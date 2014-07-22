@@ -31,6 +31,9 @@ MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mechanics, etc.
 
 IMMEDIATE STUFF: most immediate
 
+# implement new saving system in dungeon editor
+    - use the file list from the level editor as an example
+
 # figure out how tile images will be loaded. (Look at tilefactory for the general structure I'll work.)
 
 # fix the problem where the player bounces up and down on stairs.
