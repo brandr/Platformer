@@ -29,7 +29,6 @@ class FileManagerContainer(Box):
 		
 		#init data specific to this container
 		self.level_select_container, self.dungeon_grid_container = level_select_container, dungeon_grid_container
-		#self.current_file = None
 
 		#create components
 		self.new_dungeon_button = self.new_dungeon_button(8, 8)

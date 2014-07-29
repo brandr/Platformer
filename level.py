@@ -4,12 +4,13 @@
 from room import *
 from entityfactory import *
 from effect import *
+from tilefactory import TileFactory
 
 BLACK = Color ("#000000")
 EXPLORED_GREY = Color("#222222")
 
 class Level(object):
-	""" Level( Dunegon, LevelData, ( int, int ), [ [ Room ] ] ) -> Level
+	""" Level( Dungeon, LevelData, ( int, int ), [ [ Room ] ] ) -> Level
 
 	A level's contents are stored in its associated LevelObjects. Most of the action in the level 
 	is related to the player and objects he sees/interacts with, though visual effects and cutscenes
@@ -86,6 +87,7 @@ class Level(object):
 
 		if(self.outdoors): self.setTilesOutdoors() #TEMP
 		
+		self.init_bg(level_data.bg_filename)
 		self.calibrateLighting()
 		self.init_explored()
 
@@ -158,6 +160,19 @@ class Level(object):
 			self.level_objects.addLevelObjects(r.global_coords, level_objects)
 			self.setStartCoords(r)
 		self.init_blocks()
+
+	def init_bg(self, filename):
+		""" l.init_bg( str ) -> None
+
+		Set all the tiles' images based on the image file loaded via the filename.
+		"""
+		background_image = GameImage.load_image_file("./backgrounds", filename)
+		factory = TileFactory(background_image, (self.width, self.height))
+		tiles = self.getTiles()
+		for y in range(len(tiles)):
+			for x in range(len(tiles[y])):
+				tile_image = factory.image_at( (x, y) )
+				tiles[y][x].changeImage(tile_image)
 
 	def setStartCoords(self, room):
 		""" l.setStartCoords( Room ) -> None

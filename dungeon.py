@@ -28,7 +28,7 @@ class Dungeon(object):
 		rooms = factory.dungeon_rooms(self, room_data_set)
 		self.dungeon_levels = factory.dungeon_levels(self, rooms, level_data_set)
 		for L in self.dungeon_levels:
-			L.calibrateExits() #needed in case there are ways out of levels that don't lead to other levels.
+			L.calibrateExits() # needed in case there are ways out of levels that don't lead to other levels.
 		
 	def start_level(self):
 		""" d.start_level( ) -> Level 

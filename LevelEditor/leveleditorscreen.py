@@ -1,3 +1,5 @@
+# this class might be obsolete. Not sure.
+
 from pygame import *
 from ocempgui.widgets import *
 from ocempgui.widgets.Constants import *

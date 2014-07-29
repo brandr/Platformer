@@ -159,8 +159,8 @@ class LevelSelectContainer(Box):
 		relative_coords = (coords[0] - screen_offset[0], coords[1] - screen_offset[1])
 		if relative_coords[0] > self.level_window.vscrollbar.left or relative_coords[1] > self.level_window.hscrollbar.top: return
 		y_scroll_offset = self.level_window.vscrollbar.value
-		#adjusted coords represent the coordinates of the clicked cell, in pixels, 
-		#assuming that 0,0 is the upper left of the top cell (regardless of scrolling).
+		# adjusted coords represent the coordinates of the clicked cell, in pixels, 
+		# assuming that 0,0 is the upper left of the top cell (regardless of scrolling).
 		adjusted_coords = (relative_coords[0],relative_coords[1] + y_scroll_offset) 
 		selected_level_cell = self.cell_at(adjusted_coords) 
 		self.selectLevelCell(selected_level_cell)

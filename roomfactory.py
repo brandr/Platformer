@@ -19,10 +19,11 @@ class RoomFactory(object):
 
 	@staticmethod
 	def dungeon_rooms(dungeon, room_data_set):
-		""" rf.dungeon_rooms( Dungeon, [ [ RoomData ] ] ) -> [ [ Room ] ]
+		""" dungeon_rooms( Dungeon, [ [ RoomData ] ] ) -> [ [ Room ] ]
 
-		TODO
+		Generate a double list of rooms from a double list of roomdatas.
 		"""
+		# TODO: probably sort out level backgrounds starting here
 		rooms = []
 		x1, y1 = RoomFactory.origin(room_data_set)
 		x2, y2 = RoomFactory.lower_right(room_data_set)
@@ -38,6 +39,13 @@ class RoomFactory(object):
 
 	@staticmethod
 	def origin(room_data_set):
+		""" origin( [ [ RoomData ] ] ) -> int, int
+
+		Go through the set of all rooms in the dungeon and find the upper-left corner
+		(i.e., where the empty room slots stop and actual rooms begin).
+		It would work just as well to use (0, 0) for this but this might save time if the dungeon
+		is built starting from the middle.
+		"""
 		for y in xrange(len(room_data_set)):
 			for x in xrange(len(room_data_set[y])):
 				next_data = room_data_set[y][x]
@@ -46,6 +54,12 @@ class RoomFactory(object):
 
 	@staticmethod
 	def lower_right(room_data_set):
+		""" lower_right( [ [ RoomData ] ] ) -> int, int 
+
+		Go through the set of all rooms in the dungeon and find the lower-right corner
+		(i.e., where the actual rooms stop and empty room slots begin).
+		We can expect this to save a lot of time.
+		"""
 		for y in range(len(room_data_set) - 1, -1, -1):
 			for x in range(len(room_data_set[y]) - 1, -1, -1):
 				next_data = room_data_set[y][x]
@@ -54,17 +68,32 @@ class RoomFactory(object):
 
 	@staticmethod
 	def build_room(dungeon, room_data, global_x, global_y): #might be able to get global x and global y through roomdata's coords instead
+		""" build_room( Dungeon, RoomData, int, int ) -> Room
+
+		Creates a room using a roomdata and a pair of global coordinates giving the room's location in the dungeon
+		(with rooms as units). A None RoomData can be passed to generate an empty room. However, it doesn't really make
+		sense to allow the player to travel through a room created this way (since there will technically be no tiles),
+		so in practice these should be blocked off.
+
+		Note that currently, tiles are created with temporary images which will be overridden when the actual level is created.
+		This isn't really an issue though it might make sense to change it later if it improves efficiency.
+
+		The 2D for loop iterates through the tiledata set, generating an entity if it finds a non-empty tiledata. This is where
+		the entities' images/animations are first created, and also where we check whether an entity can be created with the default 
+		factory (called the EntityFactory) or a non-default factory (such as SignFactory).
+		"""
 		if(room_data == None): return RoomFactory.empty_room(dungeon, global_x, global_y) 
 		tiles = []
-		entities = [] #TODO: figure out why the original platformer used Group
+		entities = [] #TODO: figure out why the example platformer used Group
 
-		start_coords = (False,0,0)
+		start_coords = (False, 0, 0)
 		x = y = 0
 
-		#TODO: fix this part next
+		# TODO: change this part to be more efficient if necessary, since the test tiles will be overridden anyway.
+
 		tile_images = GameImage.load_image_file('./data/', 'test_tiles_1.bmp') 
-		tile_factory = TileFactory(tile_images, (2,1))
-		default_cave_tile = tile_factory.tile_at((0,0))
+		tile_factory = TileFactory(tile_images, (2, 1))
+		default_cave_tile = tile_factory.tile_at((0, 0))
 		default_tile = default_cave_tile
 
 		end_x = ROOM_WIDTH
@@ -117,6 +146,13 @@ class RoomFactory(object):
 
 	@staticmethod
 	def empty_room(dungeon, global_x, global_y):
+		""" empty_room( Dungeon, int, int ) -> Room
+
+		Generates an empty room. Note that this means there are not even walls around the edges of the room.
+		Also, I'm pretty sure that a room with no objects contained in a level (such as the center room in a 3x3 level)
+		does not technically count as an empty room. These only exist because the set of rooms "contained" in the dungeon 
+		must always be rectangular, even if the set of explorable rooms is not.
+		"""
 		tiles = []
 		entities = []
 

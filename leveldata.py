@@ -19,11 +19,14 @@ class LevelData(object):
 	coords2: the lower-right corner of the level.
 
 	sunlit: whether or not the level is illuminated by sunlight.
+
+	bg_filename: filename for loading the background image used to generate the tiles.
 	"""
-	def __init__(self, name, coords1, coords2, sunlit = False):
+	def __init__(self, name, coords1, coords2, sunlit = False, bg_filename = None):
 		self.name = name
 		self.corners = (coords1, coords2)
 		self.sunlit = sunlit #TODO: as level data gets more complicated, make this part of a more general set of tags.
+		self.bg_filename = bg_filename
 
 	def room_set(self, rooms):
 		""" ld.room_set( [ [ Room ] ] ) -> [ [ Room ] ]
@@ -40,12 +43,12 @@ class LevelData(object):
 		return room_set
 
 	def formatted_data(self): #used for saving to files
-		""" ld.formatted_data( ) -> ( str, ( int, int ), ( int, int ), bool )
+		""" ld.formatted_data( ) -> ( str, ( int, int ), ( int, int ), bool, str )
 
 		Formats the data members of leveldata into a tuplet of primitive types.
 		This is used for saving files.
 		"""
-		return (self.name, self.corners[0], self.corners[1], self.sunlit)
+		return (self.name, self.corners[0], self.corners[1], self.sunlit, self.bg_filename)
 
 	def setSunlit(self, sunlit):
 		""" ld.setSunlit( ) -> bool
@@ -56,7 +59,7 @@ class LevelData(object):
 
 	@staticmethod
 	def deformatted_level_set(formatted_data): #used for loading from files
-		""" ld.deformatted_level_set( [ ( str, ( int, int ), ( int, int ), bool ) ] ) -> [ LevelData ]
+		""" ld.deformatted_level_set( [ ( str, ( int, int ), ( int, int ), bool, str ) ] ) -> [ LevelData ]
 
 		Create a useable list of LevelDatas from saved, formatted level data.
 		"""
@@ -67,9 +70,9 @@ class LevelData(object):
 
 	@staticmethod
 	def deformatted_level(formatted_data): #used for loading from files
-		""" ld.deformatted_level( ( str, ( int, int ), ( int, int ), bool )  ) -> LevelData 
+		""" ld.deformatted_level( ( str, ( int, int ), ( int, int ), bool, str )  ) -> LevelData 
 
 		Create a useable LevelData from a a saved, formatted level data.
 		This is basically the reverse of formatted_data().
 		"""
-		return LevelData(formatted_data[0], formatted_data[1], formatted_data[2], formatted_data[3])
+		return LevelData(formatted_data[0], formatted_data[1], formatted_data[2], formatted_data[3], formatted_data[4])

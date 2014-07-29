@@ -2,6 +2,7 @@ from leveltilecell import *
 from roomdata import *
 from ocempgui.widgets import *
 from ocempgui.widgets.Constants import *
+from ocempgui.draw import Image
 
 LEFT_MOUSE_BUTTON = 1      #NOTE: this variable is repeated in dungeongridcontainer.py. Not sure if this could become a problem.
 RIGHT_MOUSE_BUTTON = 3
@@ -51,6 +52,14 @@ class LevelGrid(ImageLabel):	#maybe this should be a table instead? not sure
 			for j in xrange (cols):
 				cell = room_cells[i][j]
 				self.add_room(i, j, cell)
+
+	def set_bg(self, filename):
+		self.grid_image = LevelGrid.bg_grid_image(filename)
+		room_cells = self.level_cell().aligned_rooms()
+		room_cols, room_rows = self.get_room_dimensions()
+		self.init_cells(room_cells, room_rows, room_cols)
+		self.drawGridlines()
+		self.set_picture(self.grid_image)
 
 	def add_room(self, row, col, room_cell):
 		if room_cell.room_data == None:
@@ -112,14 +121,12 @@ class LevelGrid(ImageLabel):	#maybe this should be a table instead? not sure
 			self.leftClick(coordinate_pos[1], coordinate_pos[0]) #TEMP
 			#print event
 			#TODO: other click types (maybe middle mouse?)
-		#self.set_picture(self.grid_image)
 		
 
 	def leftClick(self, row, col):
-		#TODO: deselect before doing anything else.
 		self.deselect()
 		tile = self.level_editor.entity_select_container.current_entity 
-		if (tile == None):  #TODO: consider checking for blocked tiledata here
+		if (tile == None): 
 			return
 		existing_tile = self.tile_at(row, col)
 		if existing_tile != None: 
@@ -226,6 +233,11 @@ class LevelGrid(ImageLabel):	#maybe this should be a table instead? not sure
 		image = Surface((cols*TILE_WIDTH, rows*TILE_HEIGHT))
 		image.fill(WHITE)
 		return image
+
+	@staticmethod
+	def bg_grid_image(filename):
+		bg_image = Image.load_image("./backgrounds/" + filename)
+		return bg_image
 
 	@staticmethod
 	def empty_tile_image():

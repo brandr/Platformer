@@ -31,10 +31,18 @@ MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mechanics, etc.
 
 IMMEDIATE STUFF: most immediate
 
-# implement new saving system in dungeon editor
-    - use the file list from the level editor as an example
-
-# figure out how tile images will be loaded. (Look at tilefactory for the general structure I'll work.)
+# figure out how tile images will be loaded. (Look at tilefactory for the general structure I'll make.)
+    - STEPS:
+        1. Make some test images to represent level backgrounds. These should be of varying dimenions (1x1, 2x2, 1x2, 1x3, etc) and dimensions should be in the filenames.
+           (I have already started on this, but it might help to have more images.)
+        2. Upon opening the LevelEditor window (i.e., in the constructor), parse all filenames in the "backgrounds" directory to find backgrounds that match the level dimensions.
+           If there are no suitable backgrounds, say so in the pane that selects the background. Otherwise, build a selectlist of suitable backgrounds.
+        3. Add something to LevelData (both versions) that stores background filenames and loads them upon building the level. Note that this will affect formatted data and deformatted data.
+        4. Go through the level building process, changing things like the use of TileFactory (which is already more or less set up correctly) in order to build the level background as a grid 
+           of tiles selected from the saved background image. (Note that background images will have to be saved in both directories for this to work.)
+        5. Test to make sure it works.
+    - IDEA: In level editor window, could make a tileset grid image for every tile/entity type and make each cell selectable.
+        * At this point, I might do this for platforms, but it curretly doesn't make sense for tiles.
 
 # fix the problem where the player bounces up and down on stairs.
     - this may be related to another issue where the player collides with doors wrong.
@@ -42,11 +50,13 @@ IMMEDIATE STUFF: most immediate
 # TODO: make the "hit spark" better (and possibly more general)
     - consider other ways to show that something is being damaged
 
-# show that the player is being damaged (may want to make new, human sprites first so as not to waste more time with test sprites)
 
+# show that the player is being damaged (may want to make new, human sprites first so as not to waste more time with test sprites)
 # fix the bug where the frog (and presumably the bat) can be knocked off the screen
+
 # figure out a combat system 
     - IDEA for hp/other stats: have a double dict of {MONSTER_NAME: {MONSTER DICT }, DEFAULT: {DEFAULT DICT} }
+        * implemented this for HP only
     - may have to tweak some of the being/monster bounce system 
         * consider implementing knockback that affects both the monster attacking and the target
     - be extensible

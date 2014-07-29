@@ -11,11 +11,12 @@ class LevelSelectCell(Table):
 	def __init__(self, name, sunlit = False):	#might want to build the cell from a levelData object
 		Table.__init__(self, 1, 1) 
 		self.set_minimum_size(CELL_WIDTH, CELL_HEIGHT)
-		self.name = name#TODO:consider retrieving from self.level_data instead
+		self.name = name # TODO:consider retrieving from self.level_data instead
 		self.name_label = Label(self.name)
 		self.add_child(0, 0, self.name_label)
 		self.room_cells = None
 		self.sunlit = sunlit
+		self.bg_filename = None
 		
 	def get_name(self): #TODO: consider making this getter access level data instead.
 		return self.name
@@ -24,7 +25,7 @@ class LevelSelectCell(Table):
 		if (self.room_cells == None): return LevelData(self.name, None, None, self.sunlit)
 		origin = self.origin()
 		lower_right = self.lower_right()
-		data = LevelData(self.name, origin, lower_right, self.sunlit)
+		data = LevelData(self.name, origin, lower_right, self.sunlit, self.bg_filename)
 		return data
 
 	def origin(self): #find the upper left corner of the level

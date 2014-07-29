@@ -16,6 +16,9 @@ class LevelGridWindow(ScrolledWindow):
 	def setLevelData(self, level_cell):#TODO: build from dungeon grid cells, not level data.
 		self.level_grid.setLevelData(level_cell)
 
+	def set_bg(self, filename):
+		self.level_grid.set_bg(filename)
+
 	def processClick(self, event):
 		check_pos = (event.pos[0] - self.left - 38,event.pos[1] - self.top - 54)
 		if check_pos[0] >= self.hscrollbar.top or check_pos[1] >= self.vscrollbar.left: return

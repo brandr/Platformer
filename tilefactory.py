@@ -20,12 +20,13 @@ class TileFactory(object):
 		default_rect = Rect(0, 0, 32, 32)
 		tile_sheet = SpriteSheet(tile_sheet_image, default_rect)
 		current_rect = default_rect
-		for y in range(0, dimensions[1]): #TODO: make it possible to move rect down for y > 1
-			current_rect = Rect(0, y*32, 32, 32)
+		for y in range(dimensions[1]): #TODO: make it possible to move rect down for y > 1
 			self.tile_images.append([])
-			next_row = tile_sheet.load_strip(default_rect, dimensions[0])
-			for image in next_row:
-				self.tile_images[y].append(image)
+			for x in range(dimensions[0]):
+				current_rect = Rect(x*32, y*32, 32, 32)
+				next_row = tile_sheet.load_strip(current_rect, dimensions[0])
+				for image in next_row:
+					self.tile_images[y].append(image)
 
 	def image_at(self, coords):
 		""" tf.image_at( ( int, int ) ) -> Surface

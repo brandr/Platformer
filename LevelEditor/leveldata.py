@@ -2,23 +2,23 @@
 
 class LevelData(object):
 	"""docstring for LevelData"""
-	def __init__(self, name, coords1, coords2, sunlit = False):
+	def __init__(self, name, coords1, coords2, sunlit = False, bg_filename = None):
 		self.name = name
 		self.corners = (coords1,coords2)
 		self.sunlit = sunlit #TODO: as level data gets more complicated, make this part of a more general set of tags.
+		self.bg_filename = bg_filename
 
-	def room_set(self,rooms):
+	def room_set(self, rooms):
 		room_set = []
 		corner1 = self.corners[0]
 		corner2 = self.corners[1]
-		for y in range(corner1[1],corner2[1]+1):
-			#room_set.append([]) #not sure if this would be useful
-			for x in range(corner1[0],corner2[0]+1):
+		for y in range(corner1[1], corner2[1] + 1):
+			for x in range(corner1[0], corner2[0] + 1):
 				room_set.append(rooms[y][x])
 		return room_set
 
 	def formatted_data(self): #used for saving to files
-		return (self.name, self.corners[0], self.corners[1], self.sunlit)
+		return (self.name, self.corners[0], self.corners[1], self.sunlit, self.bg_filename)
 
 	def setSunlit(self,sunlit):
 		self.sunlit = sunlit
@@ -32,4 +32,4 @@ class LevelData(object):
 
 	@staticmethod
 	def deformatted_level(formatted_data): #used for loading from files
-		return LevelData(formatted_data[0], formatted_data[1], formatted_data[2], formatted_data[3])
+		return LevelData(formatted_data[0], formatted_data[1], formatted_data[2], formatted_data[3], formatted_data[4])

@@ -22,7 +22,7 @@ class EntitySelectContainer(Box):
 		Box.__init__(self, width, height)
 
 		self.current_entity = None
-		self.entity_select_window = self.entity_select_window(240, 240, 0, 0)
+		self.entity_select_window = self.entity_select_window(width, height - 80, 0, 0)
 		self.current_entity_label = Label("Current Entity Sprite: None")
 		self.current_entity_label.topleft = self.entity_select_window.left, self.entity_select_window.bottom + 8 
 		
