@@ -166,6 +166,7 @@ class Level(object):
 
 		Set all the tiles' images based on the image file loaded via the filename.
 		"""
+		if filename = None: return
 		background_image = GameImage.load_image_file("./backgrounds", filename)
 		factory = TileFactory(background_image, (self.width, self.height))
 		tiles = self.getTiles()
