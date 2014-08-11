@@ -31,6 +31,9 @@ MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mechanics, etc.
 
 IMMEDIATE STUFF: most immediate
 
+# fix lag more
+# fix the issue where the player sometimes doesn't travel between levels properly, but make sure he also doesn't appear too far offscreen
+
 # Make a boss (start with archaeologist)
     - give him a pick or something
     steps:

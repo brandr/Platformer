@@ -72,11 +72,11 @@ class Player(Being):
         player_walking_left = GameImage.load_animation(filepath, 'player_1_walking_left.bmp', player_rect, -1, True, 6)
         player_walking_right = GameImage.load_animation(filepath, 'player_1_walking_right.bmp', player_rect, -1, True, 6)
 
-        player_running_left = GameImage.load_animation(filepath, 'player_running_left.bmp', player_rect, -1, True, 5)
-        player_running_right = GameImage.load_animation(filepath, 'player_running_right.bmp', player_rect, -1, True, 5)
+        player_running_left = GameImage.load_animation(filepath, 'player_1_walking_left.bmp', player_rect, -1) # TODO: GameImage.load_animation(filepath, 'player_1_running_left.bmp', player_rect, -1, True, 5)
+        player_running_right = GameImage.load_animation(filepath, 'player_1_walking_right.bmp', player_rect, -1) # TODO: GameImage.load_animation(filepath, 'player_1_running_right.bmp', player_rect, -1, True, 5)
 
-        player_jumping_left = GameImage.load_animation(filepath, 'player_jumping_left.bmp', player_rect, -1, True, 12)
-        player_jumping_right = GameImage.load_animation(filepath, 'player_jumping_right.bmp', player_rect, -1, True, 12)
+        player_jumping_left = GameImage.load_animation(filepath, 'player_1_idle_left.bmp', player_rect, -1) # TODO: GameImage.load_animation(filepath, 'player_1_jumping_left.bmp', player_rect, -1, True, 12)
+        player_jumping_right = GameImage.load_animation(filepath, 'player_1_idle_right.bmp', player_rect, -1) # TODO: GameImage.load_animation(filepath, 'player_1_jumping_right.bmp', player_rect, -1, True, 12)
 
         animation_set = AnimationSet(player_idle_right)
         animation_set.insertAnimation(player_idle_left,'left', 'idle')

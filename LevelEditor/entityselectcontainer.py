@@ -44,7 +44,6 @@ class EntitySelectContainer(Box):
 		self.add_child(self.entity_select_window)
 		self.add_child(self.current_entity_label)
 		self.add_child(self.current_entity_image)
-		#self.add_child(self.additional_entity_data_pane)
 
 	def build_tile_data(self, tile_key, filepath):
 		if tile_key in ENTITY_CONSTRUCTOR_MAP:

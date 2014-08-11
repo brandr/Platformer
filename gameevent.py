@@ -72,7 +72,7 @@ class GameEvent:
 		for a in self.current_actions:
 			a.update(self, level)
 		#pass
-			#TODO (or maybe have subclasses inherit). Should probably update all current actions, which will
+			# TODO (or maybe have subclasses inherit). Should probably update all current actions, which will
 			# add new actions to this event if necessary. Finished actions are removed.
 			# should iterate in reverse so that removing actions does not mess up the updating process.
 
