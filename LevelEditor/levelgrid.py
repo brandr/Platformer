@@ -15,7 +15,7 @@ RED = Color(("#FF0000"))
 
 #TODO: give this class the same fuctionality as before using the ImageLabel setup instead of table
 
-class LevelGrid(ImageLabel):	#maybe this should be a table instead? not sure
+class LevelGrid(ImageLabel):	# maybe this should be a table instead? not sure
 	def __init__(self, level_editor):
 		print "Creating level grid..."
 		self.level_editor = level_editor
@@ -26,12 +26,10 @@ class LevelGrid(ImageLabel):	#maybe this should be a table instead? not sure
 		ImageLabel.__init__(self, self.grid_image)
 		print "Level grid created."
 
-	def init_components(self):		
+	def init_components(self, bg_filename):		
 		room_cells = self.level_cell().aligned_rooms()
 		room_cols, room_rows = self.get_room_dimensions()
-		self.init_cells(room_cells, room_rows, room_cols)
-		self.drawGridlines()
-		self.set_picture(self.grid_image)
+		self.set_bg(bg_filename)
 
 	def drawGridlines(self):
 		pixel_width, pixel_height = self.get_pixel_width(), self.get_pixel_height()
@@ -54,7 +52,10 @@ class LevelGrid(ImageLabel):	#maybe this should be a table instead? not sure
 				self.add_room(i, j, cell)
 
 	def set_bg(self, filename):
-		self.grid_image = LevelGrid.bg_grid_image(filename)
+		if filename:
+			self.grid_image = LevelGrid.bg_grid_image(filename)
+		else:
+			self.grid_image = LevelGrid.empty_grid_image(self.cols, self.rows)
 		room_cells = self.level_cell().aligned_rooms()
 		room_cols, room_rows = self.get_room_dimensions()
 		self.init_cells(room_cells, room_rows, room_cols)
@@ -105,10 +106,10 @@ class LevelGrid(ImageLabel):	#maybe this should be a table instead? not sure
 	def valid_coords(self, coords):
 		return coords[0] >= 0 and coords[0] < self.cols and coords[1] >= 0 and coords[1] < self.rows
 
-	def processClick(self, event, calculate_offset): #TODO: somewhere in here (or related methods), load additional data if necessary.
+	def processClick(self, event, calculate_offset, bg_filename): #TODO: somewhere in here (or related methods), load additional data if necessary.
 		offset = calculate_offset()
 		pos = event.pos 
-		adjusted_pos = ((pos[0] - offset[0] - 3, pos[1] - offset[1] + 15))#this bit is still a little wonky, but functional for now.
+		adjusted_pos = ((pos[0] - offset[0] - 3, pos[1] - offset[1] + 15)) # this bit is still a little wonky, but functional for now.
 		coordinate_x = int(adjusted_pos[0]/(TILE_WIDTH))
 		coordinate_y = int(adjusted_pos[1]/(TILE_HEIGHT))
 		coordinate_pos = (coordinate_x, coordinate_y) 
@@ -116,24 +117,23 @@ class LevelGrid(ImageLabel):	#maybe this should be a table instead? not sure
 		if event.button == LEFT_MOUSE_BUTTON:
 			self.leftClick(coordinate_pos[1], coordinate_pos[0])
 		elif event.button == RIGHT_MOUSE_BUTTON:
-			self.rightClick(coordinate_pos[1], coordinate_pos[0])
+			self.rightClick(coordinate_pos[1], coordinate_pos[0], bg_filename)
 		else:
-			self.leftClick(coordinate_pos[1], coordinate_pos[0]) #TEMP
+			self.leftClick(coordinate_pos[1], coordinate_pos[0]) # middle mouse case
 			#print event
-			#TODO: other click types (maybe middle mouse?)
-		
+			#TODO: other click types
 
 	def leftClick(self, row, col):
 		self.deselect()
-		tile = self.level_editor.entity_select_container.current_entity 
-		if (tile == None): 
-			return
 		existing_tile = self.tile_at(row, col)
 		if existing_tile != None: 
 			if isinstance(existing_tile, BlockedTileData):
 				row, col = existing_tile.origin_y, existing_tile.origin_x
 				existing_tile = existing_tile.origin_tile
 			self.select_cell(row, col)
+			return
+		tile = self.level_editor.entity_select_container.current_entity 
+		if (tile == None): 
 			return
 		elif not self.room_for_tile(tile, row, col):
 			return
@@ -157,7 +157,7 @@ class LevelGrid(ImageLabel):	#maybe this should be a table instead? not sure
 		#TODO: get tile, row and col from somewhere (should probably be data members of this class)
 		tile, row, col = self.selected_tile, self.selected_row, self.selected_col
 		if tile == None: return
-		image = tile.get_image() 		#this part only needs to be done once.
+		image = tile.get_image() 		# this part only needs to be done once.
 		self.drawGridlines()
 		self.updateTileImage(image, col, row)
 		self.selected_tile, self.selected_row, self.selected_col = None, 0, 0
@@ -181,7 +181,7 @@ class LevelGrid(ImageLabel):	#maybe this should be a table instead? not sure
 		self.deselect()
 		tile = template.create_copy()
 		width, height = tile.width, tile.height
-		self.level_cell().add_entity(tile, col, row) 	#this will be important to setting data differently for different signs
+		self.level_cell().add_entity(tile, col, row) 	# this will be important to setting data differently for different signs
 		for x in range(col + 1, col + width):
 			next_block = BlockedTileData(tile, col, row)
 			self.level_cell().add_entity(next_block, x, row)
@@ -189,11 +189,11 @@ class LevelGrid(ImageLabel):	#maybe this should be a table instead? not sure
 			for x in range(col, col + width):
 				next_block = BlockedTileData(tile, col, row)
 				self.level_cell().add_entity(next_block, x, y)
-		image = tile.get_image() 		#this part only needs to be done once.
+		tile_image = tile.get_image() 						# this part only needs to be done once
 		self.drawGridlines()
-		self.updateTileImage(image, col, row)
+		self.updateTileImage(tile_image, col, row)
 
-	def rightClick(self, row, col):
+	def rightClick(self, row, col, bg_filename):
 		tile = self.tile_at(row, col)
 		if tile == None: return
 		if(isinstance(tile, BlockedTileData)):
@@ -209,8 +209,12 @@ class LevelGrid(ImageLabel):	#maybe this should be a table instead? not sure
 		for y in range(row, row + height):
 			for x in range(col, col + width):
 				self.level_cell().add_entity(None, x, y) 
-				image = LevelGrid.empty_tile_image()
-				self.updateTileImage(image, x, y)
+				tile_image = LevelGrid.empty_tile_image()
+				bg_filename = self.level_editor.current_bg
+				if bg_filename:
+					bg_image = Image.load_image("./backgrounds/" + bg_filename)
+					tile_image = bg_image.subsurface(Rect(x*32, y*32, 32, 32))
+				self.updateTileImage(tile_image, x, y)
 
 	def room_for_tile(self, tile, row, col): #make sure any tile larger that 1x1 will fit in the room.
 		end_x = col + tile.width - 1

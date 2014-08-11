@@ -78,6 +78,16 @@ class GameImage(pygame.sprite.Sprite):
         """
         return self.image.get_width()/32, self.image.get_height()/32
 
+    def pixel_remainder(self):
+        """ gi.pixel_remainder( ) -> ( int, int )
+
+        Find out how may additonal pixels the gameimage is from the closest tile corner (to the up/left).
+        """
+        pixel_coords = self.rect_coords()
+        x_remainder = pixel_coords[0] % 32
+        y_remainder = pixel_coords[1] % 32
+        return (x_remainder, y_remainder)
+
     def moveTo(self, coords):
         """ gi.moveTo( int, int ) -> None
 

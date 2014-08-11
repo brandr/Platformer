@@ -10,7 +10,7 @@ DUNGEON_WIN_WIDTH = LEVEL_WIN_WIDTH	  #TEMP (maybe?)
 DUNGEON_WIN_HEIGHT = LEVEL_WIN_HEIGHT #TEMP
 
 class DungeonEditorScreen:
-	def __init__(self, dungeon_renderer):#,level_renderer):
+	def __init__(self, dungeon_renderer):
 		self.dungeon_renderer = dungeon_renderer
 
 	def openDungeonEditor(self):

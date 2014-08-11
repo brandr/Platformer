@@ -28,10 +28,11 @@ class GameManager:
 
 		factory = DungeonFactory() #might need args like filename, filepath, etc later
 		print "Building dungeon..."
-		dungeon = factory.build_dungeon("./dungeon_map_files/dungeon0")
+		dungeon_name = "arch_boss_test"
+		dungeon = factory.build_dungeon("./dungeon_map_files/" + dungeon_name)
 		print "Dungeon built."
 		
-		pygame.display.set_caption("title goes here")
+		pygame.display.set_caption(dungeon_name)
 		timer = pygame.time.Clock()
 
 		player_animations = Player.load_player_animation_set()
@@ -40,16 +41,17 @@ class GameManager:
 		player = Player(player_animations, start_level)
 		start_level.addPlayer(player)
 
-		game_controls = MainGameControls(player) #TODO: consider how controls may parse buttons differently for different screens.
+		game_controls = MainGameControls(player) # TODO: consider how controls may parse buttons differently for different screens.
 		control_manager = ControlManager(game_controls)
 		main_screen = MainGameScreen(control_manager, player) 
 		screen_manager = ScreenManager(master_screen, main_screen, player)
 		start_level.initialize_screen(screen_manager, main_screen)
 
-		#TEMP for testing cutscenes
+		# TEMP for testing cutscenes
+		# TODO: figure out how to better generalize cutscenes (start by figuring out how to generalize their actions)
 		player_right_method = GameManager.temp_player_right
 		player_right_action = GameAction(player_right_method, 60, None, player)
-		actions = [player_right_action] #TODO: action for player moving right
+		actions = [player_right_action] 		# TODO: action for player moving right
 		test_cutscene = Cutscene(actions)
 		player.current_level.begin_cutscene(test_cutscene)
 

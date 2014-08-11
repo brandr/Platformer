@@ -1,4 +1,6 @@
-from signdata import *
+from tiledata import TileData
+from signdata import SignData
+from cutscenetriggerdata import CutsceneTriggerData
 #import other children of tiledata separately
 
 from ocempgui.widgets import Bin, Box, FileList, Label, ImageLabel, Label, Entry
@@ -6,14 +8,19 @@ from ocempgui.widgets.BaseWidget import *
 from ocempgui.widgets.Constants import *
 from ocempgui.widgets.components import *
 
+import pygame
+from pygame import Color
+
 MAX_ENTITY_WINDOWS = 4
 BMP_FILETYPE = 33204 #not sure if this will work cross-platform. (Then again, a lot of this game might not.)
 
 #TODO: instead of showing current entity image in the pane, blit current entity image over a white square the size of max-sized image.
 
 DEFAULT_SIGN = "default_sign"
+DEFAULT_CUTSCENE_TRIGGER = "default_cutscene_trigger"
 ENTITY_CONSTRUCTOR_MAP = {
-		DEFAULT_SIGN:SignData 
+		DEFAULT_SIGN:SignData,
+		DEFAULT_CUTSCENE_TRIGGER:CutsceneTriggerData
 }
 
 class EntitySelectContainer(Box):

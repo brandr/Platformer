@@ -85,7 +85,7 @@ class Being(Entity):
 
     #TODO: consider having bounce take effect here, like in player.
     def collide(self, xvel, yvel, collide_objects = None):
-        """ b.collide (double, double, [Platform]) -> None
+        """ b.collide (double, double, [ Platform ] ) -> None
 
         Collide with all solid platforms using the collideWith method also found in Being.
         Collisions with non-platform objects are handled by other methods.
@@ -159,7 +159,7 @@ class Being(Entity):
                 self.rect.left += 1
 
     def moveTowards(self, destination):
-        """ moveTowards ( GameImage ) -> None
+        """ b.moveTowards ( GameImage ) -> None
 
         Move towards some destination, assuming the Being is not currently bouncing.
         I'm not sure I like this structure. Beings should probably just collide first,
@@ -176,8 +176,22 @@ class Being(Entity):
         self.xvel = dist_ratio*self.x_dist_from(destination, False)/32
         self.yvel = dist_ratio*self.y_dist_from(destination, False)/32
 
-    def bounceAgainst(self, other): #this is used for a monster colliding with the player, and may be useful in other cases.
-        """ bounceAgainst ( Being ) -> None
+    def snap_to_ground(self): # might want to move this to GameImage, not sure
+        """ b.snap_to_ground( ) -> None
+
+        Keep moving the being down until it is touching the ground.
+        This is different from the normal effects of gravity in that it happens instantaneously.
+        """
+        level = self.current_level
+        platforms = level.get_impassables() # TODO: remember that it might be possible to pass through some platforms in some directions.
+        while 1:
+            for p in platforms:
+                Being.collideWith(self, 0, 1, p)
+                if self.onGround: return
+                self.rect.top += 1
+
+    def bounceAgainst(self, other): # this is used for a monster colliding with the player, and may be useful in other cases.
+        """ b.bounceAgainst ( Being ) -> None
 
         Bounce against another being, starting the bounce counter so that this being cannot
         take other actions until the counter runs out.
@@ -197,7 +211,7 @@ class Being(Entity):
         self.bounce_count = 40
 
     def bounce(self):
-        """ bounce () -> None
+        """ b.bounce () -> None
 
         Go through one iteration of "bouncing" (i.e., being knocked away from the source of the bounce)
         and reducing the bounce counter by 1.

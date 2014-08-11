@@ -1,7 +1,6 @@
 from pygame import image, color
 from pygame.color import *
 import pygame, pygame.locals
-#from signdata import SignData
 
 DEFAULT_TILE_SIZE = 32
 
@@ -40,7 +39,11 @@ GIANT_FROG = "giant_frog"
 
 #NPCS
 NPCS = "NPCs"
+MINER = "miner"
 
+#Triggers
+TRIGGERS = "triggers"
+DEFAULT_CUTSCENE_TRIGGER = "default_cutscene_trigger"
 #---------TEMPORARY------------------
 
 KENSTAR = "kenstar"
@@ -57,6 +60,8 @@ ENTITY_CATEGORY_MAP = {
 	DEFAULT_LANTERN:LANTERNS, 
 	OIL_PICKUP:PICKUPS,
 	BAT:MONSTERS, GIANT_FROG:MONSTERS,
+	MINER:NPCS,
+	DEFAULT_CUTSCENE_TRIGGER:TRIGGERS,
 	#TEMP
 	KENSTAR:NPCS
 }

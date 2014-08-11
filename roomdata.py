@@ -2,6 +2,7 @@
 """
 
 from signdata import *
+from cutscenetriggerdata import *
 
 ROOM_WIDTH = 28
 ROOM_HEIGHT = 20
@@ -44,7 +45,7 @@ class RoomData(object):
 
 		Take a 2D list of tiledatas and set the tiledatas in this roomdata's list to the ones given.
 		"""
-		rows, cols = len(tile_set),len(tile_set[0])
+		rows, cols = len(tile_set), len(tile_set[0])
 		for y in xrange(rows):
 			for x in xrange(cols):
 				self.tiles[y][x] = tile_set[y][x]
@@ -163,7 +164,7 @@ class RoomData(object):
 		return tile_data
 
 	@staticmethod
-	def deformatted_sign(formatted_data, filepath):	#this will need to change as this class's constructor does.
+	def deformatted_sign(formatted_data, filepath):	# this will need to change as this class's constructor does.
 		""" deformatted_sign( ( str, str, int, int, [ str ] ), str ) -> SignData
 
 		Take a tuplet of primitive data loaded from a file and turn it into a usable SignData object.
@@ -171,6 +172,16 @@ class RoomData(object):
 		sign_data = SignData(formatted_data[0], formatted_data[1], filepath)
 		sign_data.text_panes = formatted_data[4]
 		return sign_data
+
+	@staticmethod
+	def deformatted_cutscene_trigger(formatted_data, filepath):	# this will need to change as this class's constructor does.
+		""" deformatted_cutscene_trigger( ( str, str, int, int, str ), str ) -> CutsceneTriggerData
+
+		Take a tuplet of primitive data loaded from a file and turn it into a usable CutsceneTriggerData object.
+		"""
+		trigger_data = CutsceneTriggerData(formatted_data[0], formatted_data[1], filepath)
+		trigger_data.cutscene_key = formatted_data[4]
+		return trigger_data
 
 	@staticmethod
 	def empty_tile_set(width, height):
@@ -186,5 +197,6 @@ class RoomData(object):
 		return tiles
 
 TILE_INIT_MAP = {
-	DEFAULT_SIGN:RoomData.deformatted_sign
+	DEFAULT_SIGN:RoomData.deformatted_sign,
+	DEFAULT_CUTSCENE_TRIGGER:RoomData.deformatted_cutscene_trigger
 }

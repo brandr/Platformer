@@ -3,7 +3,7 @@ from roomdata import *
 
 class DungeonData(object):
 	"""docstring for DungeonData"""
-	def __init__(self,level_data_set,room_data_set):
+	def __init__(self, level_data_set, room_data_set):
 		self.level_data_set = level_data_set
 		self.rooms = room_data_set #a double array of room_data
 

@@ -1,4 +1,5 @@
 from signdata import *
+from cutscenetriggerdata import *
 
 ROOM_WIDTH = 28
 ROOM_HEIGHT = 20
@@ -109,6 +110,12 @@ class RoomData(object):
 		return sign_data
 
 	@staticmethod
+	def deformatted_cutscene_trigger(formatted_data, filepath):	#this will need to change as this class's constructor does.
+		trigger_data = CutsceneTriggerData(formatted_data[0], formatted_data[1], filepath)
+		trigger_data.cutscene_key = formatted_data[4]
+		return trigger_data
+
+	@staticmethod
 	def empty_tile_set(width,height):
 		tiles = []
 		for y in xrange(height):
@@ -118,5 +125,6 @@ class RoomData(object):
 		return tiles
 
 TILE_INIT_MAP = {
-	DEFAULT_SIGN:RoomData.deformatted_sign
+	DEFAULT_SIGN:RoomData.deformatted_sign, # TODO: add deformatted cutscene trigger.
+	DEFAULT_CUTSCENE_TRIGGER:RoomData.deformatted_cutscene_trigger
 }

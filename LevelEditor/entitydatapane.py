@@ -1,12 +1,15 @@
 """ A special pane used in the LevelEditor fuor some (but not all) entity types to specify additional data.
 """
 
-from ocempgui.widgets import Bin, Box, FileList, Label, ImageLabel, Label, Entry, Button, ImageButton
+from ocempgui.widgets import Bin, Box, FileList, ScrolledList, Label, ImageLabel, Label, Entry, Button, ImageButton
 from ocempgui.widgets.BaseWidget import *
 from ocempgui.widgets import Constants #.Constants import *
 from ocempgui.widgets.components import *
+
 from pygame import Surface, Color
 from pygame.draw import polygon
+
+from cutscenescripts import MASTER_CUTSCENE_MAP
 
 WHITE = Color("#FFFFFF")
 BLACK = Color("#000000")
@@ -42,6 +45,7 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 		data_label = Label("No additional data.")
 		self.set_children([data_label])
 
+	# SIGN
 	def update_sign(self):
 		sign_data = self.current_selection
 		#TODO: add buttons which allow scrolling through different panes of sign text.
@@ -51,7 +55,7 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 		self.sign_text_panes = sign_data.text_panes
 		sign_text_entries = []
 
-		#for i in range(0, 1): #TEMP: want to iterate through all panes eventually
+		# for i in range(0, 1): #TEMP: want to iterate through all panes eventually
 		sign_text_lines = self.sign_text_panes[0]
 		y_offset = 16
 		for s in sign_text_lines:
@@ -67,7 +71,6 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 		for s in self.sign_entry_set:
 			self.add_child(s)
 
-		#self.sign_entry_set = sign_text_entries #TEMP. eventually I want to replace this with the set of all panes.
 		bottom_entry = self.sign_entry_set[-1]
 		save_sign_button = self.save_sign_button(bottom_entry.left, bottom_entry.bottom + 8)
 		self.prev_pane_button = self.build_prev_pane_button(save_sign_button.right + 8, save_sign_button.top + 4, False)
@@ -79,18 +82,11 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 		self.add_child(add_sign_pane_button)
 		self.pane_index = 0
 
-	def change_current_pane(self, pane_index):
+	def change_current_sign_pane(self, pane_index):
 		sign_text_lines = self.sign_text_panes[pane_index]
 		y_offset = 16
-		#self.sign_entry_set = []
 		for i in range(len(sign_text_lines)):
 			self.sign_entry_set[i].text = sign_text_lines[i]
-			#next_entry = Entry(s)
-			#next_entry.set_minimum_size(self.width, 12)
-			#next_entry.padding = 4
-			#next_entry.top += y_offset
-			#y_offset += 24
-			#self.sign_entry_set.append(next_entry)
 
 	def save_sign_button(self, x, y):
 		button = Button("Save current pane")
@@ -113,10 +109,37 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 		return button
 
 	def add_sign_pane(self):
-		next_pane_lines = ["", "", "", ""]
+		next_pane_lies = ["", "", "", ""]
 		self.sign_text_panes.append(next_pane_lines)
 		self.set_sensitivity(self.next_pane_button, True)
 
+	# CUTSCENE TRIGGER
+	def update_cutscene_trigger(self):
+		self.current_cutscene_key = None
+		cutscene_trigger_data = self.current_selection
+		self.cutscene_label = Label("Linked cutscene: None") #TODO: actually figure out which cutscene is stored (use cutscene_trigger_data)
+		cutscene_key = cutscene_trigger_data.cutscene_key
+		if cutscene_key: self.cutscene_label.set_text("Linked cutscene: " + cutscene_key)
+		self.set_children([self.cutscene_label])
+		self.cutscene_select_list = self.cutscene_trigger_select_list(self.cutscene_label.rect.left, self.cutscene_label.rect.bottom + 8, 360, 200) #TEMP dimensions
+		self.add_child(self.cutscene_select_list)
+
+	def cutscene_trigger_select_list(self, x, y, width, height):
+		trigger_select_list = ScrolledList(width, height)
+		for cutscene_key in MASTER_CUTSCENE_MAP:
+			trigger_select_list.items.append(TextListItem(cutscene_key))
+		trigger_select_list.topleft = x, y
+		trigger_select_list.connect_signal(SIG_SELECTCHANGED, self.change_cutscene_selection, trigger_select_list)
+		return trigger_select_list
+
+	def change_cutscene_selection(self, trigger_select_list):
+		text_list_item = trigger_select_list.get_selected()[0]
+		if not text_list_item: return
+		self.current_cutscene_key = text_list_item._text
+		self.cutscene_label.set_text("Linked cutscene: " + self.current_cutscene_key)
+		self.current_selection.cutscene_key = self.current_cutscene_key
+
+	# GENERAL METHODS
 	def set_sensitivity(self, component, sensitive):
 		state = Constants.STATE_INSENSITIVE
 		if(sensitive): state = Constants.STATE_NORMAL
@@ -128,7 +151,7 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 		prev_image = EntityDataPane.draw_prev_image(BLACK)
 		prev_button = ImageButton(prev_image)
 		prev_button.topleft = x, y
-		prev_button.connect_signal(SIG_CLICKED, self.pane_back)
+		prev_button.connect_signal(SIG_CLICKED, self.sign_pane_back)
 		self.set_sensitivity(prev_button, has_prev)
 		return prev_button
 
@@ -144,7 +167,7 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 		next_image = EntityDataPane.draw_next_image(BLACK)
 		next_button = ImageButton(next_image)
 		next_button.topleft = x, y
-		next_button.connect_signal(SIG_CLICKED, self.pane_next)
+		next_button.connect_signal(SIG_CLICKED, self.sign_pane_next)
 		self.set_sensitivity(next_button, has_next)
 		return next_button
 
@@ -155,14 +178,14 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 		polygon(next_image, color, [(0, 0), (0, 24), (24, 12)])
 		return next_image
 
-	def pane_back(self):
+	def sign_pane_back(self):
 		self.pane_index -= 1
-		self.change_current_pane(self.pane_index)
+		self.change_current_sign_pane(self.pane_index)
 		self.update_pane_buttons()
 
-	def pane_next(self):
+	def sign_pane_next(self):
 		self.pane_index += 1
-		self.change_current_pane(self.pane_index)
+		self.change_current_sign_pane(self.pane_index)
 		self.update_pane_buttons()
 
 	def update_pane_buttons(self):
@@ -172,6 +195,8 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 		self.set_sensitivity(self.next_pane_button, has_next)
 
 DEFAULT_SIGN = "default_sign"
+DEFAULT_CUTSCENE_TRIGGER = "default_cutscene_trigger"
 ENTITY_DATA_MAP = {
-		DEFAULT_SIGN:EntityDataPane.update_sign #TODO
+		DEFAULT_SIGN:EntityDataPane.update_sign,
+		DEFAULT_CUTSCENE_TRIGGER:EntityDataPane.update_cutscene_trigger
 }

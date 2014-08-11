@@ -4,6 +4,7 @@ from entityfactory import *
 from signfactory import *
 from doorfactory import *
 from pickupfactory import *
+from cutscenetriggerfactory import *
 
 from level import *
 
@@ -12,7 +13,8 @@ DEFAULT_DOOR = "default_door"
 NON_DEFAULT_ENTITY_MAP = {
 	DEFAULT_SIGN:SignFactory,	
 	DEFAULT_DOOR:DoorFactory,
-	OIL_PICKUP:PickupFactory
+	OIL_PICKUP:PickupFactory,
+	DEFAULT_CUTSCENE_TRIGGER:CutsceneTriggerFactory
 }
 
 class RoomFactory(object):

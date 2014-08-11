@@ -31,18 +31,30 @@ MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mechanics, etc.
 
 IMMEDIATE STUFF: most immediate
 
-# figure out how tile images will be loaded. (Look at tilefactory for the general structure I'll make.)
-    - STEPS:
-        1. Make some test images to represent level backgrounds. These should be of varying dimenions (1x1, 2x2, 1x2, 1x3, etc) and dimensions should be in the filenames.
-           (I have already started on this, but it might help to have more images.)
-        2. Upon opening the LevelEditor window (i.e., in the constructor), parse all filenames in the "backgrounds" directory to find backgrounds that match the level dimensions.
-           If there are no suitable backgrounds, say so in the pane that selects the background. Otherwise, build a selectlist of suitable backgrounds.
-        3. Add something to LevelData (both versions) that stores background filenames and loads them upon building the level. Note that this will affect formatted data and deformatted data.
-        4. Go through the level building process, changing things like the use of TileFactory (which is already more or less set up correctly) in order to build the level background as a grid 
-           of tiles selected from the saved background image. (Note that background images will have to be saved in both directories for this to work.)
-        5. Test to make sure it works.
-    - IDEA: In level editor window, could make a tileset grid image for every tile/entity type and make each cell selectable.
-        * At this point, I might do this for platforms, but it curretly doesn't make sense for tiles.
+# Make a boss (start with archaeologist)
+    - give him a pick or something
+    steps:
+        1. start with a cutscene when you walk into the same room as him
+            - think carefully about cutscene system
+            - IDEA: follow these steps:
+                a.  make a file like cutscenescripts.py with data structures for all possible cutscenes (there shouldn't be too many, after all)
+                    and map them accordingly
+                b.  make invisible "cutscene trigger" objects that are mapped to cutscenes. Make sure multiple triggers can map to one cutscene, and
+                    also that the same cutscene can never be triggered more than once by the player colliding with the trigger.
+                c.  Make an "additional data pane" that can be used to set the proper cutscene key for a trigger. It may be helpful to make it so such
+                    triggers are copied by default if new ones are created after setting the first.
+                d.  figure out how to parse the cutscenes from the script file, probably by using string keys for actors/actions. For instance, if an 
+                    NPC with a certain name is an actor, have the level iterate through its set of NPCs until it finds the one with that name.
+                    Making this efficient for large numbers of NPCs might be somewhat tricky, but I don't expect noticeable slowdown even in this case.
+        2. make him turn into a monster at the end (code-wise, that is). Finish this much before worrying about how that monster behaves.
+
+# make archaeologist portaits
+
+# make it easier to add simple NPCs with no actions or branching dialog trees, since most NPCs will work this way. Follow the same pattern as signs
+  and make a "default NPC" that can have many different sprites. Note that such NPCs will not have dialog portraits.
+
+# Make a giant frog with an armored mask
+    - use the subentity system
 
 # fix the problem where the player bounces up and down on stairs.
     - this may be related to another issue where the player collides with doors wrong.
@@ -50,9 +62,11 @@ IMMEDIATE STUFF: most immediate
 # TODO: make the "hit spark" better (and possibly more general)
     - consider other ways to show that something is being damaged
 
-
-# show that the player is being damaged (may want to make new, human sprites first so as not to waste more time with test sprites)
+# show that the player is being damaged 
 # fix the bug where the frog (and presumably the bat) can be knocked off the screen
+
+# IDEA: In level editor window, could make a tileset grid image for every tile/entity type and make each cell selectable.
+    - At this point, I might do this for platforms, but it curretly doesn't make sense for tiles.
 
 # figure out a combat system 
     - IDEA for hp/other stats: have a double dict of {MONSTER_NAME: {MONSTER DICT }, DEFAULT: {DEFAULT DICT} }
@@ -69,7 +83,6 @@ IMMEDIATE STUFF: most immediate
 # generalize subentities/entityeffects so that they can apply to monsters and NPCs
 
 # implement "triggers" to traverse between dungeons
-    - may want to first implement a system to allow saving dungeons by name via the dungeon editor
 
 # implement a cutscene system and ways to trigger cutscenes
 

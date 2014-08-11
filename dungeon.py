@@ -42,7 +42,7 @@ class Dungeon(object):
 		return None
 
 		#TODO: error case where next_level is None.
-	def movePlayer(self, screen_manager, screen, player, next_level, global_coords, local_coords):
+	def movePlayer(self, screen_manager, screen, player, next_level, global_coords, local_coords, pixel_remainder):
 		""" d.movePlayer( ScreenManager, GameScreen, Playr, Level, (int, int), (int, int) ):
 
 		Moves the player to another level at the appropriate position based on the level the player is leaving.
@@ -51,7 +51,7 @@ class Dungeon(object):
 		next_coords = next_level.flipped_coords(global_coords, room_coords) #TODO: will have to change this
 		next_level.screen_manager = screen_manager
 		next_level.screen = screen
-		next_level.addPlayer(player, next_coords)
+		next_level.addPlayer(player, next_coords, pixel_remainder)
 		
 	def level_at(self, x, y):
 		""" d.level_at( int, int ) -> Level

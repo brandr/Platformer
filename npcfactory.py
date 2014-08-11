@@ -32,6 +32,16 @@ TEST_KENSTAR_TIRED = "test_kenstar_tired"
 
 # for now, test dialog trees go here.
 
+#MINER
+TEST_MINER_DIALOG_TREE = (	# TODO: figure out how to store this at a cutscene and parse it properly
+	[
+		("I am a boss character!", NEUTRAL),
+		("I am going to fight you now!", NEUTRAL)
+	],
+	None #TODO: add some trigger to begin boss battle
+)
+
+#KENSTAR
 TEST_KENSTAR_START_DIALOG_TREE = (
 	[
 		("Whaaaaaaaaaaat is this place??", NEUTRAL),
@@ -104,6 +114,11 @@ TEST_KENSTAR_DIALOG_TREE_MAP = {
 	TEST_KENSTAR_TIRED:TEST_KENSTAR_TIRED_DIALOG_TREE
 }
 
+TEST_MINER_DIALOG_TREE_MAP = {
+	START:TEST_MINER_DIALOG_TREE
+}
+
 MASTER_NPC_DIALOG_MAP = {
-	KENSTAR:TEST_KENSTAR_DIALOG_TREE_MAP
+	KENSTAR:TEST_KENSTAR_DIALOG_TREE_MAP,
+	MINER:TEST_MINER_DIALOG_TREE_MAP
 }

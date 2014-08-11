@@ -166,7 +166,7 @@ class Level(object):
 
 		Set all the tiles' images based on the image file loaded via the filename.
 		"""
-		if filename = None: return
+		if filename == None: return
 		background_image = GameImage.load_image_file("./backgrounds", filename)
 		factory = TileFactory(background_image, (self.width, self.height))
 		tiles = self.getTiles()
@@ -353,13 +353,13 @@ class Level(object):
 		origin_x = self.origin[0]
 
 		if(local_coords[0] <= 1):				# left edge of level
-			return (dimensions[0] - 2, local_coords[1])		
-		if(local_coords[0] >= ROOM_WIDTH - 2):	# right edge of level
-			return (2, local_coords[1])
+			return (dimensions[0] - 1, local_coords[1])		
+		if(local_coords[0] >= ROOM_WIDTH - 1):	# right edge of level
+			return (1, local_coords[1])
 		if(local_coords[1] <= 1):				# top edge of level
-			return (local_coords[0],dimensions[1] - 2)
-		if(local_coords[1] >= ROOM_HEIGHT - 2):	# bottom edge of level
-			return (local_coords[0], 2)
+			return (local_coords[0],dimensions[1] - 1)
+		if(local_coords[1] >= ROOM_HEIGHT - 1):	# bottom edge of level
+			return (local_coords[0], 1)
 		#TODO: error case (no possible edge detected for exitblock)
 
 	def next_level_exists(self, global_coords, direction):
@@ -379,14 +379,17 @@ class Level(object):
 		player = self.getPlayer()
 		direction = self.direction_of(coords)
 		adjusted_coords = (coords[0] - direction[0], coords[1] - direction[1])
+		pixel_remainder = player.pixel_remainder()
 		self.removePlayer()
 		global_coords = self.global_coords(adjusted_coords)
 		if(self.next_level_exists(global_coords, direction)):
 			next_level = self.level_in_direction(global_coords[0], global_coords[1], direction)
-			self.dungeon.movePlayer(self.screen_manager, self.screen, player, next_level, global_coords, adjusted_coords)
+			self.dungeon.movePlayer(self.screen_manager, self.screen, player, next_level, global_coords, adjusted_coords, pixel_remainder)
+			if(direction[0] > 0 or direction[1] > 0):
+				player.moveRect(-30*direction[0], -30*direction[1])
 		player.current_level.update_explored()
 
-	def addPlayer(self, player, coords = None):
+	def addPlayer(self, player, coords = None, pixel_remainder = (0, 0)):
 		""" addPlayer( Player, ( int, int ) ) -> None
 
 		Add the given player to the level at the given tile coordinates.
@@ -398,6 +401,7 @@ class Level(object):
 			self.update_explored()
 			return
 		player.moveTo(coords)
+		player.moveRect(pixel_remainder[0], pixel_remainder[1])
 		self.level_camera.update(player)
 		player.update(self.getTiles(), self.empty_light_map())
 		pygame.display.update()
@@ -720,6 +724,8 @@ class Level(object):
 			interactables.append(m)
 		for n in self.getNPCs():
 			interactables.append(n)
+		for t in self.getTriggers():
+			interactables.append(t)
 		return interactables
 		#TODO: other objects that should update based on the player
 
@@ -790,6 +796,15 @@ class Level(object):
 		Returns all entities in the level.
 		"""
 		return self.level_objects.get_entities(Entity)
+
+	def getTriggers(self):
+		""" l.getTriggers( ) -> [?]
+
+		Returns all triggers in the level.
+		Currently, only cutscene triggers exist and there is no superclass.
+		This is because these may end up being the only trigger types that exist.
+		"""
+		return self.level_objects.get_entities(CutsceneTrigger)
 
 	def getPickups(self):
 		""" l.getPickups( ) -> [ Pickup ]

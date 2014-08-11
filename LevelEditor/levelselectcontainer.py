@@ -121,7 +121,7 @@ class LevelSelectContainer(Box):
 			self.level_data_table.add_child(self.level_count, 0, added_level_cell)
 			self.level_count += 1
 			return
-		added_level_cell = LevelSelectCell(level_data.name, level_data.sunlit)	#it might later be better just to take the whole leveldata as an arg
+		added_level_cell = LevelSelectCell(level_data.name, level_data.sunlit, level_data.bg_filename)	# it might later be better just to take the whole leveldata as an arg
 		self.level_data_table.add_child(self.level_count, 0, added_level_cell)
 		self.level_count += 1
 

@@ -1,7 +1,7 @@
 from levelgrid import *
 
 class LevelGridWindow(ScrolledWindow):
-	def __init__(self, level_editor, x, y, width, height):
+	def __init__(self, level_editor, x, y, width, height, bg_filename):
 		ScrolledWindow.__init__(self, width, height)
 		self.topleft = x, y
 		
@@ -9,7 +9,7 @@ class LevelGridWindow(ScrolledWindow):
 		print "Adding level grid to window..."
 		self.set_child(self.level_grid)		# lots of lag still happening in here for some reason
 		print "Level grid added to window."
-		self.level_grid.init_components()
+		self.level_grid.init_components(bg_filename)
 		self.master_editor = level_editor
 		self.connect_signal(SIG_MOUSEDOWN, self.processClick)
 
@@ -22,7 +22,8 @@ class LevelGridWindow(ScrolledWindow):
 	def processClick(self, event):
 		check_pos = (event.pos[0] - self.left - 38,event.pos[1] - self.top - 54)
 		if check_pos[0] >= self.hscrollbar.top or check_pos[1] >= self.vscrollbar.left: return
-		self.level_grid.processClick(event,self.calculate_offset)
+		bg_filename = self.master_editor.current_bg
+		self.level_grid.processClick(event, self.calculate_offset, bg_filename)
 
 	def calculate_offset(self):
 		window_pos = (self.left, self.top)

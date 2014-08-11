@@ -8,7 +8,7 @@ CELL_WIDTH = 242
 CELL_HEIGHT = 36 
 #not yet sure if the cell should store level data, or simply be used to create it. (I would prefer the latter.)
 class LevelSelectCell(Table):
-	def __init__(self, name, sunlit = False):	#might want to build the cell from a levelData object
+	def __init__(self, name, sunlit = False, bg_filename = None):	#might want to build the cell from a levelData object
 		Table.__init__(self, 1, 1) 
 		self.set_minimum_size(CELL_WIDTH, CELL_HEIGHT)
 		self.name = name # TODO:consider retrieving from self.level_data instead
@@ -16,7 +16,7 @@ class LevelSelectCell(Table):
 		self.add_child(0, 0, self.name_label)
 		self.room_cells = None
 		self.sunlit = sunlit
-		self.bg_filename = None
+		self.bg_filename = bg_filename
 		
 	def get_name(self): #TODO: consider making this getter access level data instead.
 		return self.name

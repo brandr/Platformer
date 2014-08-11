@@ -33,15 +33,15 @@ class Player(Being):
         self.animated = True
         self.default_image = self.animation.images[0]
         self.current_level = start_level
-
         self.active = True
         self.can_jump = True
         self.left, self.right, self.down, self.up, self.space, self.control, self.x = False, False, False, False, False, False, False
         self.movement_state = DEFAULT_MOVEMENT_STATE
-
         self.lantern = None
 
         #TODO: come up with a more general system for swords/weapons
+        self.viewed_cutscene_keys = []
+        #TEMP
         self.sword = Sword(self)
         #TEMP
 
@@ -477,6 +477,13 @@ class Player(Being):
         Resume normal gameplay.
         """
         self.current_level.unpause_game(self)
+
+    def has_viewed_cutscene(self, cutscene_key):
+        """ p.has_viewed_cutscene( str ) -> bool
+
+        Check whether the player has seen a cutscene based on its associated string key.
+        """
+        return cutscene_key in self.viewed_cutscene_keys
 
     def get_lantern(self):
         """ p.get_lantern( ) -> Lantern

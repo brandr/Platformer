@@ -1,10 +1,6 @@
 import dungeoneditorscreen
 from dungeoneditorscreen import *
 """
-	#IMMEDIATE STUFF
-
-# Fix that lag!
-
 	#LEVEL EDITOR GRID STUFF
 
 #TODO: Since adding differently rotated platforms is currently annoying, consider ways of rotating selected entities, 

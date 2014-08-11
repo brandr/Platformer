@@ -3,11 +3,14 @@
 
 from platformfactory import *
 from pickupfactory import *
+
 from ladder import *
 from lantern import *
 from exitblock import *
 from monster import *
 from sign import *
+from cutscenetrigger import *
+
 from npcfactory import *
 from roomdata import *
 
@@ -24,6 +27,9 @@ ENTITY_CONSTRUCTOR_MAP = {
 	BAT:Monster,
 	GIANT_FROG:Monster,
 
+	MINER:NonPlayerCharacter,
+
+	DEFAULT_CUTSCENE_TRIGGER:CutsceneTrigger,
 	#TEMP
 	KENSTAR:NonPlayerCharacter
 }
@@ -41,7 +47,7 @@ class EntityFactory(object):
 		if entity_key not in ENTITY_CONSTRUCTOR_MAP: return None
 		constructor = ENTITY_CONSTRUCTOR_MAP[entity_key]
 		entity = constructor(animation_set, x, y)
-		if entity_key in ENTITY_BUILD_MAP:
+		if entity_key in ENTITY_BUILD_MAP:		# not sure to what extent the entity build map is used anymore.
 			build_function = ENTITY_BUILD_MAP[entity_key]
 			build_function(entity, entity_key)
 		return entity 					
@@ -87,5 +93,6 @@ ENTITY_BUILD_MAP = {
 	BAT:EntityFactory.initMonster,
 	GIANT_FROG:EntityFactory.initMonster,
 	KENSTAR:EntityFactory.initNPC,
+	MINER:EntityFactory.initNPC,
 	DEFAULT_SIGN:EntityFactory.initSign
 }

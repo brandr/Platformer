@@ -55,6 +55,7 @@ class NonPlayerCharacter(Being):
 
 		Updates the NPC's animation and make it face towards the player.
 		"""
+		if not (self.onGround): self.snap_to_ground()
 		self.changeAnimation('idle', self.direction_id)
 		if self.active:
 			self.NPC_update(player)
@@ -232,10 +233,10 @@ NEUTRAL = "neutral"
 
 KENSTAR = "kenstar"
 
+MINER = "miner"
+
 #NPCS_WITH_PORTRAITS = ["Kenstar"] #TODO: if this NPC's name is in this list, they have a portrait. Otherwise, they don't.
 								  # might not need this: could just use a default (None) arg for all NPCs that don't have portraits.
-
-#KENSTAR_PORTRAIT_SET = {} #TODO: instead of mapping individual key words to portrait filenames, build the filenames out of their individual components
 
 ACTION_SET = "action_set"	
 ADD_DIALOG_SET = "add_dialog_set"
