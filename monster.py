@@ -50,7 +50,7 @@ class Monster(Being):
     and the monster dies when its current hp reaches 0.
     """
     def __init__(self, animations, x, y): 
-        Being.__init__(self,animations, x, y)
+        Being.__init__(self, animations, x, y)
         self.name = None
         self.animated = True
         self.active = True
@@ -86,16 +86,17 @@ class Monster(Being):
         In the future we should probably do this with a dict.
         """
         self.updateAnimation()
-
         #TODO: check if the monster can see the player. (using sightdist)
         #TODO: check if the monster is hostile the player.
         #TODO: figure out a better way to assosciate the monster with its udpate action (probably a dict.)
         if not self.active:
             return
         if self.name == "bat": #TEMPORARY
-            self.batUpdate(player)
+            self.bat_update(player)
         elif self.name == "giant_frog": #TEMPORARY
-            self.frogUpdate(player)
+            self.frog_update(player)
+        elif self.name == "miner":
+            self.miner_update(player) #TEMP
         Being.updatePosition(self)
         #TODO: giant frog animations and AI
 
@@ -106,8 +107,8 @@ class Monster(Being):
         """
         self.active = active
 
-    def batUpdate(self, player):
-        """ m.batUpdate( Player ) -> None 
+    def bat_update(self, player):
+        """ m.bat_update( Player ) -> None 
 
         In-progress method handling a bat's behavior.
         """
@@ -118,8 +119,8 @@ class Monster(Being):
         if(target != None):
             self.moveTowards(player.current_tile())
 
-    def frogUpdate(self, player):
-        """ m.frogUpdate( Player ) -> None 
+    def frog_update(self, player):
+        """ m.frog_update( Player ) -> None 
 
         In-progress method handling a giant frog's behavior.
         """
@@ -137,6 +138,15 @@ class Monster(Being):
             if self.wait_count <= 0:
                 self.jump(self.direction_val*self.max_speed/2, self.max_speed)
             self.wait()
+
+    #TEMP
+    def miner_update(self, player):
+        self.gravityUpdate()
+        if self.bounce_count > 0:   
+            self.bounce()
+            return
+    #TODO: miner boss AI goes here.
+    #TEMP
 
     def collide(self, xvel, yvel):
         """ m.collide( int, int ) -> None 

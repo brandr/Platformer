@@ -5,6 +5,7 @@ from room import *
 from entityfactory import *
 from effect import *
 from tilefactory import TileFactory
+from cutscenescripts import ACTOR_GROUP_MAP
 
 BLACK = Color ("#000000")
 EXPLORED_GREY = Color("#222222")
@@ -457,6 +458,23 @@ class Level(object):
 		for m in self.getMonsters():
 			m.set_active(False)
 
+	def get_actor(self, actor_group_type, actor_key):
+		""" l.get_actor( Class, str ) -> Player/NPC/Sign
+
+		Get an actor on this level using a unique key, along with the actor's class.
+		For use during cutscenes.
+		"""
+		return ACTOR_GETTER_MAP[actor_group_type](self, actor_key)
+
+	def get_NPC_actor(self, NPC_key):
+		""" l.get_NPC_actor( str ) -> NonPlayerCharacter
+
+		Gets a nonplayercharacter using its name as a unique key.
+		For use during cutscenes.
+		"""
+		for n in self.getNPCs():
+			if n.name == NPC_key: return n
+
 	def begin_cutscene(self, cutscene, instant = False):
 		""" l.begin_cutscene( Cutscene, bool ) -> None
 
@@ -496,6 +514,7 @@ class Level(object):
 
 		End whatever event is currently taking place and return to normal gameplay.
 		"""
+		self.current_event.end()
 		self.current_event = None
 		self.end_effects()
 		self.screen_manager.current_screen.control_manager.switch_to_main_controls(self.getPlayer())
@@ -869,3 +888,6 @@ class Level(object):
 		"""
 		return self.level_objects.get_entities(ExitBlock)
 		
+ACTOR_GETTER_MAP = {
+	NonPlayerCharacter:Level.get_NPC_actor
+}

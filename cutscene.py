@@ -1,4 +1,4 @@
-""" A cutscene during which things happen and buttons only advance the dialog.
+""" A cutscene during which things happen and buttons only advance the dialog. This may be irrelevant since it isn't much different from any other GameEvent. Not sure.
 """
 
 from gameevent import *
@@ -13,9 +13,10 @@ class Cutscene(GameEvent):
 
 	level: the level that the cutscene takes place on.
 	"""
-	def __init__(self, start_actions = []): #TODO: figure out what is special about cutscenes that can be used to separate them from normal events
+	def __init__(self, start_actions = [], level = None, end_action = None): #TODO: figure out what is special about cutscenes that can be used to separate them from normal events
 		GameEvent.__init__(self, start_actions)
-		self.level = None #TODO: either make a way to set level, or create a system that doesn't need it.
+		self.level = level #TODO: either make a way to set level, or create a system that doesn't need it.
+		self.end_action = end_action
 
 	def begin(self):
 		""" c.begin( ) -> None
@@ -31,12 +32,27 @@ class Cutscene(GameEvent):
 		Update all the current ongoing actions for this cutscene.
 		"""
 		for a in self.current_actions:
-			a.update(self)
-	
-	def continue_event(self): #TODO: change this method if pressing buttons should affect cutscenes. (this may need to be changed once we have cutscenes with dialog)
+			a.update(self, level)
+
+	def continue_event(self):
 		""" c.continue_event( ) -> bool
 
-		An abstract method that determines whether this event should continue.
-		Other classes handle this method differently.
+		Determine whether the event should continue by checking whether any of its actions are still occurring.
 		"""
+		if self.current_actions:
+			should_continue = False
+			for a in reversed(self.current_actions):
+				if a.continue_action(self, self.level):
+					should_continue = True
+			return should_continue or self.level.has_effects
+		#NOTE: this is not a constant update method, but is called when the player presses X.
+		# 	   it's possible that other keys should be allowed to pass into an event. Might make a key dict for some situations.
 		return True
+
+	def end(self):
+		""" c.end( ) -> None
+
+		Executes the associated end action.
+		Consider giving gameevents end actions if it might be useful.
+		"""
+		if self.end_action: self.end_action.execute()

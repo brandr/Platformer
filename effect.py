@@ -51,12 +51,13 @@ class Effect:
 			return
 		self.end_function = Effect.instant_close
 
-	def instant_close(self, level):
-		""" e.instant_close( Level ) -> Surface
+	def instant_close(self, level, clear_all = False):
+		""" e.instant_close( Level, Bool ) -> Surface
 
-		Removes this effect from the level instantly.
+		Removes this effect from the level instantly, along with all other effects if clear_all is True.
 		"""
 		level.remove_effect(self)
+		level.clear_effects()
 		return Surface((0, 0)), (0, 0)
 
 	def draw_black_rectangle_top(self, dimensions, time = None): #currently used specifically for cutscenes
@@ -101,7 +102,7 @@ class Effect:
 			width, height = dimensions[0], time*4
 			offset_y = max(0, dimensions[1] - time*4)
 			return Surface((width, height)), (0, offset_y)
-		return self.instant_close(level)
+		return self.instant_close(level, True)
 
 	def draw_image(self, level = None):
 		if self.ending:
@@ -118,5 +119,6 @@ class Effect:
 		self.ending = True
 
 END_FUNCTION_MAP = {
-	Effect.draw_black_rectangle_top:Effect.remove_black_rectangle_top, Effect.draw_black_rectangle_bottom:Effect.remove_black_rectangle_bottom
+	Effect.draw_black_rectangle_top:Effect.remove_black_rectangle_top, 
+	Effect.draw_black_rectangle_bottom:Effect.remove_black_rectangle_bottom
 }

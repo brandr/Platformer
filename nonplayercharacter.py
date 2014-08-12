@@ -4,6 +4,7 @@
 from being import *
 from gameevent import *
 from dialogchoice import *
+from monster import Monster
 
 class NonPlayerCharacter(Being):
 	""" NonPlayerCharacter( AnimationSet, int, int ) -> NonPlayerCharacter
@@ -228,6 +229,16 @@ class NonPlayerCharacter(Being):
 		if self.name == None:
 			return None
 		return "portrait_" + self.name + "_" + key + ".bmp"
+
+		#TEMP
+		#IDEA: change this method to "become hostile" or something in order to turn any NPC into its corresponding (mapped) monster.
+	def test_begin_fight(self, arg = None):
+		#TODO
+		monster_self = Monster(self.animation_set, self.rect.left, self.rect.top)
+		monster_self.name = self.name
+		self.current_level.level_objects.addEntity(monster_self)
+		self.delete()
+		#TEMP
 
 NEUTRAL = "neutral"
 

@@ -50,6 +50,13 @@ class GameEvent:
 		# 	   it's possible that other keys should be allowed to pass into an event. Might make a key dict for some situations.
 		return False 
 
+	def end(self):
+		""" ge.end( ) -> None
+
+		Does nothing, but overridden by cutscene.
+		"""
+		return
+
 	def add_action(self, action):
 		""" ge.add_action( GameAction ) -> None
 

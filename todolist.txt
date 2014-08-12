@@ -37,19 +37,8 @@ IMMEDIATE STUFF: most immediate
 # Make a boss (start with archaeologist)
     - give him a pick or something
     steps:
-        1. start with a cutscene when you walk into the same room as him
-            - think carefully about cutscene system
-            - IDEA: follow these steps:
-                a.  make a file like cutscenescripts.py with data structures for all possible cutscenes (there shouldn't be too many, after all)
-                    and map them accordingly
-                b.  make invisible "cutscene trigger" objects that are mapped to cutscenes. Make sure multiple triggers can map to one cutscene, and
-                    also that the same cutscene can never be triggered more than once by the player colliding with the trigger.
-                c.  Make an "additional data pane" that can be used to set the proper cutscene key for a trigger. It may be helpful to make it so such
-                    triggers are copied by default if new ones are created after setting the first.
-                d.  figure out how to parse the cutscenes from the script file, probably by using string keys for actors/actions. For instance, if an 
-                    NPC with a certain name is an actor, have the level iterate through its set of NPCs until it finds the one with that name.
-                    Making this efficient for large numbers of NPCs might be somewhat tricky, but I don't expect noticeable slowdown even in this case.
-        2. make him turn into a monster at the end (code-wise, that is). Finish this much before worrying about how that monster behaves.
+        1. Make him turn into a monster at the end (code-wise, that is). Finish this much before worrying about how that monster behaves.
+        2. (worry about monster behavior here.)
 
 # make archaeologist portaits
 

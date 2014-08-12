@@ -112,7 +112,7 @@ class Dialog(Effect):
 		pane.fill(WHITE)
 		return pane
 
-	#even though dialog inherits from effect, it shares some methods with GameAction.
+	# even though dialog inherits from effect, it shares some methods with GameAction.
 
 	def add_next_action(self, action):
 		""" d.add_next_action( GameAction ) -> None
