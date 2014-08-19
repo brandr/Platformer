@@ -3,22 +3,6 @@
 
 from being import *
 
-DEFAULT = "default"
-BAT = "bat"
-GIANT_FROG = "giant_frog"
-HIT_POINTS = "hit_points"
-
-MONSTER_DATA_MAP = { 
-    DEFAULT:
-        {
-        HIT_POINTS:1
-        },
-    GIANT_FROG:
-        {
-        HIT_POINTS:3
-        }
-}
-
 class Monster(Being):
     """ Monster( AnimationSet, int, int ) -> AnimationSet
 
@@ -62,6 +46,7 @@ class Monster(Being):
 
         self.wait_count = 20        # TEMP. As monster behavior gets more complex, find other ways to set timers.
         self.hit_points = None
+        self.weapon = None
 
     def monster_init(self, name):
         """ m.monster_init( str ) -> None
@@ -74,8 +59,16 @@ class Monster(Being):
             monster_map = MONSTER_DATA_MAP[name]
         else:
             monster_map = MONSTER_DATA_MAP[DEFAULT]
-        start_hp = monster_map[HIT_POINTS]
+        if HIT_POINTS in monster_map:
+            start_hp = monster_map[HIT_POINTS]
+        else:
+            start_hp = MONSTER_DATA_MAP[DEFAULT][HIT_POINTS]
+        if WEAPON in monster_map:
+            weapon = monster_map[WEAPON]
+        else:
+            weapon = MONSTER_DATA_MAP[DEFAULT][WEAPON]
         self.hit_points = [start_hp, start_hp]
+        self.weapon = weapon
 
     #TODO: make this general in the long run, so that monsters can interact with each other as well as with the player.
     #  in particular, consider having monsters "collide" with each other (they probably shouldn't bounce but I'm not sure.)
@@ -88,7 +81,7 @@ class Monster(Being):
         self.updateAnimation()
         #TODO: check if the monster can see the player. (using sightdist)
         #TODO: check if the monster is hostile the player.
-        #TODO: figure out a better way to assosciate the monster with its udpate action (probably a dict.)
+        #TODO: figure out a better way to assosciate the monster with its udpate action (probably a dict, though name alone might not be sophisticated enoough.)
         if not self.active:
             return
         if self.name == "bat": #TEMPORARY
@@ -96,9 +89,8 @@ class Monster(Being):
         elif self.name == "giant_frog": #TEMPORARY
             self.frog_update(player)
         elif self.name == "miner":
-            self.miner_update(player) #TEMP
+            self.miner_update(player) #TEMPORARY
         Being.updatePosition(self)
-        #TODO: giant frog animations and AI
 
     def set_active(self, active):
         """ m.set_active( bool ) -> None
@@ -145,8 +137,23 @@ class Monster(Being):
         if self.bounce_count > 0:   
             self.bounce()
             return
+        # TODO?
+        if self.onGround:
+            #self.changeAnimation('idle', self.direction_id)
+            self.xvel = 0
     #TODO: miner boss AI goes here.
+        self.miner_swing() # TEST
+    
+    def miner_swing(self):
+        self.changeAnimation('swinging', self.direction_id)
+        #self.weapon.activate(0, 0, self.direction_id)
+
+    @staticmethod
+    def miner_pick():
+        return None
+
     #TEMP
+
 
     def collide(self, xvel, yvel):
         """ m.collide( int, int ) -> None 
@@ -245,3 +252,28 @@ class Monster(Being):
         """
         self.delete()
         #TODO: death animation goes here
+
+DEFAULT = "default"
+BAT = "bat"
+GIANT_FROG = "giant_frog"
+MINER = "miner"
+
+HIT_POINTS = "hit_points"
+WEAPON = "weapon"
+
+MONSTER_DATA_MAP = { 
+    DEFAULT:
+        {
+        HIT_POINTS:1,
+        WEAPON:None
+        },
+    GIANT_FROG:
+        {
+        HIT_POINTS:3
+        },
+    MINER:
+        {
+        HIT_POINTS:20,
+        WEAPON:Monster.miner_pick
+        }
+}

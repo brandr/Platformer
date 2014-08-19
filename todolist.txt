@@ -14,33 +14,70 @@
 # when falling down a large chasm, player can get to the other side of a wall by holding left.
     - may be reproducible in more generalizable situations, like "leaving the level very quickly and diagonally"
 
-    #IMMEDIATE STUFF
-
 #NOTE: see dungeoneditorlauncher.py for dungeon editor-specific TODOs.
 
 # Make docstrings for each class
-
     remaining classes to docstring:
 
     (all LevelEditor classes)
 
-MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mechanics, etc. once all immediate stuff is finished.
-    - the next demo should include inventory screen and lantern mechanics based on fading light/oil
+-----------------------------------------------------------------------
+
+LONG-TERM GOALS: (short summaries, does not include all TODOs)
+
+# combat
+    - more sophisticated collisions/knockback/invincibility frames
+    - more sophisticated damage/hp system (probably don't need too much in this area, though)
+    - more sophisticated use of subentities like more general melee weapons, projectiles, armor plating, weak spots, etc.
+# monsters
+    - more general mapping to AI
+    - look for patterns while developing more AI routines and try to minimize redundancy
+    - consider the ability to set varying monster data, based on what monster data turns out to be useful
+    - maybe have different sprites/animation sets for the same monster (this might not be worth the effort)
+# cutscenes/events
+    - consider cutscenes with dialog options, different possible endings, world data checks, etc.
+    - currently cutscene building is incomplete is far as building cutscenes with multiple actions 
+        * see begin_cutscene in cutsenetrigger.py.
+# world and world data
+    - dungeon <-> world relationship
+    - saving/loading game
+    - world data:
+        * will be something stored as an instance when the player saves, but also update as the player goes through the game.
+        * includes relatively temporary things like which enemies have been killed and which blocks have been broken, 
+          as well as permanent things like "morality" data, which cutscenes have been viewed, which shortcuts have been opened, etc.
+# exploration/hidden objects
+    - Breakable blocks? Pick/shovel item? "Hidden" tiles that appear as solid block until the player's light strikes them?
+    - Need more ideas before I can really start fleshing out exploration system
+    - Keep in mind how the map will work
+# items/inventory
+    - Barely implemented and don't have many ideas.
+    - There should probably be an inventory screen.
+# screens/menus
+    - Make it more clear what each screen is supposed to be and plan out the pause screens/menus after other systems have been implemented.
 
 -------------------------------------------------------------------
+
+OVERARCHING MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mechanics, etc. once all immediate stuff is finished.
+    - the next demo should include inventory screen and lantern mechanics based on fading light/oil
 
 IMMEDIATE STUFF: most immediate
 
 # fix lag more
 # fix the issue where the player sometimes doesn't travel between levels properly, but make sure he also doesn't appear too far offscreen
 
-# Make a boss (start with archaeologist)
-    - give him a pick or something
+# Make a boss
+    
     steps:
-        1. Make him turn into a monster at the end (code-wise, that is). Finish this much before worrying about how that monster behaves.
-        2. (worry about monster behavior here.)
+        1. Consider giving him a pick or something.
+            - this would be a subentity, similar to the player's sword.
+            - make a "miner swinging" sprite animation which does not contain the pick itself, and make the pick animation line up
+            - this would require better fleshing out the subentity/weapon system.
+            - make a "swinging state" that the miner uses to know when it is in the middle of swinging a pick (and therefore can't do other stuff, like swinging again)
+            - NOTE: pick animation offset is (32, 13)
+        2. The miner is supposed to be fast and aggressive, so experiment with different ways to achieve this.
 
-# make archaeologist portaits
+
+# make miner portait(s)
 
 # make it easier to add simple NPCs with no actions or branching dialog trees, since most NPCs will work this way. Follow the same pattern as signs
   and make a "default NPC" that can have many different sprites. Note that such NPCs will not have dialog portraits.
@@ -51,7 +88,7 @@ IMMEDIATE STUFF: most immediate
 # fix the problem where the player bounces up and down on stairs.
     - this may be related to another issue where the player collides with doors wrong.
 
-# TODO: make the "hit spark" better (and possibly more general)
+# TODO: make the "hit spark" better (and possibly more well-adapted to the shape of the thing hit)
     - consider other ways to show that something is being damaged
 
 # show that the player is being damaged 
@@ -70,7 +107,7 @@ IMMEDIATE STUFF: most immediate
     - later, use gun/bow as example
 # consider making the lantern a subentity of the player that appears when the player is in the dark
 # figure out an item system
-    - remember that lantern/sword are items but work very differently
+    - remember that the lantern and sword are items but work very differently
 
 # generalize subentities/entityeffects so that they can apply to monsters and NPCs
 
@@ -146,21 +183,7 @@ IMMEDIATE STUFF: dialog
 
 IMMEDIATE STUFF: cutscenes
 
-# Try to implement some more examples of cutscenes, like two non-player characters with actions and scrolling dialogue.
-    - use dialogue from girlchan in paradise as a test. It'll make it more fun.
-    - Have Yusuke talking to Kenstar
-    - to test something I'll probably use a lot: 
-        * have Yusuke start on the screen, but not Kenstar
-        * make the cutscene start when the player talks to Yusuke
-        * Have the cutscene "create" Kenstar off the left edge of the screen and make him walk on
-        * Test different facial expressions in the portraits
-        * use other actions from there (don't care as much about these)
-        * maybe end with Kenstar leaving and Yusuke staying (you can talk to him, but it doesn't start a new cutscene)
-        * alternately, figure out how to keep Kenstar but take away his cutscene trigger.
-    - probably use that scene where they're about to fight but spend forever talking instead
-        * still have actions mixed with dialogue for testing reasons, though
-
-# Think of a structure that will allow different events to happen at the same time in a cutscene 
+# Make sure cutscene structure will allow allow different events to happen at the same time in a cutscene 
     - i.e., entity A starts walking, entity B does something while A is still walking
     - this might work if actions are not ended when new actions start, meaning ending an action is an action in itself.
     - IDEA: different actions that make up a cutscene are linked to "next" actions, which execute when they are over.
@@ -175,35 +198,26 @@ IMMEDIATE STUFF: cutscenes
 
 # implement collectable items of some kind and an inventory screen
     - will require a lot of planning as far as actual game design
-# make lanterns run out with distance
-    - this means implementing lantern as a held object, making it different that the current system.
-    - Need to figure out how the player will interface with "Lantern oil" amounts and how that system will work.
 # consider making it so the player does not jump repeatedly if the jump button is held down.
-# Make a launcher that makes it possible to select which dungeon to load
-    # It may help to change the dungeoneditor to let the user give different dungeons different saved names.
-    # A filelist would be useful for this.
+# Make a launcher that makes it possible to select which dungeon to load from the saved list.
 # build the enemies extensibly. Make temporary classes/methods if necessary, but plan to replace them later
-    # have the bat start hanging from the ceiling and maybe give it "dropping"
-        # animation followed by the flying animation
-    # change the bat's attack patterns so that it periodically flaps around the player before diving, bounces off, 
-        # moves away, and then dives again.
-        # (some randomness may make this pattern look more natural)
+    - have the bat start hanging from the ceiling and maybe give it "dropping"
+      animation followed by the flying animation
+    - change the bat's attack patterns so that it periodically flaps around the player before diving, bounces off, 
+      moves away, and then dives again.
+        * (some randomness may make this pattern look more natural)
 # consider possible combat systems (damage, HP, etc)
 # consider removing level_ID, but first try to think of possible uses for it.
-# figure out how to handle monsters in complete/partial darkness
-    # I put an idea in Being class
-    # Keep in mind that the being may occupy multiple tiles
+    - it is likely to come in handy when "world data" is implemented.
 
     # USER SUGGESTIONS
 
-# make it so when reading signs, the "continue reading" button is the same as the "start reading button"
 # Add pigs (simon)
+# make a bicycle weapon (simon)
 
 ---------------------------------------------------------------
 
-
     # REDUCING LAG
-
 
 # IDEA to reduce lag: instead of having the level constantly check for up-interacatbles, simply generate a list stored in levelobjects
     when the level is created
@@ -241,7 +255,7 @@ IMMEDIATE STUFF: cutscenes
 
     # LONG-TERM STUFF
 
-# change the player sprites to match my concept art
+# change the rest of the player sprites to match my concept art
 # since being in the dark with no light could make it extremely tedious to get out, make a "suicide" option and ensure that death
     has siginficant pentalties and sends the player back to a save point where they are guaranteed to have access to light
         - want to structure the game partly around this system

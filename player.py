@@ -144,10 +144,8 @@ class Player(Being):
         if up:
             if self.collide_ladder():
                 self.movement_state = LADDER_MOVEMENT_STATE
-
         if down:
             pass
-
         if left and not right:
             self.xvel = -3
             self.direction_id = 'left'
@@ -162,7 +160,6 @@ class Player(Being):
                 self.animation.iter()
                 self.onGround = False
                 self.can_jump = True
-
         if not self.onGround:    # only accelerate with gravity if in the air
             self.yvel += 0.35
             #TODO: falling animation starts once self.yvel >=0 (or maybe slightly lower/higher)

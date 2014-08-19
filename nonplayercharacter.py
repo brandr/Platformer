@@ -236,6 +236,7 @@ class NonPlayerCharacter(Being):
 		#TODO
 		monster_self = Monster(self.animation_set, self.rect.left, self.rect.top)
 		monster_self.name = self.name
+		monster_self.monster_init(self.name)
 		self.current_level.level_objects.addEntity(monster_self)
 		self.delete()
 		#TEMP

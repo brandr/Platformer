@@ -51,7 +51,7 @@ class CutsceneTrigger(Block):
 		cutscene = Cutscene(start_action_list, level, cutscene_end_action)
 		level.begin_cutscene(cutscene)
 
-		#mark that the player has already seen the cutscene.
+		# mark that the player has already seen the cutscene.
 		player.viewed_cutscene_keys.append(self.cutscene_key)
 
 	def build_cutscene_action_list(self, action_data_list, level):
@@ -85,7 +85,6 @@ class CutsceneTrigger(Block):
 		dialog_tree = action_data[2]
 		actor.init_dialogs(dialog_tree)
 		return actor.first_dialog
-		#TODO: return a method but don't execute it
 
 	#TEMP
 	def test_begin_miner_fight(self, miner, action_data):

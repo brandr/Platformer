@@ -77,9 +77,14 @@ D_DEFAULT = "default"
 #animation keys
 
 DEFAULT = "default"
+
 IDLE = "idle"
 IDLE_LEFT = "idle_left"
 IDLE_RIGHT = "idle_right"
+
+SWINGING = "swinging"
+SWINGING_LEFT = "swinging_left"
+SWINGING_RIGHT = "swinging_right"
 
 #TODO: as we add more monsters, look for patterns in their animation sets and 
 	# generalize these data structures accordingly.
@@ -98,6 +103,16 @@ IDLE_RIGHT = "idle_right"
 DEFAULT_LANTERN_ANIMATION_KEYS = [
 	(DEFAULT, DEFAULT, D_DEFAULT),
 ]
+
+MINER_ANIMATION_KEYS = [
+	(IDLE_LEFT, IDLE, D_DEFAULT),
+	(IDLE_LEFT,  IDLE, D_LEFT), 
+	(IDLE_RIGHT, IDLE, D_RIGHT),
+	(SWINGING_LEFT, SWINGING, D_LEFT),
+	(SWINGING_RIGHT, SWINGING, D_RIGHT)
+]
+
+# DEFAULTS
 
 DEFAULT_MONSTER_ANIMATION_KEYS = [
 	(IDLE_LEFT, IDLE, D_DEFAULT),
@@ -123,7 +138,8 @@ BAT_ANIMATION_KEYS = [
 
 ANIMATION_KEY_MAP = {
 	DEFAULT_LANTERN:DEFAULT_LANTERN_ANIMATION_KEYS,
-	BAT:BAT_ANIMATION_KEYS
+	BAT:BAT_ANIMATION_KEYS,
+	MINER:MINER_ANIMATION_KEYS
 }
 
 CATEGORY_ANIMATION_KEY_MAP = {
