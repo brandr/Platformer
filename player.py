@@ -5,8 +5,9 @@ from being import *
 from lantern import *
 from exitblock import *
 from platform import *
+from weaponfactory import build_weapon, SWORD
 
-from sword import * #TEMP
+#from sword import * #TEMP
 
 class Player(Being):
     """ Player( AnimationSet, Level ) -> Player
@@ -42,7 +43,7 @@ class Player(Being):
         #TODO: come up with a more general system for swords/weapons
         self.viewed_cutscene_keys = []
         #TEMP
-        self.sword = Sword(self)
+        self.sword = build_weapon(SWORD, self)
         #TEMP
 
     def temp_z_method(self):    

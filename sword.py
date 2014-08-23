@@ -1,4 +1,5 @@
 """ A sword that the player can swing. Find a general class to describe this object in the long run.
+NOTE: this class may now be obsolete.
 """
 
 from entityeffect import *

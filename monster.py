@@ -2,6 +2,7 @@
 """
 
 from being import *
+from weaponfactory import build_weapon, PICK
 
 class Monster(Being):
     """ Monster( AnimationSet, int, int ) -> AnimationSet
@@ -68,7 +69,7 @@ class Monster(Being):
         else:
             weapon = MONSTER_DATA_MAP[DEFAULT][WEAPON]
         self.hit_points = [start_hp, start_hp]
-        self.weapon = weapon
+        if weapon: self.weapon = weapon(self)
 
     #TODO: make this general in the long run, so that monsters can interact with each other as well as with the player.
     #  in particular, consider having monsters "collide" with each other (they probably shouldn't bounce but I'm not sure.)
@@ -146,11 +147,11 @@ class Monster(Being):
     
     def miner_swing(self):
         self.changeAnimation('swinging', self.direction_id)
-        #self.weapon.activate(0, 0, self.direction_id)
+        if not self.weapon.active:
+            self.weapon.activate(31, -13, self.direction_id)
 
-    @staticmethod
-    def miner_pick():
-        return None
+    def miner_pick(self):
+        return build_weapon(PICK, self)
 
     #TEMP
 

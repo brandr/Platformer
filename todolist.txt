@@ -68,13 +68,13 @@ IMMEDIATE STUFF: most immediate
 # Make a boss
     
     steps:
-        1. Consider giving him a pick or something.
-            - this would be a subentity, similar to the player's sword.
-            - make a "miner swinging" sprite animation which does not contain the pick itself, and make the pick animation line up
-            - this would require better fleshing out the subentity/weapon system.
-            - make a "swinging state" that the miner uses to know when it is in the middle of swinging a pick (and therefore can't do other stuff, like swinging again)
-            - NOTE: pick animation offset is (32, 13)
-        2. The miner is supposed to be fast and aggressive, so experiment with different ways to achieve this.
+        1. Make sure his pick works properly.
+            - May want to create "bouncing" or "getting hit" animations for both the player and the miner
+            - NOTE: pick animation offset is (33, -13)
+        2. Make sure the miner collides with blocks correctly.
+        3. The miner is supposed to be fast and aggressive, so experiment with different ways to achieve this.
+        4. Attack pattern idea: charge while swinging, turn around in an exaggerrated way (if the player is behind), charge while swinging again
+            - figure out how attack pattern will work, and make it interruptible (probably)
 
 
 # make miner portait(s)

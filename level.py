@@ -637,6 +637,20 @@ class Level(object):
 
 			# TODO: blit subentites and then entity effects of non-player objects starting here
 
+			for m in self.getMonsters():
+				monster_subs = m.active_subentities
+				if monster_subs:
+					for s in monster_subs:
+						s.update()
+						self.screen.blit(s.image, self.level_camera.apply(s))
+				monster_effects = player.entity_effects
+				if monster_effects:
+					for e in monster_effects:
+						e.update()
+						self.screen.blit(e.image, self.level_camera.apply(e))	
+
+			# ...and ending here
+
 			#TEMP
 			player_subs = player.active_subentities
 			if player_subs:
