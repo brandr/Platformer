@@ -70,12 +70,12 @@ IMMEDIATE STUFF: most immediate
     steps:
         1. Make sure his pick works properly.
             - May want to create "bouncing" or "getting hit" animations for both the player and the miner
+            - Maybe the miner doesn't bounce? This would make things much easier.
             - NOTE: pick animation offset is (33, -13)
         2. Make sure the miner collides with blocks correctly.
         3. The miner is supposed to be fast and aggressive, so experiment with different ways to achieve this.
         4. Attack pattern idea: charge while swinging, turn around in an exaggerrated way (if the player is behind), charge while swinging again
             - figure out how attack pattern will work, and make it interruptible (probably)
-
 
 # make miner portait(s)
 

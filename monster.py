@@ -45,6 +45,7 @@ class Monster(Being):
         self.direction_id = 'left'
         self.changeAnimation('idle','left')
 
+        self.can_bounce = True
         self.wait_count = 20        # TEMP. As monster behavior gets more complex, find other ways to set timers.
         self.hit_points = None
         self.weapon = None
@@ -56,20 +57,46 @@ class Monster(Being):
         Might move this to a new MonsterFactory class if it clutters up this 
         class too much.
         """
+        default_map = MONSTER_DATA_MAP[DEFAULT]
         if name in MONSTER_DATA_MAP:
             monster_map = MONSTER_DATA_MAP[name]
+            for key in default_map:
+                if key in monster_map:
+                    self.init_attribute(key, monster_map[key])
+                else:
+                    self.init_attribute(key, default_map)
         else:
-            monster_map = MONSTER_DATA_MAP[DEFAULT]
-        if HIT_POINTS in monster_map:
-            start_hp = monster_map[HIT_POINTS]
-        else:
-            start_hp = MONSTER_DATA_MAP[DEFAULT][HIT_POINTS]
-        if WEAPON in monster_map:
-            weapon = monster_map[WEAPON]
-        else:
-            weapon = MONSTER_DATA_MAP[DEFAULT][WEAPON]
-        self.hit_points = [start_hp, start_hp]
-        if weapon: self.weapon = weapon(self)
+            for key in default_map:
+                self.init_attribute(key, default_map[key])
+
+    def init_attribute(self, key, value):
+        """ m.init_attribute( str, ? ) -> None
+
+        Init the appropriate attribute to the given value.
+        """
+        init_method = MONSTER_INIT_MAP[key]
+        init_method(self, value)
+    
+    def init_hit_points(self, hit_points):
+        """ m.init_hit_points( int ) -> None
+
+        Set this monster's hp to the given value.
+        """
+        self.hit_points = [hit_points, hit_points]
+
+    def init_weapon(self, weapon):
+        """ m.init_weapon( MeleeWeapon ) -> None
+
+        Set this monster's weapon to the given weapon.
+        """
+        self.weapon = weapon(self)
+
+    def init_bounce(self, bounce):
+        """ m.init_bounce( bool ) -> None
+
+        Sets whether or not this monster can bounce.
+        """
+        self.can_bounce = bounce
 
     #TODO: make this general in the long run, so that monsters can interact with each other as well as with the player.
     #  in particular, consider having monsters "collide" with each other (they probably shouldn't bounce but I'm not sure.)
@@ -189,6 +216,16 @@ class Monster(Being):
                 self.exitLevel(e)
                 return
 
+    def bounceAgainst(self, other): # this is used for a monster colliding with the player, and may be useful in other cases.
+        """ m.bounceAgainst ( Being ) -> None
+
+        Bounce against another being, starting the bounce counter so that this monster cannot
+        take other actions until the counter runs out.
+        """
+        if self.can_bounce:
+            Being.bounceAgainst(self, other)
+        # TODO: separate bouncing frames from invincibility frames, and think of some structure that can hold both.
+
     def wait(self):
         """ m.wait( ) -> None
 
@@ -205,7 +242,6 @@ class Monster(Being):
         """
         self.xvel += xvel
         self.yvel -= yvel
-        #self.changeAnimation('jumping',self.direction_id)     #TODO
         self.animation.iter()
         self.wait_count = 25 #TEMP
         self.onGround = False
@@ -254,6 +290,13 @@ class Monster(Being):
         self.delete()
         #TODO: death animation goes here
 
+    def hittable_targets(self):
+        """ m.hittable_targets( ) -> [ Player ]
+        
+        A general method used by monsters and the player. For mosters, it returns the player, wrapped in a list (since monsters would be in a list as well.)
+        """
+        return [self.current_level.getPlayer()]
+
 DEFAULT = "default"
 BAT = "bat"
 GIANT_FROG = "giant_frog"
@@ -261,12 +304,14 @@ MINER = "miner"
 
 HIT_POINTS = "hit_points"
 WEAPON = "weapon"
+BOUNCE = "bounce"
 
 MONSTER_DATA_MAP = { 
     DEFAULT:
         {
         HIT_POINTS:1,
-        WEAPON:None
+        WEAPON:None,
+        BOUNCE:True
         },
     GIANT_FROG:
         {
@@ -275,6 +320,13 @@ MONSTER_DATA_MAP = {
     MINER:
         {
         HIT_POINTS:20,
-        WEAPON:Monster.miner_pick
+        WEAPON:Monster.miner_pick,
+        BOUNCE:False
         }
+}
+
+MONSTER_INIT_MAP = {
+    HIT_POINTS:Monster.init_hit_points,
+    WEAPON:Monster.init_weapon,
+    BOUNCE:Monster.init_bounce
 }

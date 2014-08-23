@@ -44,6 +44,7 @@ class Player(Being):
         self.viewed_cutscene_keys = []
         #TEMP
         self.sword = build_weapon(SWORD, self)
+        self.hit_points = [10, 10]
         #TEMP
 
     def temp_z_method(self):    
@@ -310,6 +311,17 @@ class Player(Being):
 
     #TODO: collidewith could be an abstract method in the object we collide with
     #TODO: could speed this method up by only checking collidable objects near the player.
+
+    def take_damage(self, damage):
+        """ p.take_damage( int ) -> None
+        
+        The player receives the given amount of damage.
+        Since the game would be a pain to test if the player could die, this is not yet implemented.
+        """
+        if damage <= 0: return
+        self.hit_points[0] -= damage
+
+
     def collide(self, xvel, yvel):
         """ p.collide( int, int ) -> None
 
@@ -436,6 +448,28 @@ class Player(Being):
             return
         self.bounce_count -= 1
 
+    def bounceAgainst(self, other): 
+        """ b.bounceAgainst ( Being ) -> None
+
+        Bounce against another being, starting the bounce counter so that the player cannot
+        take other actions until the counter runs out.
+        Similar to Being's bounceAgainst, except it alters the current state.
+        """
+        self.movement_state = BOUNCING_MOVEMENT_STATE
+        if(self.bounce_count > 0): return
+        x_direction_sign = 1
+        y_direction_sign = 1
+        if(self.rect.left < other.rect.left):
+            x_direction_sign = -1
+        if(self.rect.top < other.rect.top):
+            y_direction_sign = -1
+        new_xvel = 2 * x_direction_sign
+        new_yvel = 2 * y_direction_sign
+        self.xvel = new_xvel
+        self.yvel = new_yvel 
+        self.collide(self.xvel, self.yvel)
+        self.bounce_count = 40
+
     def light_distance(self):
         """ p.light_distance( ) -> int
 
@@ -489,6 +523,13 @@ class Player(Being):
         AHAHAHAHAHAHAHAHA oh wait you're serious
         """
         return self.lantern
+
+    def hittable_targets(self):
+        """ p.hittable_targets( ) -> [ Monster ]
+
+        Returns everything that can be hit by the player's weapons. Currently only includes monsters.
+        """
+        return self.current_level.getMonsters()
 
 DEFAULT_MOVEMENT_STATE = "default_movement_state"
 BOUNCING_MOVEMENT_STATE = "bouncing_movement_state"

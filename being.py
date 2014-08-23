@@ -45,7 +45,6 @@ class Being(Entity):
         self.sightdist = 5
         self.max_speed = 10 # doesn't apply to player yet, but could
         self.bounce_count = 0
-
         self.hit_points = None
         #TODO: if methods/data from monster/player are universal, move them to this class.
 
@@ -90,11 +89,22 @@ class Being(Entity):
         Collide with all solid platforms using the collideWith method also found in Being.
         Collisions with non-platform objects are handled by other methods.
         """
-        if(collide_objects == None):
-            level = self.current_level
-            collide_objects = level.get_impassables()
-        for c in collide_objects:
-            self.collideWith(xvel, yvel, c)
+
+    
+        level = self.current_level
+        platforms = level.get_impassables()
+        slopes = []
+        default_platforms = []
+        for p in platforms:
+            if pygame.sprite.collide_mask(self, p) and p.is_solid:
+                if p.is_sloped:
+                    slopes.append(p)
+                else:
+                    default_platforms.append(p)
+        for s in slopes:
+            self.collideWith(xvel, yvel, s)
+        for p in default_platforms:
+            self.collideWith(xvel, yvel, p)
 
     def collideWith(self, xvel, yvel, collide_object):
         """ b.collideWith (double, double, Platform) -> None
@@ -104,7 +114,8 @@ class Being(Entity):
         to move in the direction of that platform. (i.e., through the platform.)
         """
         if pygame.sprite.collide_rect(self, collide_object):  #may need collide_mask in some cases, not sure.
-            if isinstance(collide_object, Platform) and collide_object.is_sloped:   #consider dict here instead of if statements if we are trying to deal with lag
+            self.mask = pygame.mask.from_surface(self.image)
+            if isinstance(collide_object, Platform) and collide_object.is_sloped:   # not sure whether the slope version will work for non-sloping objects
                 self.collide_with_slope(xvel, yvel, collide_object)
                 return
             if isinstance(collide_object, Door):
@@ -113,6 +124,7 @@ class Being(Entity):
             if isinstance(collide_object, Being):
                 if not pygame.spirte.collide_mask(self, collide_object):
                     return
+            # TODO: better collision handling.
             if xvel > 0:
                 self.rect.right = collide_object.rect.left
             if xvel < 0:
@@ -196,7 +208,7 @@ class Being(Entity):
         Bounce against another being, starting the bounce counter so that this being cannot
         take other actions until the counter runs out.
         """
-    	if(self.bounce_count > 0): return
+        if(self.bounce_count > 0): return
         x_direction_sign = 1
         y_direction_sign = 1
         if(self.rect.left < other.rect.left):

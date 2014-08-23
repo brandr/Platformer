@@ -4,7 +4,7 @@
 from entityeffect import *
 
 class MeleeWeapon(SubEntity):
-	""" TODO: docstring
+	""" TODO: docstrings errywhere
 	"""
 	def __init__(self, superentity, animation_set):
 		SubEntity.__init__(self, superentity, animation_set)
@@ -17,7 +17,7 @@ class MeleeWeapon(SubEntity):
 
 		#TODO: 
 		# make a "spark" appear if the sword hits a monster
-		#print "SWING"
+		self.enemies_hit = []
 		self.direction_id = direction_id
 		if direction_id == 'left': off_x *= -1
 		self.changeAnimation('swinging', direction_id)
@@ -39,17 +39,18 @@ class MeleeWeapon(SubEntity):
 	def check_collisions(self):
 		#TEMP
 		# TODO: check things that block collisions with monsters BEFORE checking collisions with monsters
+		# TODO: if this weapon belongs to a monster, it can hurt the player. Therfore, instead of level.getMonsters, use some getter for the superentity's enemies.
 		self.rect = Rect(self.rect.left, self.rect.top, 32, 32)
-		level = self.superentity.current_level
-		monsters = level.getMonsters()
-		for m in monsters:
-			if m != self.superentity and pygame.sprite.collide_rect(self, m): #TODO: consider using mask instead
-				if m.bounce_count <= 0:
-					self.mask = pygame.mask.from_surface(self.image)
-					m.mask = pygame.mask.from_surface(m.image)
-					if pygame.sprite.collide_mask(self, m):
-						self.collide_with_monster(m)
-						return
+		targets = self.superentity.hittable_targets()
+		for t in targets:
+			if t in self.enemies_hit: continue
+			self.mask = pygame.mask.from_surface(self.image)
+			t.mask = pygame.mask.from_surface(t.image)
+			if pygame.sprite.collide_mask(self, t) and t != self.superentity: #TODO: consider using mask instead
+				if t.bounce_count <= 0:
+					self.collide_with_monster(t)
+					self.enemies_hit.append(t)
+					return
 		#TEMP
 
 	def collide_with_monster(self, monster):
