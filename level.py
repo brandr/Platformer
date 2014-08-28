@@ -642,7 +642,8 @@ class Level(object):
 				if monster_subs:
 					for s in monster_subs:
 						s.update()
-						self.screen.blit(s.image, self.level_camera.apply(s))
+						if s.active:
+							self.screen.blit(s.image, self.level_camera.apply(s))
 				monster_effects = player.entity_effects
 				if monster_effects:
 					for e in monster_effects:
@@ -656,7 +657,8 @@ class Level(object):
 			if player_subs:
 				for s in player_subs:
 					s.update()
-					self.screen.blit(s.image, self.level_camera.apply(s))	
+					if s.active:
+						self.screen.blit(s.image, self.level_camera.apply(s))	
 
 			player_effects = player.entity_effects
 			if player_effects:
@@ -822,6 +824,16 @@ class Level(object):
 		Returns a 2D list of the level's tiles.
 		"""
 		return self.level_objects.tiles
+
+	def tile_at(self, x, y):
+		""" l.tile_at( int, int ) -> Tile
+
+		Returns the tile at the given coordinates.
+		"""
+		tiles = self.getTiles()
+		if 0 <= y and y < len(tiles):
+			if 0 <= x and x < len(tiles[y]):
+				return tiles[y][x]
 
 	def getEntities(self):
 		""" l.getEntities( ) -> [ Entity ]

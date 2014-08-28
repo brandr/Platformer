@@ -170,6 +170,24 @@ class Being(Entity):
             while pygame.sprite.collide_mask(self, door):
                 self.rect.left += 1
 
+    def check_blocked(self, direction_val):
+        """ b.check_blocked( int ) -> bool
+
+        Check whether this being is immediately blocked in the given direction.
+        """
+        y1 = self.rect.top/32
+        y2 = self.rect.bottom/32
+        if direction_val == -1:
+            x = self.rect.left/32 - 1
+        else:
+            x = self.rect.right/32 + 1
+        level = self.current_level
+        for y in range(y1, y2):
+            tile = level.tile_at(x, y)
+            if not tile.passable():
+                return True
+        return False
+
     def moveTowards(self, destination):
         """ b.moveTowards ( GameImage ) -> None
 

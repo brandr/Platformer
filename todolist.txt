@@ -62,22 +62,26 @@ OVERARCHING MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mec
 
 IMMEDIATE STUFF: most immediate
 
-# fix lag more
 # fix the issue where the player sometimes doesn't travel between levels properly, but make sure he also doesn't appear too far offscreen
+    - this seems to be a problem when sprinting, especially into a cutscene room
 
 # Make a boss
     
+    # gonna need invincibility separate from bouncing for combat to work neatly
+        - invicibilty might not be its own animation, since there would have to be an "invincible version" of every animation.
+        - instead, make a general way to make every other frame of an animation invisible (remember this is based on actual frames, not the different animation images.)
+
     steps:
         1. Make sure his pick works properly.
             - May want to create "bouncing" or "getting hit" animations for both the player and the miner
             - Maybe the miner doesn't bounce? This would make things much easier.
             - NOTE: pick animation offset is (33, -13)
-        2. Make sure the miner collides with blocks correctly.
-        3. The miner is supposed to be fast and aggressive, so experiment with different ways to achieve this.
-        4. Attack pattern idea: charge while swinging, turn around in an exaggerrated way (if the player is behind), charge while swinging again
+        2. The miner is supposed to be fast and aggressive, so experiment with different ways to achieve this.
+        3. Attack pattern idea: charge while swinging, turn around in an exaggerrated way (if the player is behind), charge while swinging again
             - figure out how attack pattern will work, and make it interruptible (probably)
 
 # make miner portait(s)
+    - maybe lilly can do this thing
 
 # make it easier to add simple NPCs with no actions or branching dialog trees, since most NPCs will work this way. Follow the same pattern as signs
   and make a "default NPC" that can have many different sprites. Note that such NPCs will not have dialog portraits.

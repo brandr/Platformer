@@ -4,6 +4,8 @@
 from being import *
 from weaponfactory import build_weapon, PICK
 
+from random import randint
+
 class Monster(Being):
     """ Monster( AnimationSet, int, int ) -> AnimationSet
 
@@ -29,7 +31,7 @@ class Monster(Being):
 
     direction_id: A string value to represent the direction.
 
-    wait_count: A temporary value used to set timers in between the monster's actions.
+    ai_counter: A temporary value used to set timers in between the monster's actions.
 
     hit_points: An [int, int] value represeting [current hp, max hp]. Current hp cannot exceed max hp,
     and the monster dies when its current hp reaches 0.
@@ -46,7 +48,8 @@ class Monster(Being):
         self.changeAnimation('idle','left')
 
         self.can_bounce = True
-        self.wait_count = 20        # TEMP. As monster behavior gets more complex, find other ways to set timers.
+        self.ai_state = AI_IDLE
+        self.ai_counter = 20         # TEMP. Might want to consider this an attribute instead.
         self.hit_points = None
         self.weapon = None
 
@@ -110,14 +113,8 @@ class Monster(Being):
         #TODO: check if the monster can see the player. (using sightdist)
         #TODO: check if the monster is hostile the player.
         #TODO: figure out a better way to assosciate the monster with its udpate action (probably a dict, though name alone might not be sophisticated enoough.)
-        if not self.active:
-            return
-        if self.name == "bat": #TEMPORARY
-            self.bat_update(player)
-        elif self.name == "giant_frog": #TEMPORARY
-            self.frog_update(player)
-        elif self.name == "miner":
-            self.miner_update(player) #TEMPORARY
+        if not self.active: return
+        self.ai_update(player)
         Being.updatePosition(self)
 
     def set_active(self, active):
@@ -126,6 +123,25 @@ class Monster(Being):
         Activate or inactivate this monster. This might be pointless since "hurrdurr setters in python 2014"
         """
         self.active = active
+
+    def randomize_next_action(self, actions, player):
+        """ m.randomize_next_action( [ Method ], Player ) -> None
+
+        Randomly choose a method to execute from the given set. Usually used to make AI less predictable.
+        """
+        if not actions: return
+        action_count = len(actions) - 1
+        action_index = randint(0, action_count)
+        actions[action_index](self, player)
+
+    def ai_update(self, player):
+        """ m.ai_update( self, Player ) -> None
+
+        Perform some action based on the monster's name and current AI state.
+        """
+        self.ai_counter -= 1
+        update_method = MONSTER_AI_MAP[(self.name, self.ai_state)]
+        update_method(self, player)
 
     def bat_update(self, player):
         """ m.bat_update( Player ) -> None 
@@ -155,33 +171,82 @@ class Monster(Being):
             #TODO: make the frog try to land on the player.
                 # figure out the frog's distance from the player, and calculate the necessary xvel.
                 # jump with min(self.max_speed/2, target_speed)
-            if self.wait_count <= 0:
+            if self.ai_counter <= 0: #TODO: change the way this works
                 self.jump(self.direction_val*self.max_speed/2, self.max_speed)
             self.wait()
 
     #TEMP
-    def miner_update(self, player):
+
+    def miner_update_idle(self, player):
+        """ m.miner_update_idle( Player ) -> None
+
+        The miner does nothing. Gravity is applied here.
+        """
         self.gravityUpdate()
         if self.bounce_count > 0:   
             self.bounce()
-            return
-        # TODO?
         if self.onGround:
-            #self.changeAnimation('idle', self.direction_id)
+            self.changeAnimation('idle', self.direction_id)
             self.xvel = 0
-    #TODO: miner boss AI goes here.
-        self.miner_swing() # TEST
+        if self.ai_counter <= 0:
+            self.faceTowards(player)
+            next_actions = [Monster.miner_begin_charging, Monster.miner_begin_jumping] #TODO: make a more general way to select a "next action" from a set of possibilities
+            self.randomize_next_action(next_actions, player)
+
+    def miner_begin_charging(self, player):
+        """ m.miner_begin_charging( Player ) -> None
+
+        The miner begins charging towards the player.
+        """        
+        self.ai_state = AI_CHARGING
+        self.ai_counter = 30
+        if self.direction_id == 'left': self.xvel = -8
+        elif self.direction_id == 'right': self.xvel = 8
+
+    def miner_update_charging(self, player):
+        """ m.miner_update_charging( Player ) -> None
+
+        The miner charges towards the player.
+        """
+        direction_map = {'left': -1, 'right': 1}
+        blocked = self.check_blocked(direction_map[self.direction_id])
+        if blocked or self.ai_counter <= 0:
+            self.weapon.deactivate()
+            self.ai_state = AI_IDLE
+            self.ai_counter = 40
+            return
+        self.miner_swing()
+
+    def miner_begin_jumping(self, player):
+        """ m.miner_begin_jumping( Player ) -> None
+
+        The miner begins jumping towards the player.
+        """
+        self.ai_state = AI_JUMPING
+        self.ai_counter = 25
+        #TODO: jump
+
+    def miner_update_jumping(self, player):
+        """ m.miner_update_jumping( Player ) -> None
+
+        The miner jumps towards the player.
+        """
+        #TODO
+        if self.ai_counter <= 0:
+            self.ai_state = AI_IDLE
+            self.ai_counter = 40
     
     def miner_swing(self):
-        self.changeAnimation('swinging', self.direction_id)
+        self.changeAnimation('swinging', self.direction_id) # this part might not belong here if there are different animations that involve swinging the pick.
         if not self.weapon.active:
             self.weapon.activate(31, -13, self.direction_id)
 
     def miner_pick(self):
+        """ m.miner_pick( ) -> MeleeWeapon
+
+        A pick used by the miner boss. May want to load this sort of data more neatly once there are a lot of weapons.
+        """
         return build_weapon(PICK, self)
-
-    #TEMP
-
 
     def collide(self, xvel, yvel):
         """ m.collide( int, int ) -> None 
@@ -229,10 +294,9 @@ class Monster(Being):
     def wait(self):
         """ m.wait( ) -> None
 
-        Decremet the monster's wait count, but not below 0. This is done to make it wait before taking certain actions.
+        Does nothing. This is done to make it wait before taking certain actions.
         """
-        if(self.wait_count <= 0): return
-        self.wait_count -= 1
+        return # this method might be obsolete since wait counter is no longer used and the ai counter is handled elsewhere.
 
         #the jump method could go in Being as well.
     def jump(self, xvel = 0, yvel = 0): #TODO: figure out how a monster's jumping ability is determined.
@@ -243,7 +307,7 @@ class Monster(Being):
         self.xvel += xvel
         self.yvel -= yvel
         self.animation.iter()
-        self.wait_count = 25 #TEMP
+        self.ai_count = 25 #TEMP
         self.onGround = False
 
     def faceTowards(self, target):
@@ -297,6 +361,8 @@ class Monster(Being):
         """
         return [self.current_level.getPlayer()]
 
+# monster build keys
+
 DEFAULT = "default"
 BAT = "bat"
 GIANT_FROG = "giant_frog"
@@ -329,4 +395,20 @@ MONSTER_INIT_MAP = {
     HIT_POINTS:Monster.init_hit_points,
     WEAPON:Monster.init_weapon,
     BOUNCE:Monster.init_bounce
+}
+
+# monster AI keys
+
+AI_IDLE = "idle"
+AI_CHARGING = "charging"
+AI_JUMPING = "jumping"
+
+MONSTER_AI_MAP = {
+    (BAT, AI_IDLE):Monster.bat_update,
+
+    (GIANT_FROG, AI_IDLE):Monster.frog_update, #TEMP: frog should also have jump method
+
+    (MINER, AI_IDLE):Monster.miner_update_idle,
+    (MINER, AI_CHARGING):Monster.miner_update_charging,
+    (MINER, AI_JUMPING):Monster.miner_update_jumping
 }

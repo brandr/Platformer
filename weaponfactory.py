@@ -18,11 +18,11 @@ def weapon_animation_set(animation_data):
 	weapon_rect =  animation_data[0]
 	animation_set_data = animation_data[1]
 	default_anim_data = animation_set_data[0]
-	default_animation = GameImage.load_animation(filepath, default_anim_data[0], weapon_rect, -1)
+	default_animation = GameImage.load_animation(filepath, default_anim_data[0], weapon_rect, -1, True, 10) #last 2 args are temp
 	animation_set = AnimationSet(default_animation)
 	for d in animation_set_data:
 		filename = d[0]
-		animation = GameImage.load_animation(filepath, filename, weapon_rect, -1)
+		animation = GameImage.load_animation(filepath, filename, weapon_rect, -1, True, 10) #last 2 args are temp
 		animation_set.insertAnimation(animation, d[1], d[2])
 	return animation_set
 

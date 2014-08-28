@@ -9,7 +9,7 @@ WIN_WIDTH = 800
 WIN_HEIGHT = 640
 
 BACKGROUND_COLOR = Color("#000000")
-DEF_COLORKEY = Color("#FF00FF")
+DEFAULT_COLORKEY = Color("#FF00FF")
 
 class GameImage(pygame.sprite.Sprite):
     """ GameImage( AnimationSet ) -> GameImage
@@ -120,7 +120,7 @@ class GameImage(pygame.sprite.Sprite):
             self.changeDirection(direction)
         self.animation = self.direction_set[ID]
         self.animation.iter()
-        self.animation_id = (ID,direction)
+        self.animation_id = (ID, direction)
 
     def changeDirection(self, direction):
         """ gi.changeDirection( str ) -> None
@@ -162,7 +162,7 @@ class GameImage(pygame.sprite.Sprite):
         self.image = self.unseen_image
 
     @staticmethod
-    def still_animation_set(still_image, rect = Rect(0, 0, 32, 32), colorkey = DEF_COLORKEY):
+    def still_animation_set(still_image, rect = Rect(0, 0, 32, 32), colorkey = DEFAULT_COLORKEY):
         """ still_animation_set( Surface, Rect, str ) -> AnimationSet
 
         Return an "animation set" containing only one image.
@@ -171,7 +171,7 @@ class GameImage(pygame.sprite.Sprite):
         return AnimationSet(still_animation)
 
     @staticmethod
-    def load_animation_set(tile_data, tile_size, colorkey = -1):
+    def load_animation_set(tile_data, tile_size, colorkey = DEFAULT_COLORKEY):
         """ load_animation_set( TileData, int, int ) -> AnimationSet
 
         Build an animation set from a TileData object.

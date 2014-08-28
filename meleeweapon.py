@@ -28,10 +28,11 @@ class MeleeWeapon(SubEntity):
 		self.moveRect(x, y, True)
 		
 		#TODO: start swinging animation
-		self.active_count = 24 #TEMP
+		self.active_count = 20 #TEMP
 
 		#TODO: check for collisions either here or in level class
 	def update(self):
+		self.changeAnimation('swinging', self.direction_id)
 		SubEntity.update(self)
 		SubEntity.single_animation_update(self)
 		SubEntity.follow_update(self)
@@ -43,7 +44,7 @@ class MeleeWeapon(SubEntity):
 		self.rect = Rect(self.rect.left, self.rect.top, 32, 32)
 		targets = self.superentity.hittable_targets()
 		for t in targets:
-			if t in self.enemies_hit: continue
+			if not t or t in self.enemies_hit: continue
 			self.mask = pygame.mask.from_surface(self.image)
 			t.mask = pygame.mask.from_surface(t.image)
 			if pygame.sprite.collide_mask(self, t) and t != self.superentity: #TODO: consider using mask instead
