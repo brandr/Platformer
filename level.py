@@ -268,6 +268,7 @@ class Level(object):
 		Update the explored list if the player has been to a new room.
 		"""
 		player = self.getPlayer()
+		if not player: return
 		coords = player.coordinates()
 		room_x, room_y = coords[0]/ROOM_WIDTH, coords[1]/ROOM_HEIGHT
 		if room_y < len(self.explored) and room_x < len(self.explored[0]):
@@ -386,8 +387,9 @@ class Level(object):
 		if(self.next_level_exists(global_coords, direction)):
 			next_level = self.level_in_direction(global_coords[0], global_coords[1], direction)
 			self.dungeon.movePlayer(self.screen_manager, self.screen, player, next_level, global_coords, adjusted_coords, pixel_remainder)
-			if(direction[0] > 0 or direction[1] > 0):
-				player.moveRect(-30*direction[0], -30*direction[1])
+			while not player.current_tile():
+				player.rect.left += direction[0]
+				player.rect.top += dircetion[1]
 		player.current_level.update_explored()
 
 	def addPlayer(self, player, coords = None, pixel_remainder = (0, 0)):
@@ -669,8 +671,7 @@ class Level(object):
 
 			# light update
 			if light_map: self.update_light(light_map)
-			self.screen.blit(player.image, self.level_camera.apply(player))
-
+			if (player.invincibility_frames % 2) == 0: self.screen.blit(player.image, self.level_camera.apply(player))
 			if(self.has_effects): 
 				self.update_effects()
 			pygame.display.update()

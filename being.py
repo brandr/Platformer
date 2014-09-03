@@ -43,8 +43,9 @@ class Being(Entity):
         self.onGround = False
         self.running = False
         self.sightdist = 5
-        self.max_speed = 10 # doesn't apply to player yet, but could
-        self.bounce_count = 0
+        self.max_speed = 10   # doesn't apply to player yet, but could
+        self.bounce_count = 0 # might want a more general counter system, like a dict of counters
+        self.invincibility_frames = 0
         self.hit_points = None
         #TODO: if methods/data from monster/player are universal, move them to this class.
 
@@ -65,6 +66,8 @@ class Being(Entity):
         """
         if self.current_tile() == None: return
         GameImage.updateAnimation(self, 256) 
+        #if self.invicibility_frames % 2:   # TODO: use this if things besides the player should flicker while invincible.
+        #    print "UNBREAKABLE :D :D"
 
     def updatePosition(self):
         """ b.updatePosition () -> None
@@ -90,7 +93,6 @@ class Being(Entity):
         Collisions with non-platform objects are handled by other methods.
         """
 
-    
         level = self.current_level
         platforms = level.get_impassables()
         slopes = []
@@ -184,9 +186,17 @@ class Being(Entity):
         level = self.current_level
         for y in range(y1, y2):
             tile = level.tile_at(x, y)
-            if not tile.passable():
+            if not tile or not tile.passable():
                 return True
         return False
+
+    def flip_direction(self):
+        """ b.flip_direction( ) -> None
+
+        Reverses this being's direction.
+        """
+        if self.direction_id == 'left': self.direction_id = 'right'
+        elif self.direction_id == 'right': self.direction_id = 'left'
 
     def moveTowards(self, destination):
         """ b.moveTowards ( GameImage ) -> None

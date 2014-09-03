@@ -161,6 +161,14 @@ class GameImage(pygame.sprite.Sprite):
         """
         self.image = self.unseen_image
 
+    def clear_image(self):
+        """ gi.clear_image( ) -> None
+        Make this gameimage completely invisible.
+        """
+        nothing_image = Surface((32, 32))
+        nothing_image.fill(DEFAULT_COLORKEY)
+        self.image = nothing_image
+
     @staticmethod
     def still_animation_set(still_image, rect = Rect(0, 0, 32, 32), colorkey = DEFAULT_COLORKEY):
         """ still_animation_set( Surface, Rect, str ) -> AnimationSet

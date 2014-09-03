@@ -125,6 +125,7 @@ class Player(Being):
         if(self.exitLevelCheck()): return
         update_method = MOVEMENT_STATE_MAP[self.movement_state]
         update_method(self)
+        self.invincibility_update()
         self.lantern_update()
         Being.updatePosition(self)
         player_interactables = self.current_level.player_interactables()
@@ -222,6 +223,13 @@ class Player(Being):
             self.xvel = 2
             self.direction_id = 'right'
 
+    def invincibility_update(self):
+        """ p.invincibility_update( ) -> None
+
+        Advances the player's invincibility frames.
+        """
+        if self.invincibility_frames > 0: self.invincibility_frames -= 1
+
     def lantern_update(self):
         """ p.lantern_update( ) -> None
 
@@ -265,8 +273,7 @@ class Player(Being):
         start_y = max(0, coords[1] - self.sight_dist() - 2)
         end_y = min(len(all_tiles), coords[1] + self.sight_dist() + 2)
 
-        GameImage.updateAnimation(self, 256) 
-        
+        GameImage.updateAnimation(self, 256)         
         if(self.current_level.outdoors):
             return
         nearby_light_sources = []
@@ -416,6 +423,7 @@ class Player(Being):
 
         If the player is touching any monsters, he gets hurt and bounces off of them.
         """
+        if self.invincibility_frames > 0: return
         x_direction_sign = 1
         y_direction_sign = 1
         level = self.current_level
@@ -425,18 +433,30 @@ class Player(Being):
                 self.mask = pygame.mask.from_surface(self.image)
                 m.mask = pygame.mask.from_surface(m.image)
                 if pygame.sprite.collide_mask(self, m):
-                    if(self.rect.left < m.rect.left):
-                        x_direction_sign = -1
-                    if(self.rect.top < m.rect.top):
-                        y_direction_sign = -1
-                    new_xvel = 4*x_direction_sign
-                    new_yvel = y_direction_sign
-                    self.xvel = new_xvel
-                    self.yvel = new_yvel 
-                    self.movement_state = BOUNCING_MOVEMENT_STATE
-                    self.bounce_count = 15
-                    m.bounceAgainst(self)
+                    self.collide_with_monster(m)
                     break #makes sure the player can only collide with one monster per cycle
+
+    def collide_with_monster(self, monster):
+        """ p.collide_with_monster( Monster ) -> None
+
+        A player being hit by a monster takes damage, goes through invincibility frames, etc.
+        """
+        x_direction_sign = 1
+        y_direction_sign = 1
+        if(self.rect.left < monster.rect.left):
+            x_direction_sign = -1
+        if(self.rect.top < monster.rect.top):
+            y_direction_sign = -1
+        #NOTE: why not call self.bounceAgainst(other) here?
+        #      I guess I need different args or something
+        new_xvel = 4*x_direction_sign
+        new_yvel = y_direction_sign
+        self.xvel = new_xvel
+        self.yvel = new_yvel 
+        self.movement_state = BOUNCING_MOVEMENT_STATE
+        self.bounce_count = 15
+        self.invincibility_frames = 60
+        monster.bounceAgainst(self)
 
     def bounce(self):
         """ p.bounce( ) -> None
@@ -455,8 +475,9 @@ class Player(Being):
         take other actions until the counter runs out.
         Similar to Being's bounceAgainst, except it alters the current state.
         """
+        if self.invincibility_frames > 0: return
         self.movement_state = BOUNCING_MOVEMENT_STATE
-        if(self.bounce_count > 0): return
+#        if(self.bounce_count > 0): return
         x_direction_sign = 1
         y_direction_sign = 1
         if(self.rect.left < other.rect.left):

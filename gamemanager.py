@@ -56,7 +56,7 @@ class GameManager:
 		player.current_level.begin_cutscene(test_cutscene)
 
 		while 1:
-			timer.tick(90)
+			timer.tick(120) # make this value lower to make the game run slowly for testing. (use about 40-50 I think)
 
  			for e in pygame.event.get():
 				screen_manager.process_event(e)

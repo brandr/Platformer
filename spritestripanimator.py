@@ -50,6 +50,10 @@ class SpriteStripAnimator(object):
     def at_end(self):
         return self.i >= len(self.images)
 
+    def synch_animation_frame(self, other):
+        self.i = other.i
+        self.f = other.f
+
     def __add__(self, ss):
         self.images.extend(ss.images)
         return self

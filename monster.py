@@ -101,6 +101,12 @@ class Monster(Being):
         """
         self.can_bounce = bounce
 
+    def init_max_speed(self, speed):
+        """ m.init_max_speed( int ) -> None
+        Set the monster's maximum movement speed.
+        """
+        self.max_speed = speed
+
     #TODO: make this general in the long run, so that monsters can interact with each other as well as with the player.
     #  in particular, consider having monsters "collide" with each other (they probably shouldn't bounce but I'm not sure.)
     def update(self, player):
@@ -200,19 +206,21 @@ class Monster(Being):
         """        
         self.ai_state = AI_CHARGING
         self.ai_counter = 30
-        if self.direction_id == 'left': self.xvel = -8
-        elif self.direction_id == 'right': self.xvel = 8
+        if self.direction_id == 'left': self.xvel = -1*self.max_speed
+        elif self.direction_id == 'right': self.xvel = self.max_speed
 
     def miner_update_charging(self, player):
         """ m.miner_update_charging( Player ) -> None
 
         The miner charges towards the player.
         """
-        direction_map = {'left': -1, 'right': 1}
-        blocked = self.check_blocked(direction_map[self.direction_id])
+        self.gravityUpdate()
+        blocked = self.check_blocked(DIRECTION_MAP[self.direction_id])
         if blocked or self.ai_counter <= 0:
             self.weapon.deactivate()
             self.ai_state = AI_IDLE
+            self.changeAnimation('idle', self.direction_id)
+            #self.flip_direction()
             self.ai_counter = 40
             return
         self.miner_swing()
@@ -222,9 +230,14 @@ class Monster(Being):
 
         The miner begins jumping towards the player.
         """
-        self.ai_state = AI_JUMPING
-        self.ai_counter = 25
-        #TODO: jump
+        if self.onGround:
+            self.faceTowards(player)
+            self.ai_state = AI_JUMPING
+            self.ai_counter = 50
+            self.jump(self.direction_val*self.max_speed/2, self.max_speed)
+            self.changeAnimation('idle', self.direction_id) #TODO: use a jumping animation rather than an idle animation
+            return
+        #TODO: other case?
 
     def miner_update_jumping(self, player):
         """ m.miner_update_jumping( Player ) -> None
@@ -232,7 +245,10 @@ class Monster(Being):
         The miner jumps towards the player.
         """
         #TODO
-        if self.ai_counter <= 0:
+        blocked = self.check_blocked(DIRECTION_MAP[self.direction_id])
+        if blocked: self.xvel = 0
+        self.gravityUpdate()
+        if self.onGround:
             self.ai_state = AI_IDLE
             self.ai_counter = 40
     
@@ -240,6 +256,7 @@ class Monster(Being):
         self.changeAnimation('swinging', self.direction_id) # this part might not belong here if there are different animations that involve swinging the pick.
         if not self.weapon.active:
             self.weapon.activate(31, -13, self.direction_id)
+        self.weapon.animation.synch_animation_frame(self.animation)
 
     def miner_pick(self):
         """ m.miner_pick( ) -> MeleeWeapon
@@ -361,6 +378,8 @@ class Monster(Being):
         """
         return [self.current_level.getPlayer()]
 
+DIRECTION_MAP = {'left': -1, 'right': 1}
+
 # monster build keys
 
 DEFAULT = "default"
@@ -371,13 +390,15 @@ MINER = "miner"
 HIT_POINTS = "hit_points"
 WEAPON = "weapon"
 BOUNCE = "bounce"
+MAX_SPEED = "max_speed"
 
 MONSTER_DATA_MAP = { 
     DEFAULT:
         {
         HIT_POINTS:1,
         WEAPON:None,
-        BOUNCE:True
+        BOUNCE:True,
+        MAX_SPEED:6
         },
     GIANT_FROG:
         {
@@ -387,14 +408,16 @@ MONSTER_DATA_MAP = {
         {
         HIT_POINTS:20,
         WEAPON:Monster.miner_pick,
-        BOUNCE:False
+        BOUNCE:False,
+        MAX_SPEED:8
         }
 }
 
 MONSTER_INIT_MAP = {
     HIT_POINTS:Monster.init_hit_points,
     WEAPON:Monster.init_weapon,
-    BOUNCE:Monster.init_bounce
+    BOUNCE:Monster.init_bounce,
+    MAX_SPEED:Monster.init_max_speed
 }
 
 # monster AI keys
