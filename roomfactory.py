@@ -126,7 +126,7 @@ class RoomFactory(object):
 								t.block = entity
 						
 						elif next_tile_data.is_animated():
-							entity_animation_set = GameImage.load_animation_set(next_tile_data, DEFAULT_TILE_SIZE)
+							entity_animation_set = GameImage.load_animation_set(next_tile_data, DEFAULT_TILE_SIZE)	#TODO: allow this to incorporate frames
 							e = EntityFactory.build_entity(entity_animation_set, key, x, y)
 							entities.append(e)
 		

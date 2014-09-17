@@ -205,8 +205,11 @@ class GameImage(pygame.sprite.Sprite):
             anim_file_key = animation_keys[n][0]
             anim_key = animation_keys[n][1]
             anim_direction = animation_keys[n][2] 
+            anim_frames = 10
+            if len(animation_keys[n]) > 3:
+                anim_frames = animation_keys[n][3]
             animation_filename = key + "_" + anim_file_key + ".bmp"
-            next_animation = GameImage.load_animation(animation_filepath, animation_filename, image_rect, colorkey)
+            next_animation = GameImage.load_animation(animation_filepath, animation_filename, image_rect, colorkey, True, anim_frames)
             #TODO: get the colorkey more generally (this may come up if we use animated blocks or square enemies).
             animation_set.insertAnimation(next_animation, anim_direction, anim_key)
 

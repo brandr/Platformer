@@ -40,6 +40,7 @@ class Being(Entity):
             self.rect.centery += y
         self.xvel = 0
         self.yvel = 0
+        self.can_leave_level = False
         self.onGround = False
         self.running = False
         self.sightdist = 5
@@ -66,12 +67,9 @@ class Being(Entity):
         """
         if self.current_tile() == None: return
         GameImage.updateAnimation(self, 256) 
-        #if self.invicibility_frames % 2:   # TODO: use this if things besides the player should flicker while invincible.
-        #    print "UNBREAKABLE :D :D"
 
     def updatePosition(self):
         """ b.updatePosition () -> None
-
         Updates the Being's pixel coordinate position on the screen based on its current velocities.
         """
         # increment in x direction
@@ -84,6 +82,20 @@ class Being(Entity):
         self.onGround = False
         # do y-axis collisions
         self.collide(0, self.yvel)
+        if not self.can_leave_level:
+            self.stay_in_level_update()
+
+    def stay_in_level_update(self):
+        """ b.stay_in_level_update( ) -> None
+
+        If any part of this being is outside the level, nudge it back in.
+        """
+        dimensions = self.current_level.get_dimensions()
+        pixel_width, pixel_height = dimensions[0]*32, dimensions[1]*32
+        while self.rect.left < 0: self.rect.left += 1
+        while self.rect.right > pixel_width: self.rect.right -= 1
+        while self.rect.top < 0: self.rect.top += 1
+        while self.rect.bottom > pixel_height: self.rect.bottom -= 1
 
     #TODO: consider having bounce take effect here, like in player.
     def collide(self, xvel, yvel, collide_objects = None):

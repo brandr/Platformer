@@ -49,24 +49,27 @@ class MeleeWeapon(SubEntity):
 			t.mask = pygame.mask.from_surface(t.image)
 			if pygame.sprite.collide_mask(self, t) and t != self.superentity: #TODO: consider using mask instead
 				if t.bounce_count <= 0:
-					self.collide_with_monster(t)
+					self.collide_with_target(t)
 					self.enemies_hit.append(t)
 					return
 		#TEMP
 
-	def collide_with_monster(self, monster):
+	def collide_with_target(self, target):
 		
 		#TODO: the hit spark should be an entityeffect belonging to the player
 
-		relative_hit_coords = pygame.sprite.collide_mask(self, monster)
+		relative_hit_coords = pygame.sprite.collide_mask(self, target)
 		global_hit_coords = (relative_hit_coords[0] + self.rect.left - 8, relative_hit_coords[1] + self.rect.top - 8)
 		hit_spark = self.hit_spark(global_hit_coords)
 		self.superentity.add_entity_effect(hit_spark)
 		
-		monster.bounceAgainst(self)
-		monster.take_damage(self.damage) #TEMP
+		target.collide_with_damage_source(self)
+		target.take_damage(self.damage)
 
 	def hit_spark(self, coords):
 		hit_spark_animation = GameImage.load_animation('./animations', 'hit_spark_1.bmp', Rect(0, 0, 16, 16), -1, False, 6)
 		hit_spark_animation_set = AnimationSet(hit_spark_animation)
 		return EntityEffect(self.superentity, hit_spark_animation_set, coords[0], coords[1])
+
+	def bounceAgainst(self, other):
+		return #used to make some general methods work

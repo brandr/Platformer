@@ -1,6 +1,8 @@
 
     #KNOWN BUGS
 
+# the player can fall out of the world and end up in a dark place. No idea how this happens.
+
 # Bats can fly outside the level and disappear.
 
 # This can happen to frogs, too. (though they have to be knocked out of the level)
@@ -28,7 +30,7 @@ LONG-TERM GOALS: (short summaries, does not include all TODOs)
 # combat
     - more sophisticated collisions/knockback/invincibility frames
     - more sophisticated damage/hp system (probably don't need too much in this area, though)
-    - more sophisticated use of subentities like more general melee weapons, projectiles, armor plating, weak spots, etc.
+    - expand use of subentities like more general melee weapons, projectiles, armor plating, weak spots, etc.
 # monsters
     - more general mapping to AI
     - look for patterns while developing more AI routines and try to minimize redundancy
@@ -39,7 +41,7 @@ LONG-TERM GOALS: (short summaries, does not include all TODOs)
     - currently cutscene building is incomplete is far as building cutscenes with multiple actions 
         * see begin_cutscene in cutsenetrigger.py.
 # world and world data
-    - dungeon <-> world relationship
+    - create the basic world-related classes, flesh out dungeon <-> world relationship
     - saving/loading game
     - world data:
         * will be something stored as an instance when the player saves, but also update as the player goes through the game.
@@ -62,28 +64,36 @@ OVERARCHING MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mec
 
 IMMEDIATE STUFF: most immediate
 
-# NOTE: are AI keys really necessary, or could the AI methods themselves just be stored as temporary values and/or mapped to each other with dicts?
+# the player doesn't always turn invincible when hit by the boss. Narrow down the methods related to taking damage, bouncing and becoming invincible, and streamline them so that monsters hittig the player (whether with a weapon or their bodies) will be easier to deal with in the future.
+# For the sake of testing the boss fight, add in "getting hurt" animations, swinging animations, jumping animations, etc. for the player and boss to make movement more natural-looking.
+# give the player health bar/some other health display to see if bosses can be beaten without taking much damage (possibly without taking any)
 
 # Make a boss
 
     # NOTE: it still seems to be possible for the miner to fall outside the level, so look for ways to fix this.
-    # IDEA: have part of the default update for being say that if any part of the being's rect is outside the level, nudge it back in.
 
     steps:
         1. Make sure his pick works properly.
             - May want to create "bouncing" or "getting hit" animations for both the player and the miner (can lilly do this thing?)
             - Maybe the miner doesn't bounce? This would make things much easier.
-            - NOTE: pick animation offset is (33, -13)
+            - consider making the miner's sprite flash red when hit. Not sure how to implement this in a general way, though.
+            - NOTE: pick animation offset is currently (33, -13)
         2. The miner is supposed to be fast and aggressive, so experiment with different ways to achieve this.
         3. Attack pattern idea: charge while swinging, turn around in an exaggerrated way (if the player is behind), charge while swinging again
             - figure out how attack pattern will work, and make it interruptible (probably)
-        4. add miner jumps 
+        4. have the miner check for a clear path to the player before charging. If there is not a clear path, jump instead of charging.
 
 # make the miner closer to the player in size (Lilly pls)
 
 # make miner portait(s)
     - maybe lilly can do this thing
     - probably not though because it doesn't sound like she felt like it at all
+
+# make the priestess
+
+# make the immortal
+
+# make some actual levels that are cool and fun
 
 # make it easier to add simple NPCs with no actions or branching dialog trees, since most NPCs will work this way. Follow the same pattern as signs
   and make a "default NPC" that can have many different sprites. Note that such NPCs will not have dialog portraits.

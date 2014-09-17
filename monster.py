@@ -216,12 +216,11 @@ class Monster(Being):
         """
         self.gravityUpdate()
         blocked = self.check_blocked(DIRECTION_MAP[self.direction_id])
-        if blocked or self.ai_counter <= 0:
+        if blocked or self.ai_counter <= 0: # NOTE: consider dealing with blockage differently to stop the miner from glitching out all over blocks.
             self.weapon.deactivate()
             self.ai_state = AI_IDLE
             self.changeAnimation('idle', self.direction_id)
-            #self.flip_direction()
-            self.ai_counter = 40
+            self.ai_counter = 100
             return
         self.miner_swing()
 
@@ -250,7 +249,7 @@ class Monster(Being):
         self.gravityUpdate()
         if self.onGround:
             self.ai_state = AI_IDLE
-            self.ai_counter = 40
+            self.ai_counter = 100
     
     def miner_swing(self):
         self.changeAnimation('swinging', self.direction_id) # this part might not belong here if there are different animations that involve swinging the pick.
@@ -297,6 +296,14 @@ class Monster(Being):
             if pygame.sprite.collide_rect(self, e):
                 self.exitLevel(e)
                 return
+
+    def collide_with_damage_source(self, source):
+        """ m.collide_with_monster( ? ) -> None
+
+        A monster being hit by a weapon, projectile, etc. takes damage, goes through invincibility frames, etc.
+        """
+        self.bounceAgainst(source)
+        source.bounceAgainst(self)
 
     def bounceAgainst(self, other): # this is used for a monster colliding with the player, and may be useful in other cases.
         """ m.bounceAgainst ( Being ) -> None
