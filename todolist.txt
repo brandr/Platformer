@@ -66,16 +66,6 @@ OVERARCHING MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mec
 
 IMMEDIATE STUFF: most immediate
 
-# In the dungeon editor file manager, when saving a dungeon, update the list of dungeon files.
-
-# for additional sign data, show which index of the pane the user is currently on (ex: "3/5"), and maybe grey out the arrows when there is no pane in a direction.
-
-# make the dungeon editor screen (and/or level editor screen) a good size and adjust the components (this will be an ongoing thing as I add more stuff)
-
-# figure out how to make a more extensible filepath in filemanagercontainer.py's saveDungeon method so that it isn't specific to my computer. 
-    - be sure to test the exe maker again if I change the directory structure
-    - IDEA: since there won't be many developers, just ask (via terminal?) who is there and use the answer to figure out their directory.
-
 # implement world stuff
     - currently working on the dungeoneditor side of it
         * change what happens when the DungeonTravelPane is opened so that it grabs the desired information from the loaded LevelData, as it does with bg
@@ -88,6 +78,18 @@ IMMEDIATE STUFF: most immediate
     - connections between dungeons will amount to specific sides of specific levels (top, bottom, left, right, etc.)
         * therefore, these should be special attributes that you can set in the level editor
     - will I need a worlddata class?
+
+# perform new tests for rooms and levels once the new dungeon system is implemented.
+
+# In the dungeon editor file manager, when saving a dungeon, update the list of dungeon files.
+
+# for additional sign data, show which index of the pane the user is currently on (ex: "3/5"), and maybe grey out the arrows when there is no pane in a direction.
+
+# make the dungeon editor screen (and/or level editor screen) a good size and adjust the components (this will be an ongoing thing as I add more stuff)
+
+# figure out how to make a more extensible filepath in filemanagercontainer.py's saveDungeon method so that it isn't specific to my computer. 
+    - be sure to test the exe maker again if I change the directory structure
+    - IDEA: since there won't be many developers, just ask (via terminal?) who is there and use the answer to figure out their directory.
 
 # For the sake of testing the boss fight, add in "getting hurt" animations, swinging animations, jumping animations, etc. for the player and boss to make movement more natural-looking.
 

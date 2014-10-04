@@ -26,7 +26,7 @@ class LevelData(object):
 	"""
 	def __init__(self, name, coords1, coords2, sunlit = False, bg_filename = None, travel_data = None):
 		self.name = name
-		self.corners = (coords1, coords2)
+		self.corners = ( coords1, coords2 )
 		self.sunlit = sunlit #TODO: as level data gets more complicated, maybe make this part of a more general set of tags.
 		self.bg_filename = bg_filename
 		self.travel_data = travel_data
@@ -42,17 +42,14 @@ class LevelData(object):
 		corner2 = self.corners[1]
 		width = len(rooms[0])
 		height = len(rooms)
-		if not ( 0 <= corner1[0] < width and
-			0 <= corner2[0] < width and
-			0 <= corner1[1] < height and
-			0 <= corner2[1] < height
-			):
+		if not ( 0 <= corner2[0] - corner1[0] < width and
+			0 <= corner2[1] - corner1[1] < height):
+			print corner1, corner2, width, height
 			print "ERROR: attempting to load an invalid level."
 			raise(SystemExit)
-
 		for y in range(corner1[1], corner2[1] + 1):
 			for x in range(corner1[0], corner2[0] + 1):
-				room_set.append(rooms[y][x])
+				room_set.append(rooms[y - corner1[1]][x - corner1[0]]) # is this right? need to test
 				# TODO: error checking for out of range
 		return room_set
 

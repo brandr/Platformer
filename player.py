@@ -350,7 +350,7 @@ class Player(Being):
             Being.collideWith(self, xvel, yvel, s)
         for p in default_platforms:
             Being.collideWith(self, xvel, yvel, p)
-        self.collideExits()
+        #self.collideExits()
         self.collidePickups()
         self.collideLanterns() #might not need this with the new lantern system (if lantern is obtained  from a chest or something)
         if(self.bounce_count <= 0):
@@ -490,33 +490,53 @@ class Player(Being):
 
         Checks whether the player is outside the level and send him to the adjacent level in that direction if necessary.
         """
-        coords = self.coordinates()
-        x, y = coords[0], coords[1]
-        x_dir, y_dir = 0, 0
-        level_dimensions = self.current_level.get_dimensions()
-        if x <= 0: x_dir = -1
-        elif x >= level_dimensions: x_dir = 1
-        if y <= 0: y_dir = -1
-        elif y >= level_dimensions: y_dir = 1
-        direction = (x_dir, y_dir)
-        if(self.current_tile() == None): 
+        if(self.current_tile() == None):
+            coords = self.coordinates()
+            x, y = coords[0], coords[1]
+            x_dir, y_dir = 0, 0
+            level_dimensions = self.current_level.get_dimensions()
+            if x <= 0: x_dir = -1
+            elif x >= level_dimensions[0]: x_dir = 1
+            if y <= 0: y_dir = -1
+            elif y >= level_dimensions[0]: y_dir = 1
+            direction = (x_dir, y_dir)
             if self.current_level.next_level_exists(self.current_level.global_coords( (x, y) ), direction) :
-                self.exitLevel(coords)
+                self.exit_level(coords)
+                return True
+            if self.current_level.next_dungeon_exists(direction):
+                self.exit_dungeon(coords)
                 return True
             else:
-                while self.rect.left < 0: self.rect.left += 1
-                while self.rect.right >= 32*level_dimensions[0]: self.rect.right -= 1
-                while self.rect.top < 0: self.rect.top += 1
-                while self.rect.bottom >= 32*level_dimensions[1]: self.rect.bottom -= 1
+                if self.rect.left < 0: 
+                    self.rect.left = 0
+                    self.xvel = 0
+                if self.rect.right >= 32*level_dimensions[0]: 
+                    self.rect.right = 32*level_dimensions[0]
+                    self.xvel = 0
+                if self.rect.top < 0: 
+                    self.rect.top = 0
+                    self.yvel = 0
+                if self.rect.bottom >= 32*level_dimensions[1]: 
+                    self.rect.bottom = 32*level_dimensions[1]
+                    self.onGround = True
+                    self.yvel = 0
         return False
 
-    def exitLevel(self, coords):
-        """ p.exitLevel( ( int, int ) ) -> None 
+    def exit_level(self, coords):
+        """ p.exit_level( ( int, int ) ) -> None 
 
         Move the player to the proper adjacent level.
         This is called if the player is outside the current level.
         """
-        self.current_level.movePlayer(coords)
+        self.current_level.move_player(coords)
+
+    def exit_dungeon(self, coords):
+        """ p.exit_dungeon( (int, int ) ) -> None
+
+        Move the player to an adjacent level.
+        This happens at very specific level borders.
+        """
+        self.current_level.move_player_dungeon(coords)
 
     def pause_game(self):
         """ p.pause_game( ) -> None

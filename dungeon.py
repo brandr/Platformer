@@ -25,8 +25,8 @@ class Dungeon(object):
 		print "Building dungeon rooms..."
 		rooms = factory.dungeon_rooms(self, room_data_set)
 		self.dungeon_levels = factory.dungeon_levels(self, rooms, level_data_set)
-		for L in self.dungeon_levels:
-			L.calibrateExits() # needed in case there are ways out of levels that don't lead to other levels.
+		#for L in self.dungeon_levels:
+		#	L.calibrateExits() # needed in case there are ways out of levels that don't lead to other levels.
 		
 	def start_level(self):
 		""" d.start_level( ) -> Level 
@@ -40,16 +40,35 @@ class Dungeon(object):
 		return None
 
 		#TODO: error case where next_level is None.
-	def movePlayer(self, screen_manager, screen, player, next_level, global_coords, local_coords, pixel_remainder):
-		""" d.movePlayer( ScreenManager, GameScreen, Playr, Level, (int, int), (int, int) ):
+	def move_player(self, screen_manager, screen, player, next_level, global_coords, local_coords, pixel_remainder):
+		""" d.move_player( ScreenManager, GameScreen, Player, Level, (int, int), (int, int), ( int, int ) ) -> None
 
 		Moves the player to another level at the appropriate position based on the level the player is leaving.
 		"""
-		room_coords = (local_coords[0]%ROOM_WIDTH,local_coords[1]%ROOM_HEIGHT)
+		room_coords = (local_coords[0]%ROOM_WIDTH, local_coords[1]%ROOM_HEIGHT)
 		next_coords = next_level.flipped_coords(global_coords, room_coords) #TODO: will have to change this
 		next_level.screen_manager = screen_manager
 		next_level.screen = screen
 		next_level.addPlayer(player, next_coords, pixel_remainder)
+
+	def add_player(self, screen_manager, screen, player, next_level, local_coords, pixel_remainder):
+		""" d.add_player( ScreenManager, GameScreen, Player, Level, (int, int), (int, int) ) -> None
+
+		Adds the player to this dungeon at the given level using arguments to determine the correct position.
+		"""
+		room_coords = (local_coords[0], local_coords[1])
+		next_coords = next_level.flipped_coords( (0, 0), room_coords) #TODO: will have to change this
+		next_level.screen_manager = screen_manager
+		next_level.screen = screen
+		next_level.addPlayer(player, next_coords, pixel_remainder)
+
+	def connect_to_level(self, level, dungeon):
+		""" d.connect_to_level( Level ) -> None
+
+		Establish a connection with the given level.
+		"""
+		own_level = self.find_level_by_name(level.dungeon_travel_data[1])
+		own_level.adjacent_dungeon = dungeon
 		
 	def level_at(self, x, y):
 		""" d.level_at( int, int ) -> Level
@@ -64,3 +83,23 @@ class Dungeon(object):
 			if(global_coords[0] <= x <= level_end[0] and global_coords[1] <= y <= level_end[1]):
 				return L
 		return None
+
+	def find_level_by_name(self, name):
+		""" d.find_level_by_name( str ) -> bool
+
+		Checks whether the dungeon contains a level with the given name, and returns it if so.
+		"""
+		for L in self.dungeon_levels:
+			if L.level_ID == name: return L
+		return None
+
+	def contains_level(self, name):
+		""" d.contains_level( str ) -> bool
+
+		Checks whether the dungeon contains a level with the given name.
+		"""
+		for L in self.dungeon_levels:
+			#print L.level_ID, name
+			if L.level_ID == name: 
+				return True
+		return False

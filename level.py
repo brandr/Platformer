@@ -8,6 +8,9 @@ from effect import *
 from tilefactory import TileFactory
 from cutscenescripts import ACTOR_GROUP_MAP
 
+import thread
+#from multiprocessing import Process
+
 BLACK = Color ("#000000")
 EXPLORED_GREY = Color("#222222")
 
@@ -77,7 +80,7 @@ class Level(object):
 		self.level_objects = LevelObjects(self) # all objects in the level (tiles and entities)
 		self.start_coords = None 				# coords where the player appears upon entering the level (set by addRooms)
 		self.dungeon_travel_data = level_data.travel_data
-		#self.adjacent_dungeon = None #not sure if I'll use this yet
+		self.adjacent_dungeon = None #not sure if I'll use this yet
 		self.addRooms(rooms)
 
 		tiles = self.getTiles()
@@ -354,6 +357,7 @@ class Level(object):
 		and returns the coordinates the player should appear on when it levaes this level and travels to
 		the adjacent one.
 		"""
+		# NOTE: global coords do not seem to be used here. why?
 		dimensions = self.get_dimensions()
 		origin_x = self.origin[0]
 
@@ -362,7 +366,7 @@ class Level(object):
 		if(local_coords[0] >= ROOM_WIDTH - 1):	# right edge of level
 			return (1, local_coords[1])
 		if(local_coords[1] <= 1):				# top edge of level
-			return (local_coords[0],dimensions[1] - 1)
+			return (local_coords[0], dimensions[1] - 1)
 		if(local_coords[1] >= ROOM_HEIGHT - 1):	# bottom edge of level
 			return (local_coords[0], 1)
 		#TODO: error case (no possible edge detected for exitblock)
@@ -375,8 +379,19 @@ class Level(object):
 		next_level = self.level_in_direction(global_coords[0], global_coords[1], direction)
 		return next_level != None
 
-	def movePlayer(self, coords):
-		""" l.movePlayer( ( int, int ) ) -> None
+	def next_dungeon_exists(self, direction):
+		""" l.next_dungeon_exists( (int, int ) ) -> bool
+
+		Check whether another dungeon exists in the given direction.
+		"""
+
+		if not(self.dungeon_travel_data and self.adjacent_dungeon): return False
+		if not(self.dungeon_travel_data[0] and self.dungeon_travel_data[1] and self.dungeon_travel_data[2]): return False
+		direction_map = { "Up" : (0, -1) , "Down" : (0, 1) , "Left" : (-1, 0) , "Right" : (1, 0) }
+		return self.dungeon_travel_data[2] in direction_map and direction_map[self.dungeon_travel_data[2]] == direction and self.adjacent_dungeon.contains_level(self.dungeon_travel_data[1])
+
+	def move_player(self, coords):
+		""" l.move_player( ( int, int ) ) -> None
 
 		Takes a pair of tile coords and figures out where the player should go based on the side 
 		and location the player leaves the level from.
@@ -389,11 +404,27 @@ class Level(object):
 		global_coords = self.global_coords(adjusted_coords)
 		if(self.next_level_exists(global_coords, direction)):
 			next_level = self.level_in_direction(global_coords[0], global_coords[1], direction)
-			self.dungeon.movePlayer(self.screen_manager, self.screen, player, next_level, global_coords, adjusted_coords, pixel_remainder)
+			self.dungeon.move_player(self.screen_manager, self.screen, player, next_level, global_coords, adjusted_coords, pixel_remainder)
 			while not player.current_tile():
 				player.rect.left += direction[0]
 				player.rect.top += dircetion[1]
 		player.current_level.update_explored()
+
+	def move_player_dungeon(self, coords):
+		""" l.move_player_dungeon( ( int, int ) ) -> None
+
+		Takes a pair of tile coords and figures out where (in another dungeon) the player should go based on the side 
+		and location the player leaves the level from.
+		"""
+		player = self.getPlayer()
+		direction = self.direction_of(coords)
+		adjusted_coords = (coords[0] - direction[0], coords[1] - direction[1])
+		pixel_remainder = player.pixel_remainder()
+		next_level = self.adjacent_dungeon.find_level_by_name(self.dungeon_travel_data[1])
+		self.removePlayer()
+		self.adjacent_dungeon.add_player(self.screen_manager, self.screen, player, next_level, adjusted_coords, pixel_remainder)
+
+		#TODO: player goes to the other dungeon. Hardest part.
 
 	def addPlayer(self, player, coords = None, pixel_remainder = (0, 0)):
 		""" l.addPlayer( Player, ( int, int ) ) -> None
@@ -402,6 +433,7 @@ class Level(object):
 		"""
 		player.current_level = self
 		self.level_objects.addPlayer(player)
+		if self.dungeon_travel_data: self.begin_loading_adjacent_dungeon(self.dungeon_travel_data)
 		if(coords == None):	
 			player.moveRect(self.start_coords[0], self.start_coords[1], True)
 			self.update_explored()
@@ -410,7 +442,6 @@ class Level(object):
 		player.moveRect(pixel_remainder[0], pixel_remainder[1])
 		self.level_camera.update(player)
 		player.update(self.getTiles(), self.empty_light_map())
-		if self.dungeon_travel_data: self.begin_loading_adjacent_dungeon(self.dungeon_travel_data)
 		pygame.display.update()
 
 	def begin_loading_adjacent_dungeon(self, travel_data):
@@ -418,11 +449,21 @@ class Level(object):
 
 		Starts loading the dungeon that the player can travel to by leaving this level.
 		"""
+		if self.adjacent_dungeon: return
 		dungeon_name, level_name, direction = travel_data[0], travel_data[1], travel_data[2]
 		if not(dungeon_name and level_name and direction): return
 		dungeon_directory = "./dungeon_map_files/" #TODO: store this somewhere more central in case it gets changed
+		thread.start_new_thread( Level.load_adjacent_dungeon, (self, dungeon_directory, dungeon_name, ) )
+		#IDEA: could also start a thread for the level in the correpsonding dungeon to map to this one
+
+	def load_adjacent_dungeon(self, dungeon_directory, dungeon_name):
+		""" l.load_adjacent_dungeon ( str, str ) -> None
+
+		Sets this level's adjacent dungeon, building it if necessary.
+		"""
 		adjacent_dungeon = build_dungeon(dungeon_directory + dungeon_name)
-		#TODO: use multithreading if this causes lag
+		adjacent_dungeon.connect_to_level(self, self.dungeon)
+		self.adjacent_dungeon = adjacent_dungeon
 
 	# pausing/events/other thing that change screen and controls
 	def pause_game(self, player):
