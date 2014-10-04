@@ -16,11 +16,12 @@
 # when falling down a large chasm, player can get to the other side of a wall by holding left.
     - may be reproducible in more generalizable situations, like "leaving the level very quickly and diagonally"
 
-#NOTE: see dungeoneditorlauncher.py for dungeon editor-specific TODOs.
+# NOTE: see dungeoneditorlauncher.py for dungeon editor-specific TODOs.
 
 # Make docstrings for each class
     remaining classes to docstring:
 
+    (go back through non-LevelEditor classes because I haven't been diligent about docstringing)
     (all LevelEditor classes)
 
 -----------------------------------------------------------------------
@@ -40,7 +41,7 @@ LONG-TERM GOALS: (short summaries, does not include all TODOs)
     - consider cutscenes with dialog options, different possible endings, world data checks, etc.
     - currently cutscene building is incomplete is far as building cutscenes with multiple actions 
         * see begin_cutscene in cutsenetrigger.py.
-# world and world data
+# world and world data (implementing this might be a priority, but it'll be a big project)
     - create the basic world-related classes, flesh out dungeon <-> world relationship
     - saving/loading game
     - world data:
@@ -61,16 +62,40 @@ LONG-TERM GOALS: (short summaries, does not include all TODOs)
 
 OVERARCHING MAIN GOAL: Build a demo showing off dialogs, cutscenes, lighting mechanics, etc. once all immediate stuff is finished.
     - the next demo should include inventory screen and lantern mechanics based on fading light/oil
+    - should also include a boss that feels good to fight, maybe world stuff
 
 IMMEDIATE STUFF: most immediate
 
-# the player doesn't always turn invincible when hit by the boss. Narrow down the methods related to taking damage, bouncing and becoming invincible, and streamline them so that monsters hittig the player (whether with a weapon or their bodies) will be easier to deal with in the future.
+# In the dungeon editor file manager, when saving a dungeon, update the list of dungeon files.
+
+# for additional sign data, show which index of the pane the user is currently on (ex: "3/5"), and maybe grey out the arrows when there is no pane in a direction.
+
+# make the dungeon editor screen (and/or level editor screen) a good size and adjust the components (this will be an ongoing thing as I add more stuff)
+
+# figure out how to make a more extensible filepath in filemanagercontainer.py's saveDungeon method so that it isn't specific to my computer. 
+    - be sure to test the exe maker again if I change the directory structure
+    - IDEA: since there won't be many developers, just ask (via terminal?) who is there and use the answer to figure out their directory.
+
+# implement world stuff
+    - currently working on the dungeoneditor side of it
+        * change what happens when the DungeonTravelPane is opened so that it grabs the desired information from the loaded LevelData, as it does with bg
+        * find where the constructor for LevelSelectCell is called and alter it based on the new system
+        * change how levels/dungeon are saved/loaded
+        * consider implementing "room offset" (i.e., which room of the corresponding level the player should appear in when traveling between levels)
+    - this will significantly change the dungeoneditor and the main files
+    - need to create specific (and unique?) linkages between dungeons (assume not unique, just in case)
+    - may need multithreading to load dungeons within an acceptable time
+    - connections between dungeons will amount to specific sides of specific levels (top, bottom, left, right, etc.)
+        * therefore, these should be special attributes that you can set in the level editor
+    - will I need a worlddata class?
+
 # For the sake of testing the boss fight, add in "getting hurt" animations, swinging animations, jumping animations, etc. for the player and boss to make movement more natural-looking.
+
 # give the player health bar/some other health display to see if bosses can be beaten without taking much damage (possibly without taking any)
 
 # Make a boss
 
-    # NOTE: it still seems to be possible for the miner to fall outside the level, so look for ways to fix this.
+    # NOTE: it still seems to be possible for the miner to occassionally fall outside the level, so look for ways to fix this.
 
     steps:
         1. Make sure his pick works properly.
@@ -107,14 +132,15 @@ IMMEDIATE STUFF: most immediate
 # TODO: make the "hit spark" better (and possibly more well-adapted to the shape of the thing hit)
     - consider other ways to show that something is being damaged
 
-# show that the player is being damaged 
+# show that the player is being damaged (animation)
+
 # fix the bug where the frog (and presumably the bat) can be knocked off the screen
 
 # IDEA: In level editor window, could make a tileset grid image for every tile/entity type and make each cell selectable.
     - At this point, I might do this for platforms, but it curretly doesn't make sense for tiles.
 
 # figure out a combat system 
-    - IDEA for hp/other stats: have a double dict of {MONSTER_NAME: {MONSTER DICT }, DEFAULT: {DEFAULT DICT} }
+    - IDEA for hp/other stats: have a double dict of { MONSTER_NAME: { MONSTER DICT }, DEFAULT: { DEFAULT DICT } }
         * implemented this for HP only
     - may have to tweak some of the being/monster bounce system 
         * consider implementing knockback that affects both the monster attacking and the target
@@ -123,15 +149,19 @@ IMMEDIATE STUFF: most immediate
     - later, use gun/bow as example
 # consider making the lantern a subentity of the player that appears when the player is in the dark
 # figure out an item system
-    - remember that the lantern and sword are items but work very differently
+    - remember that the lantern and sword are both items but work very differently
 
 # generalize subentities/entityeffects so that they can apply to monsters and NPCs
 
-# implement "triggers" to traverse between dungeons
+# implement "triggers" to traverse between dungeons (similar to cutscene triggers?)
+    might not be based on context
 
-# implement a cutscene system and ways to trigger cutscenes
+# fully implement a cutscene system and ways to trigger cutscenes (besides the existing contact-based triggers)
 
 # make some sprites for the main character, archaeologist, sorceress, and the immortal
+
+# make error checking happen when a dungeon cannot be loaded.
+    - partially done, but might not be foolproof.
 
 -------------------------------------------------------------------
 
@@ -159,7 +189,7 @@ IMMEDIATE STUFF: screens and menus
 
 IMMEDIATE STUFF: movement
 
-# come up with more movement examples to expand movement process
+# come up with more movement examples to expand dict-based movement process
     - consider making ice blocks (or some other example besides ladders) to test whether this system is really extensible.
 
 # implement one-way platforms, spikes, etc
@@ -176,7 +206,7 @@ IMMEDIATE STUFF: dialog
         *this is because different actions in the game will affect NPC behavior/dialog later on.
         *need to start really implementing (or planning in detail) the game's main story 
             in order to flesh out the NPC system I'll need
-    - IDEA: simple NPCs (which won't appear again) have their dialogs set similarly to signs,
+    - IDEA: simple NPCs (which won't appear in multiple places) have their dialogs set similarly to signs,
             while main characters have "triggers" linked to text files and other saved data
             which make them appear.
 
@@ -272,7 +302,7 @@ IMMEDIATE STUFF: cutscenes
 
     # LONG-TERM STUFF
 
-# change the rest of the player sprites to match my concept art
+# figure out the long-term artstyle and change sprites to match
 # since being in the dark with no light could make it extremely tedious to get out, make a "suicide" option and ensure that death
     has siginficant pentalties and sends the player back to a save point where they are guaranteed to have access to light
         - want to structure the game partly around this system

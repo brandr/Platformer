@@ -1,9 +1,10 @@
 from levelgridwindow import *
 from entityselectcontainer import *
 from entitydatapane import *
+from dungeontravelpane import DungeonTravelPane
+
 from ocempgui.draw import Image
 import os.path
-#TODO: make it possible to set some kind of additional data
 
 class LevelEditorContainer(Box):
 	def __init__(self, window, level_cell, dimensions):
@@ -16,25 +17,27 @@ class LevelEditorContainer(Box):
 		print "Building level grid window..."
 		self.level_grid_window = self.level_grid_window(self.current_bg)
 		print "Level grid windows built."
-		self.entity_select_container = self.entity_select_container(self.left + 8, level_name_label.bottom + 8, self.level_grid_window.left - 16, 240)
-		self.additional_entity_data_pane = self.additional_entity_data_pane(self.level_grid_window.left, self.level_grid_window.bottom + 8, self.level_grid_window.width, 160) #TODO: make this method and get dimensions right
+		self.entity_select_container = self.entity_select_container(self.left + 8, level_name_label.bottom + 8, 360, 240)
+		#TODO
+		self.travel_pane = self.dungeon_travel_pane(self.entity_select_container.right + 16, level_name_label.bottom + 8, 
+			(self.level_grid_window.left - 16 - self.entity_select_container.right), 240)
+		#TODO
+		self.additional_entity_data_pane = self.additional_entity_data_pane(self.level_grid_window.left, self.level_grid_window.bottom + 8, self.level_grid_window.width, 160)
 		self.background_select_label = self.background_select_label(self.entity_select_container.left, self.entity_select_container.bottom + 64)
-		self.background_select_list = self.build_background_select_list(self.background_select_label.left, self.background_select_label.bottom + 16, self.entity_select_container.width, 120)
+		self.background_select_list = self.build_background_select_list(self.background_select_label.left, self.background_select_label.bottom + 16, self.level_grid_window.left - 16, 120)
 		self.invalid_bg_label = Label("")
 		self.invalid_bg_label.topleft = self.background_select_list.left, self.background_select_list.bottom + 8
-
 		close_editor_button = self.close_editor_button(self.left + 8, self.bottom - 32) # also consider lower right corner
-
-		self.sunlit = False # TODO: make sure sunlit is set correctly based on level cell's data.
+		self.sunlit = False
 		self.sunlit_button = CheckButton("Sunlit")
 		self.sunlit_button.connect_signal(SIG_TOGGLED, self.toggleSunlit)
 		self.sunlit_button.topleft = (close_editor_button.right + 16, close_editor_button.top)
 		self.setSunlit(level_cell.sunlit)
-		# TODO: add a background selector.
 
 		self.add_child(level_name_label) # should be self if it can be altered, I think.
 		self.add_child(self.level_grid_window)
 		self.add_child(self.entity_select_container)
+		self.add_child(self.travel_pane)
 		self.add_child(self.additional_entity_data_pane)
 		self.add_child(self.background_select_label)
 		self.add_child(self.background_select_list)
@@ -42,12 +45,18 @@ class LevelEditorContainer(Box):
 		self.add_child(close_editor_button)
 		self.add_child(self.sunlit_button)
 
-	#TODO: label for the entity select container
+		#TODO: add something that will allow linkage to another dungeon
 
 	def entity_select_container(self, x, y, width, height):
 		container = EntitySelectContainer(width, height) # may need "self" arg
 		container.topleft = x, y
 		return container
+
+	def dungeon_travel_pane(self, x, y, width, height):
+		travel_pane = DungeonTravelPane(width, height)
+		travel_pane.topleft = x, y
+		travel_pane.initialize_travel_data(self.level_cell.travel_data)
+		return travel_pane
 
 	def background_select_label(self, x, y):
 		bg_name = "None"
@@ -110,13 +119,15 @@ class LevelEditorContainer(Box):
 		self.level_cell.bg_filename = self.current_bg
 		self.master_window.level_select_container.resume()
 		self.level_cell.updateSunlit(self.sunlit)
+		travel_data = self.travel_pane.build_travel_data()
+		self.level_cell.update_travel_data(travel_data)
 		self.master_window.destroy()
 
 	def level_grid_window(self, bg_filename):
-		window = LevelGridWindow(self, self.left + 400, self.top + 8, 360, 360, bg_filename) 
+		window = LevelGridWindow(self, self.right - 480, self.top + 8, 420, 420, bg_filename) 
 		return window
 
-	def setSunlit(self,sunlit):
+	def setSunlit(self, sunlit):
 		if(sunlit): self.sunlit_button.activate()
 
 	def toggleSunlit(self):

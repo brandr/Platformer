@@ -1,10 +1,8 @@
 """ A set of levels that exist on a grid, where each grid square represents a single room and a level may be one or more rooms.
 """
 
-import levelfactory
-from levelfactory import *
-import player
-from player import *
+from levelfactory import LevelFactory
+from player import Player
 
 # Dungeon currently represents all the levels in the game. If for some reason it becomes undesirable
 # to store all levels in one Dungeon, (example: the game takes too long to load, the level arrangements we want don't

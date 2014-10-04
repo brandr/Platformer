@@ -3,11 +3,10 @@ from levelselectcontainer import *
 import dungeongridcontainer
 from dungeongridcontainer import *
 from filemanagercontainer import *
-#import pygame
 from leveleditorscreen import *
 
-DUNGEON_WIN_WIDTH = LEVEL_WIN_WIDTH	  #TEMP (maybe?)
-DUNGEON_WIN_HEIGHT = LEVEL_WIN_HEIGHT #TEMP
+DUNGEON_WIN_WIDTH = 1200	  #TEMP (maybe?)
+DUNGEON_WIN_HEIGHT = 800 #TEMP
 
 class DungeonEditorScreen:
 	def __init__(self, dungeon_renderer):
@@ -21,9 +20,9 @@ class DungeonEditorScreen:
 	def initComponents(self): #could maybe be static
 		print "Intializing dungeon editor components..."
 		self.level_select_container = self.level_select_container(32, 32, 312, 400)
-		self.dungeon_grid_container = self.dungeon_grid_container(self.level_select_container, self.level_select_container.right + 36, self.level_select_container.top, 312, 400)
-		self.file_manager_container = self.file_manager_container(self.level_select_container, self.dungeon_grid_container, self.level_select_container.left, self.level_select_container.bottom + 16, 700,128)
-		print "Dungeon editor components Intialized."
+		self.dungeon_grid_container = self.dungeon_grid_container(self.level_select_container, self.level_select_container.right + 36, self.level_select_container.top, 350, 400)
+		self.file_manager_container = self.file_manager_container(self.level_select_container, self.dungeon_grid_container, self.level_select_container.left, self.level_select_container.bottom + 16, 700, 256)
+		print "Dungeon editor components Intialized.", '\n'
 		self.dungeon_renderer.add_widget(self.level_select_container)
 		self.dungeon_renderer.add_widget(self.dungeon_grid_container)
 		self.dungeon_renderer.add_widget(self.file_manager_container)

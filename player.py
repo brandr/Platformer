@@ -490,10 +490,24 @@ class Player(Being):
 
         Checks whether the player is outside the level and send him to the adjacent level in that direction if necessary.
         """
-        if(self.current_tile() == None):
-            #a bug can sometimes occur here, crashing the game. (this is rare however.)
-            self.exitLevel(self.coordinates())
-            return True
+        coords = self.coordinates()
+        x, y = coords[0], coords[1]
+        x_dir, y_dir = 0, 0
+        level_dimensions = self.current_level.get_dimensions()
+        if x <= 0: x_dir = -1
+        elif x >= level_dimensions: x_dir = 1
+        if y <= 0: y_dir = -1
+        elif y >= level_dimensions: y_dir = 1
+        direction = (x_dir, y_dir)
+        if(self.current_tile() == None): 
+            if self.current_level.next_level_exists(self.current_level.global_coords( (x, y) ), direction) :
+                self.exitLevel(coords)
+                return True
+            else:
+                while self.rect.left < 0: self.rect.left += 1
+                while self.rect.right >= 32*level_dimensions[0]: self.rect.right -= 1
+                while self.rect.top < 0: self.rect.top += 1
+                while self.rect.bottom >= 32*level_dimensions[1]: self.rect.bottom -= 1
         return False
 
     def exitLevel(self, coords):

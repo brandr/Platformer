@@ -1,7 +1,7 @@
 from leveleditorcontainer import *
 
-LEVEL_WIN_WIDTH = 1000	#not sure these are needed
-LEVEL_WIN_HEIGHT = 650
+LEVEL_WIN_WIDTH = 1120	#not sure these are needed (YES THEY ARE)
+LEVEL_WIN_HEIGHT = 720
 
 class LevelEditorWindow(Window): 
 	def __init__(self, level_select_container, title, level_cell, position, dimensions):

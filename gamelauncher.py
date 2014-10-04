@@ -14,9 +14,8 @@ def runGame():
 
     """
     pygame.init()
-    screen = pygame.display.set_mode(DISPLAY, FLAGS, DEPTH)
     manager = GameManager()
-    manager.run_game(screen)
+    manager.run_game()
 
 if __name__ == "__main__":
     runGame()

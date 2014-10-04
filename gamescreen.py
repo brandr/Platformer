@@ -4,7 +4,6 @@
 
 from controlmanager import *
 from player import *
-from dungeon import *
 
 DISPLAY = (WIN_WIDTH, WIN_HEIGHT)
 DEPTH = 32

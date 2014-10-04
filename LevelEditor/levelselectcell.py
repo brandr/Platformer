@@ -7,25 +7,27 @@ from leveldata import * #might not be necessary if this is reachable through oth
 CELL_WIDTH = 242
 CELL_HEIGHT = 36 
 #not yet sure if the cell should store level data, or simply be used to create it. (I would prefer the latter.)
+# TODO: figure out where this constructor is called and grab travel data where relevant.
 class LevelSelectCell(Table):
-	def __init__(self, name, sunlit = False, bg_filename = None):	#might want to build the cell from a levelData object
+	def __init__(self, level_data):#name, sunlit = False, bg_filename = None, travel_data = None):	#might want to build the cell from a levelData object
 		Table.__init__(self, 1, 1) 
 		self.set_minimum_size(CELL_WIDTH, CELL_HEIGHT)
-		self.name = name # TODO:consider retrieving from self.level_data instead
+		self.name = level_data.name # TODO:consider retrieving from self.level_data instead
 		self.name_label = Label(self.name)
 		self.add_child(0, 0, self.name_label)
 		self.room_cells = None
-		self.sunlit = sunlit
-		self.bg_filename = bg_filename
-		
+		self.sunlit = level_data.sunlit
+		self.bg_filename = level_data.bg_filename
+		self.travel_data = level_data.travel_data
+
 	def get_name(self): #TODO: consider making this getter access level data instead.
 		return self.name
 
 	def get_level_data(self): #add other information here if more is needed for level data.
-		if (self.room_cells == None): return LevelData(self.name, None, None, self.sunlit)
+		if (self.room_cells == None): return LevelData(self.name, None, None, self.sunlit, self.travel_data)
 		origin = self.origin()
 		lower_right = self.lower_right()
-		data = LevelData(self.name, origin, lower_right, self.sunlit, self.bg_filename)
+		data = LevelData(self.name, origin, lower_right, self.sunlit, self.bg_filename, self.travel_data)
 		return data
 
 	def origin(self): #find the upper left corner of the level
@@ -83,6 +85,9 @@ class LevelSelectCell(Table):
 
 	def updateSunlit(self, sunlit):
 		self.sunlit = sunlit
+
+	def update_travel_data(self, travel_data):
+		self.travel_data = travel_data
 	
 	def rename_level(self, level_name):
 		self.name = level_name

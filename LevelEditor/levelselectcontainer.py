@@ -94,10 +94,10 @@ class LevelSelectContainer(Box):
 		data_set = []
 		rows = self.level_data_table._rows
 		for y in xrange(rows):
-			cell = self.level_data_table.grid[(y,0)]
+			cell = self.level_data_table.grid[(y, 0)]
 			if(cell != None): 
-				next_data = cell.get_level_data() #cell's type is LevelSelectCell
-				data_set.append(next_data)	#might have a check for empty or otherwise invalid levels before doing this
+				next_data = cell.get_level_data()  # cell's type is LevelSelectCell
+				data_set.append(next_data)	       # might have a check for empty or otherwise invalid levels before doing this
 		return data_set
 
 		#reset the levels
@@ -111,17 +111,18 @@ class LevelSelectContainer(Box):
 	def clearLevelTable(self):
 		rows = self.level_data_table._rows
 		for y in xrange(rows):
-			cell = self.level_data_table.grid[(y,0)]
+			cell = self.level_data_table.grid[(y, 0)]
 			if(cell != None): self.level_data_table.remove_child(cell)
 
 	def addLevel(self, level_data = None):
 		if level_data == None:
 			level_name = "level " + str(self.level_count)
-			added_level_cell = LevelSelectCell(level_name)
+			level_data = LevelData(level_name, (0, 0), (0, 0)) # these coords shouldn't matter
+			added_level_cell = LevelSelectCell(level_data)
 			self.level_data_table.add_child(self.level_count, 0, added_level_cell)
 			self.level_count += 1
 			return
-		added_level_cell = LevelSelectCell(level_data.name, level_data.sunlit, level_data.bg_filename)	# it might later be better just to take the whole leveldata as an arg
+		added_level_cell = LevelSelectCell(level_data)#level_data.name, level_data.sunlit, level_data.bg_filename)	# it might later be better just to take the whole leveldata as an arg, so I'll try it for now
 		self.level_data_table.add_child(self.level_count, 0, added_level_cell)
 		self.level_count += 1
 
@@ -147,7 +148,7 @@ class LevelSelectContainer(Box):
 	def editSelectedLevel(self):
 		title = "Level Editor" #might have title vary more and include level's name
 		print "Openining level editor..."
-		level_editor_window = LevelEditorWindow(self, title, self.selected_level_cell, (32, 32), (800, 550))	#TODO: fix lag
+		level_editor_window = LevelEditorWindow(self, title, self.selected_level_cell, (32, 32), (LEVEL_WIN_WIDTH, LEVEL_WIN_HEIGHT))	#TODO: fix lag
 		level_editor_window.depth = 1
 		self.editor_screen.dungeon_renderer.add_widget(level_editor_window)
 		self.editor_screen.adjustSensitivty(False)

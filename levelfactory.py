@@ -1,9 +1,8 @@
 """ A factory that creates levels from LevelDatas and Rooms.
 """
 
-import roomfactory
 from roomfactory import *
-
+from level import Level
 #The LevelFactory calls methods from RoomFactory (along with some additional methods)
 	#to create the dungeon levels based on a set of input.
 

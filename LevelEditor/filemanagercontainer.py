@@ -10,15 +10,11 @@ from dungeondata import *
 
 DEFAULT_FILE_COUNT = 10
 
-#IDEA: could indicate which slots are empty and which are not
-
-#TODO: use Json to read/write files containing DungeonData objects.
-
-
-#"Another variant of the dumps() function, called dump(), simply serializes the object to a file. So if f is a file object opened for writing, we can do this:
-#json.dump(x, f)
-#To decode the object again, if f is a file object which has been opened for reading:
-#x = json.load(f)"
+# use Json to read/write files containing DungeonData objects.
+# "Another variant of the dumps() function, called dump(), simply serializes the object to a file. So if f is a file object opened for writing, we can do this:
+# json.dump(x, f)
+# To decode the object again, if f is a file object which has been opened for reading:
+# x = json.load(f)"
 
 class FileManagerContainer(Box):
 	"""docstring for FileManagerContainer"""
@@ -82,7 +78,8 @@ class FileManagerContainer(Box):
 		return label
 
 	def filename_entry(self, x, y):
-		entry = Entry("                  ")
+		entry = Entry("                  ") #all these spaces are only to determine the size
+		entry.set_text("")
 		entry.topleft = x, y
 		return entry
 
@@ -106,9 +103,9 @@ class FileManagerContainer(Box):
 		save_data = dungeon_data.formatted_data()
 		json.dump(save_data, dungeon_file)
 		
-		dev_filepath = "C:\Users\Robert\Documents\python_stuff\Platformer\dungeon_map_files"
+		dev_filepath = "/home/robert/Documents/python_stuff/Platformer/dungeon_map_files"
 		if(path.exists(dev_filepath)):
-			dev_filename = dev_filepath + "\\" + current_filename
+			dev_filename = dev_filepath + "/" + current_filename
 			print "Saving dungeon for the developers..."
 			dev_dungeon_file = open(dev_filename,'wb') #'wb' means "write binary"
 			json.dump(save_data, dev_dungeon_file)
@@ -121,7 +118,7 @@ class FileManagerContainer(Box):
 		#TODO: (make sure to deal with ununsed rooms/levels properly when building the DungeonData)
 		level_data_set = self.level_select_container.level_save_data() 
 		room_data_set = self.dungeon_grid_container.room_save_data() 
-		dungeon_data = DungeonData(level_data_set,room_data_set)
+		dungeon_data = DungeonData(level_data_set, room_data_set)
 		return dungeon_data
 
 	#load method

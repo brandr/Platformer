@@ -109,7 +109,7 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 		return button
 
 	def add_sign_pane(self):
-		next_pane_lies = ["", "", "", ""]
+		next_pane_lines = ["", "", "", ""]
 		self.sign_text_panes.append(next_pane_lines)
 		self.set_sensitivity(self.next_pane_button, True)
 

@@ -64,18 +64,13 @@ from dungeoneditorscreen import *
 """
 def load_dungeon_editor():
 	pygame.init()
-	
 	print "Loading dungeon editor..."
-
 	dungeon_renderer = Renderer()
 	dungeon_renderer.create_screen(DUNGEON_WIN_WIDTH, DUNGEON_WIN_HEIGHT)
 	dungeon_renderer.title = "Dungeon Editor"
 	dungeon_renderer.color = (250, 250, 250)
-
 	dungeon_editor_screen = DungeonEditorScreen(dungeon_renderer)
 	dungeon_editor_screen.openDungeonEditor() #add more args if necessary
-
-
 
 if __name__ == "__main__":
 	load_dungeon_editor()

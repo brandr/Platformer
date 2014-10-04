@@ -1,8 +1,8 @@
 """ A data set used to generate a dungeon.
 """
 
-from leveldata import *
-from roomdata import *
+from leveldata import LevelData
+from roomdata import RoomData
 
 class DungeonData(object):
 	""" DungeonData( [ LevelData ], [ [ RoomData ] ] -> DungeonData

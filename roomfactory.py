@@ -1,12 +1,14 @@
-from tilefactory import *
-from entityfactory import *
-
-from signfactory import *
-from doorfactory import *
+from tilefactory import TileFactory
+from entityfactory import EntityFactory
+from signfactory import SignFactory
+from doorfactory import DoorFactory
 from pickupfactory import *
 from cutscenetriggerfactory import *
-
-from level import *
+from levelobjects import LevelObjects
+from room import Room
+from block import Block
+from tiledata import *#TileData, BlockedTileData, DEFAULT_TILE_SIZE, DEFAULT_CUTSCENE_TRIGGER
+from roomdata import ROOM_WIDTH, ROOM_HEIGHT
 
 DEFAULT_SIGN = "default_sign"
 DEFAULT_DOOR = "default_door"

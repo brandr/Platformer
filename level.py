@@ -1,6 +1,7 @@
 """ A set of tiles and entities that are active as long as the player is on the level.
 """ 
 
+from dungeonfactory import build_dungeon
 from room import *
 from entityfactory import *
 from effect import *
@@ -70,11 +71,13 @@ class Level(object):
 		self.active = True
 		self.bg = Surface((32, 32))
 
-		self.dungeon = dungeon 			# the LevelGroup that the level is part of
-		self.level_ID = level_data.name # a currently unused value which identifies the level uniquely
-		self.origin = origin 			# upper-left corner of the level (in terms of global coords, so each coordinate pair corresponds to a room)
-		self.level_objects = LevelObjects(self) #all objects in the level (tiles and entities)
-		self.start_coords = None 		# coords where the player appears upon entering the level (set by addRooms)
+		self.dungeon = dungeon 					# the Dungeon that the level is part of
+		self.level_ID = level_data.name 		# a currently unused value which identifies the level uniquely
+		self.origin = origin 					# upper-left corner of the level (in terms of global coords, so each coordinate pair corresponds to a room)
+		self.level_objects = LevelObjects(self) # all objects in the level (tiles and entities)
+		self.start_coords = None 				# coords where the player appears upon entering the level (set by addRooms)
+		self.dungeon_travel_data = level_data.travel_data
+		#self.adjacent_dungeon = None #not sure if I'll use this yet
 		self.addRooms(rooms)
 
 		tiles = self.getTiles()
@@ -107,7 +110,7 @@ class Level(object):
 			d.fill_tiles(self.getTiles())
 
 		#toString test methods
-	def to_string(self): #will only be used for testing, I  think. THerefore, no doctring.
+	def to_string(self): #will only be used for testing, I  think. Therefore, no doctring.
 		level_string = ""
 		tiles = self.getTiles()
 		for row in tiles:
@@ -393,7 +396,7 @@ class Level(object):
 		player.current_level.update_explored()
 
 	def addPlayer(self, player, coords = None, pixel_remainder = (0, 0)):
-		""" addPlayer( Player, ( int, int ) ) -> None
+		""" l.addPlayer( Player, ( int, int ) ) -> None
 
 		Add the given player to the level at the given tile coordinates.
 		"""
@@ -407,7 +410,19 @@ class Level(object):
 		player.moveRect(pixel_remainder[0], pixel_remainder[1])
 		self.level_camera.update(player)
 		player.update(self.getTiles(), self.empty_light_map())
+		if self.dungeon_travel_data: self.begin_loading_adjacent_dungeon(self.dungeon_travel_data)
 		pygame.display.update()
+
+	def begin_loading_adjacent_dungeon(self, travel_data):
+		""" l.begin_loading_adjacent_dungeon( ( str, str, str ) ) -> None
+
+		Starts loading the dungeon that the player can travel to by leaving this level.
+		"""
+		dungeon_name, level_name, direction = travel_data[0], travel_data[1], travel_data[2]
+		if not(dungeon_name and level_name and direction): return
+		dungeon_directory = "./dungeon_map_files/" #TODO: store this somewhere more central in case it gets changed
+		adjacent_dungeon = build_dungeon(dungeon_directory + dungeon_name)
+		#TODO: use multithreading if this causes lag
 
 	# pausing/events/other thing that change screen and controls
 	def pause_game(self, player):
