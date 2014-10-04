@@ -86,7 +86,7 @@ class LevelObjects(object):
 		if self.entities == None:
 			self.entities = []
 		level = self.level
-		x_offset = room_coords[0] - level.origin[0]
+		x_offset = room_coords[0] - level.origin[0]	#this didn't work. need to test new version before deleting, though.
 		y_offset = room_coords[1] - level.origin[1]
 		for e in level_objects.entities:
 			self.entities.append(e)

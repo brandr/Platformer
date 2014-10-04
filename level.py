@@ -248,7 +248,7 @@ class Level(object):
 			direction = e[1]
 			x = tile.coordinates()[0]
 			y = tile.coordinates()[1]
-			if self.next_level_exists(self.global_coords((x, y)), direction): #this is the sort of area whre we want to get rid of these 32s
+			if self.next_level_exists(self.global_coords((x, y)), direction):
 				continue
 			exit_platform_image = GameImage.load_image_file('./data/', 'exitblock1.bmp') #TODO: make exitblocks more terrifying in case anyone finds them
 			exit_platform = GameImage.still_animation_set(exit_platform_image) #TEMPORARY
@@ -357,18 +357,21 @@ class Level(object):
 		and returns the coordinates the player should appear on when it levaes this level and travels to
 		the adjacent one.
 		"""
-		# NOTE: global coords do not seem to be used here. why?
+
 		dimensions = self.get_dimensions()
 		origin_x = self.origin[0]
+		origin_y = self.origin[1]
+		room_offset_x = global_coords[0] - origin_x
+		room_offset_y = global_coords[1] - origin_y
 
 		if(local_coords[0] <= 1):				# left edge of level
-			return (dimensions[0] - 1, local_coords[1])		
+			return (dimensions[0] - 1, local_coords[1] + ROOM_HEIGHT*room_offset_y)		
 		if(local_coords[0] >= ROOM_WIDTH - 1):	# right edge of level
-			return (1, local_coords[1])
+			return (1, local_coords[1] + ROOM_HEIGHT*room_offset_y)
 		if(local_coords[1] <= 1):				# top edge of level
-			return (local_coords[0], dimensions[1] - 1)
+			return (local_coords[0] + ROOM_WIDTH*room_offset_x, dimensions[1] - 1)
 		if(local_coords[1] >= ROOM_HEIGHT - 1):	# bottom edge of level
-			return (local_coords[0], 1)
+			return (local_coords[0] + ROOM_WIDTH*room_offset_x, 1)
 		#TODO: error case (no possible edge detected for exitblock)
 
 	def next_level_exists(self, global_coords, direction):
@@ -401,7 +404,7 @@ class Level(object):
 		adjusted_coords = (coords[0] - direction[0], coords[1] - direction[1])
 		pixel_remainder = player.pixel_remainder()
 		self.removePlayer()
-		global_coords = self.global_coords(adjusted_coords)
+		global_coords = self.global_coords(adjusted_coords)	#these represent the room coords the player is curretly at.
 		if(self.next_level_exists(global_coords, direction)):
 			next_level = self.level_in_direction(global_coords[0], global_coords[1], direction)
 			self.dungeon.move_player(self.screen_manager, self.screen, player, next_level, global_coords, adjusted_coords, pixel_remainder)

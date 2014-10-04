@@ -3,7 +3,7 @@
 
 from levelfactory import LevelFactory
 from player import Player
-
+from roomdata import ROOM_WIDTH, ROOM_HEIGHT
 # Dungeon currently represents all the levels in the game. If for some reason it becomes undesirable
 # to store all levels in one Dungeon, (example: the game takes too long to load, the level arrangements we want don't
 # fit neatly into one grid, etc) then we might make it possible to travel between LevelGroups.
@@ -23,7 +23,7 @@ class Dungeon(object):
 	def __init__(self, level_data_set, room_data_set): #Dungeon builds the dungeon from a single map along with some other data about the level.
 		factory = LevelFactory()
 		print "Building dungeon rooms..."
-		rooms = factory.dungeon_rooms(self, room_data_set)
+		rooms = factory.dungeon_rooms(self, room_data_set) #<--- THIS IS THE PROBLEM!!!
 		self.dungeon_levels = factory.dungeon_levels(self, rooms, level_data_set)
 		#for L in self.dungeon_levels:
 		#	L.calibrateExits() # needed in case there are ways out of levels that don't lead to other levels.
@@ -99,7 +99,6 @@ class Dungeon(object):
 		Checks whether the dungeon contains a level with the given name.
 		"""
 		for L in self.dungeon_levels:
-			#print L.level_ID, name
 			if L.level_ID == name: 
 				return True
 		return False

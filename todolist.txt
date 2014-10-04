@@ -79,6 +79,10 @@ IMMEDIATE STUFF: most immediate
         * therefore, these should be special attributes that you can set in the level editor
     - will I need a worlddata class?
 
+# resizing levels with backgrounds in the dungeon editor doesn't quite seem to work properly. Look into this.
+    * NOTE: this may be a result of the automatic system that prevents levels from being saved with rooms that contain nothing. if so, it has nothing to do with the backgrounds.
+    * this appears to cause larger bugs when the level is actually created.
+
 # perform new tests for rooms and levels once the new dungeon system is implemented.
 
 # In the dungeon editor file manager, when saving a dungeon, update the list of dungeon files.

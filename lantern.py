@@ -99,8 +99,9 @@ class Lantern(Entity):	#lantern which can help the player see
         Figure out the light level (according to this lantern only) at the given coordinates.
         If another light source calcualtes a higehr brigihtness, then that one is used instead.
         """
+        light_value = self.light_distance()
         other = Tile.tileat(coords,tiles)
         temp_dist = max(1, self.dist_from(other))
-        temp_dist = max(0, self.lightvalue - temp_dist + 1)
-        temp_brightness = ((0.9*temp_dist)/(self.lightvalue))*256
+        temp_dist = max(0, light_value - temp_dist + 1)
+        temp_brightness = ((0.9*temp_dist)/(light_value)*256)
         return min(temp_brightness, 255)

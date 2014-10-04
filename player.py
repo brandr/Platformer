@@ -498,8 +498,10 @@ class Player(Being):
             if x <= 0: x_dir = -1
             elif x >= level_dimensions[0]: x_dir = 1
             if y <= 0: y_dir = -1
-            elif y >= level_dimensions[0]: y_dir = 1
+            elif y >= level_dimensions[1]: y_dir = 1
             direction = (x_dir, y_dir)
+            x -= x_dir
+            y -= y_dir
             if self.current_level.next_level_exists(self.current_level.global_coords( (x, y) ), direction) :
                 self.exit_level(coords)
                 return True

@@ -32,12 +32,17 @@ class RoomFactory(object):
 		x1, y1 = RoomFactory.origin(room_data_set)
 		x2, y2 = RoomFactory.lower_right(room_data_set)
 		print "Setting up rooms..."
-		for y in range(y1, y2 + 1):	
+		for y in range(0, y2 + 1):	
 			rooms.append([])
+			for x in range(0, x2 + 1):
+				rooms[y].append(None)
+		for y in range(y1, y2 + 1):	
+			#rooms.append([])
 			for x in range(x1, x2 + 1):
 				next_data = room_data_set[y][x]
 				next_room = RoomFactory.build_room(dungeon, next_data, x, y)
-				rooms[y].append(next_room)
+				rooms[y][x] = next_room
+				#rooms[y].append(next_room)
 		print "Rooms set up."
 		return rooms
 

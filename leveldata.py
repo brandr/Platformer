@@ -49,7 +49,11 @@ class LevelData(object):
 			raise(SystemExit)
 		for y in range(corner1[1], corner2[1] + 1):
 			for x in range(corner1[0], corner2[0] + 1):
-				room_set.append(rooms[y - corner1[1]][x - corner1[0]]) # is this right? need to test
+				#if x > width or y > height:
+				#	print "x, y: ", x, y
+				#	print "width, height: ", width, height
+				room_set.append(rooms[y][x]) # is this right? need to test
+
 				# TODO: error checking for out of range
 		return room_set
 
