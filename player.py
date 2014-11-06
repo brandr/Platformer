@@ -6,6 +6,7 @@ from lantern import *
 from exitblock import *
 from platform import *
 from weaponfactory import build_weapon, SWORD
+from inventory import Inventory, LANTERN
 
 #from sword import * #TEMP
 
@@ -39,7 +40,8 @@ class Player(Being):
         self.can_jump = True
         self.left, self.right, self.down, self.up, self.space, self.control, self.x = False, False, False, False, False, False, False
         self.movement_state = DEFAULT_MOVEMENT_STATE
-        self.lantern = None
+        #self.lantern = None
+        self.inventory = Inventory()
 
         #TODO: come up with a more general system for swords/weapons
         self.viewed_cutscene_keys = []
@@ -236,8 +238,9 @@ class Player(Being):
 
         Update the player's lantern (draining oil) if the player is underground and holding a lantern.
         """
-        if self.lantern and self.active and not self.current_level.outdoors:
-            self.lantern.oil_update()
+        lantern = self.get_lantern()
+        if lantern and self.active and not self.current_level.outdoors:
+            lantern.oil_update()
 
     def x_action_check(self):
         """ p.x_action_check( ) -> None
@@ -266,7 +269,7 @@ class Player(Being):
         This updates the player's view and makes visible light sources emit light.
         """
         level = self.current_level
-        lanterns = level.getLanterns()
+        #lanterns = level.getLanterns() #TODO: just do this for light sources in general
 
         coords = self.coordinates()
         start_x = max(0, coords[0] - self.sight_dist() - 2)
@@ -279,6 +282,8 @@ class Player(Being):
             return
         nearby_light_sources = []
         far_light_sources = []
+        #TODO: just do this for light sources in general
+        """
         for l in lanterns:
             l.update(self)
             if self.in_vision_range(l):
@@ -287,6 +292,7 @@ class Player(Being):
                 far_light_sources.append(l)
         for f in far_light_sources:
        	    f.update_light(all_tiles, light_map)
+        """
         self.emit_light(self.sight_dist(), all_tiles, light_map, nearby_light_sources)
 
     def sight_dist(self):
@@ -294,8 +300,9 @@ class Player(Being):
 
         Returns the radius of light that the player's lantern should emit.
         """
-        if self.lantern and not self.lantern.is_empty():
-            return self.lantern.light_distance()
+        lantern = self.get_lantern()
+        if lantern and not lantern.is_empty():
+            return lantern.light_distance()
         return 0 
 
     def in_vision_range(self, other):	
@@ -414,9 +421,9 @@ class Player(Being):
         pickup.take_effect(self)
 
         #TEMP METHOD (therefore no docstring)
-    def pick_up_lantern(self, lantern):
-        lantern.delete()
-        self.lantern = lantern
+    #def pick_up_lantern(self, lantern):
+    #   lantern.delete()
+    #   self.lantern = lantern
         #TEMP METHOD
 
     def collideMonsters(self, xvel, yvel):
@@ -435,15 +442,16 @@ class Player(Being):
                 m.mask = pygame.mask.from_surface(m.image)
                 if pygame.sprite.collide_mask(self, m):
                     self.collide_with_damage_source(m)
+                    self.take_damage(m.contact_damage) #TODO: grab this from monster
                     break #makes sure the player can only collide with one monster per cycle
 
     def collide_with_damage_source(self, source):
-        """ p.collide_with_monster( Monster/Weapon ) -> None
+        """ p.collide_with_damage_source( Monster/Weapon ) -> None
 
         A player being hit by a monster, weapon, projectile, etc. takes damage, goes through invincibility frames, etc.
         """
         self.bounceAgainst(source)
-        self.invincibility_frames = 60
+        self.invincibility_frames = 100
         source.bounceAgainst(self)
         
 
@@ -540,6 +548,21 @@ class Player(Being):
         """
         self.current_level.move_player_dungeon(coords)
 
+    # ITEM-RELATED METHODS
+    def get_lantern(self):
+        """ p.get_latern( ) -> Lantern
+
+        Return the player's current lantern, or None if he has no lantern.
+        """
+        return self.inventory.get_item(LANTERN)
+
+    def acquire_item(self, item, key):
+        """ p.acquire_item( Item, str ) -> None
+
+        The player acquires the given item.
+        """
+        self.inventory.add_item( item, key )
+
     def pause_game(self):
         """ p.pause_game( ) -> None
 
@@ -560,13 +583,6 @@ class Player(Being):
         Check whether the player has seen a cutscene based on its associated string key.
         """
         return cutscene_key in self.viewed_cutscene_keys
-
-    def get_lantern(self):
-        """ p.get_lantern( ) -> Lantern
-
-        AHAHAHAHAHAHAHAHA oh wait you're serious
-        """
-        return self.lantern
 
     def hittable_targets(self):
         """ p.hittable_targets( ) -> [ Monster ]

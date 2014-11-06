@@ -6,6 +6,7 @@ from pickupfactory import *
 
 from ladder import *
 from lantern import *
+from chest import Chest
 from exitblock import *
 from monster import *
 from sign import *
@@ -14,7 +15,7 @@ from cutscenetrigger import *
 from npcfactory import *
 from roomdata import *
 
-ENTITY_CONSTRUCTOR_MAP = {
+ENTITY_CONSTRUCTOR_MAP = { #TODO: try to figure out why signs aren't in here
 	DEFAULT_PLATFORM:Platform,
 	SLOPING_PLATFORM:Platform,
 
@@ -29,7 +30,7 @@ ENTITY_CONSTRUCTOR_MAP = {
 
 	MINER:NonPlayerCharacter,
 
-	DEFAULT_CUTSCENE_TRIGGER:CutsceneTrigger,
+	DEFAULT_CUTSCENE_TRIGGER:CutsceneTrigger,	#this might not be necessary, but I'm not sure.
 	#TEMP
 	KENSTAR:NonPlayerCharacter
 }

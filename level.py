@@ -1,5 +1,5 @@
 """ A set of tiles and entities that are active as long as the player is on the level.
-""" 
+"""
 
 from dungeonfactory import build_dungeon
 from room import *
@@ -8,8 +8,11 @@ from effect import *
 from tilefactory import TileFactory
 from cutscenescripts import ACTOR_GROUP_MAP
 
+from pygame import Surface, Color
+from pygame.font import Font
+
 import thread
-#from multiprocessing import Process
+from multiprocessing import Process
 
 BLACK = Color ("#000000")
 EXPLORED_GREY = Color("#222222")
@@ -125,7 +128,7 @@ class Level(object):
 			level_string += "\n"
 		return level_string
 
-	def entities_to_string(self): #for testing. No docstring.
+	def entities_to_string(self): # for testing. No docstring.
 		dimensions = self.get_dimensions()
 		entities_string_array = []
 		while(len(entities_string_array) <= dimensions[1]):
@@ -144,7 +147,7 @@ class Level(object):
 			entities_string += "\n"
 		return entities_string
 
-		#TEMP METHOD. No docstring.
+		# TEMP METHOD. No docstring.
 	def setTilesOutdoors(self):
 		default_sky_tile = GameImage.load_image_file('./data/', 'test_sky_tile_1.bmp') #GameImage.loadImageFile('test_sky_tile_1.bmp') 
 		dimensions =  self.get_dimensions()
@@ -152,7 +155,7 @@ class Level(object):
 		for y in xrange(dimensions[1]):
 			for x in xrange(dimensions[0]):
 				tiles[y][x].changeImage(default_sky_tile) #Tile(default_sky_tile, x,y)
-		#TEMP METHOD
+		# TEMP METHOD
 
 		#level building methods (called in constructor)
 	def addRooms(self, rooms):
@@ -410,7 +413,7 @@ class Level(object):
 			self.dungeon.move_player(self.screen_manager, self.screen, player, next_level, global_coords, adjusted_coords, pixel_remainder)
 			while not player.current_tile():
 				player.rect.left += direction[0]
-				player.rect.top += dircetion[1]
+				player.rect.top += direction[1]
 		player.current_level.update_explored()
 
 	def move_player_dungeon(self, coords):
@@ -457,6 +460,7 @@ class Level(object):
 		if not(dungeon_name and level_name and direction): return
 		dungeon_directory = "./dungeon_map_files/" #TODO: store this somewhere more central in case it gets changed
 		thread.start_new_thread( Level.load_adjacent_dungeon, (self, dungeon_directory, dungeon_name, ) )
+		#p = Process( target = Level.load_adjacent_dungeon, args = ( self, dungeon_directory, dungeon_name,  ) )
 		#IDEA: could also start a thread for the level in the correpsonding dungeon to map to this one
 
 	def load_adjacent_dungeon(self, dungeon_directory, dungeon_name):
@@ -640,7 +644,8 @@ class Level(object):
 		If the player is still on the level at this iteration of the update, the player performs a physical
 		update in which things like gravity and collisions are applied.
 
-		At this point, objects in the level are blitted onto the level in the following order:
+		At this point, objects in the level are blitted onto the screen in the following order:
+
 		-tiles
 		-stationary objects
 		-moving non-player objects
@@ -650,7 +655,8 @@ class Level(object):
 		-subentites of the player
 		-entity effects of the player
 
-		After this, lighting is applied. Finally, visual effects like cutscene bars or dialog boxes are displayed.
+		After this, lighting is applied by blitting black squares of varying transparency over the tiles. 
+		Finally, visual effects like cutscene bars or dialog boxes are displayed.
 		"""
 		if(not self.active):
 			return
@@ -685,6 +691,8 @@ class Level(object):
 				self.screen.blit(l.image, self.level_camera.apply(l))
 			for s in self.getSigns():
 				self.screen.blit(s.image, self.level_camera.apply(s))
+			for c in self.getChests():
+				self.screen.blit(c.image, self.level_camera.apply(c))
 			for d in self.getDoors():
 				self.screen.blit(d.image, self.level_camera.apply(d))
 
@@ -731,6 +739,8 @@ class Level(object):
 			# light update
 			if light_map: self.update_light(light_map)
 			if (player.invincibility_frames % 2) == 0: self.screen.blit(player.image, self.level_camera.apply(player))
+			if not self.current_event:
+				self.update_player_hud(player) #TODO: blit player HUD
 			if(self.has_effects): 
 				self.update_effects()
 			pygame.display.update()
@@ -758,7 +768,7 @@ class Level(object):
 						dark.fill(EXPLORED_GREY)
 						grey_flag = True
 					dark.set_alpha(256 - light_value)
-					#dark.set_alpha(256 - ambient_light - light_value)
+					#dark.set_alpha(256 - ambient_light - light_value)	# might do this if I can make it less laggy
 					self.screen.blit(dark, (x1, y1))
 					if grey_flag:
 						dark.fill(BLACK)				
@@ -787,6 +797,33 @@ class Level(object):
 		for e in self.effect_layer:
 			next_effect, offset = e.draw_image(self)
 			self.screen.blit(next_effect, (e.offset[0] + offset[0], e.offset[1] + offset[1]))
+
+	def update_player_hud(self, player):
+		""" l.update_player_hud( ) -> None
+
+		Blit visual effects like the player's current health and lantern oil onto the screen.
+		"""
+		self.update_heatlh_display(player)
+		#TODO: other components of HUD
+
+	def update_heatlh_display(self, player):
+		""" l.update_heatlh_display( Player ) -> None
+
+		Show the player's current health on the screen.
+		"""
+		hp = player.hit_points
+		current_hp, max_hp = hp[0], hp[1]
+
+		#TEMP
+		font = Font("./fonts/FreeSansBold.ttf", 20)
+		hp_text = "HP: " + str(current_hp) + "/" + str(max_hp)
+		hp_bg = 255, 255, 255 #Surface( (100, 28) )
+		#hp_bg.fill(Color("#FFFFFF"))
+		hp_image = font.render(hp_text, False, Color("#FF0000"), hp_bg)
+		#TEMP
+
+		self.screen.blit(hp_image, (8, 8) )
+		#TODO
 
 	def level_end_coords(self):
 		""" l.level_end_coords( ) -> ( int, int )
@@ -966,6 +1003,13 @@ class Level(object):
 		Returns all lanterns in the level.
 		"""
 		return self.level_objects.get_entities(Lantern)
+
+	def getChests(self):
+		""" l.getChests( ) -> [ Chest ]
+
+		Returns all chests in the level.
+		"""
+		return self.level_objects.get_entities(Chest)
 
 	def get_exit_blocks(self):
 		""" l.get_exit_blocks( ) -> [ ExitBlock ]

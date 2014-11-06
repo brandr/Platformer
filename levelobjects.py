@@ -2,6 +2,7 @@
 """
 
 from roomdata import *
+from chest import Chest #TEMP
 
 class LevelObjects(object):
 	""" LevelObjects( Level, [ [ Tile ] ], [ Entity ] ) -> LevelObjects

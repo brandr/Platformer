@@ -3,6 +3,7 @@
 
 from signdata import *
 from cutscenetriggerdata import *
+from chestdata import ChestData
 
 ROOM_WIDTH = 28
 ROOM_HEIGHT = 20
@@ -174,6 +175,17 @@ class RoomData(object):
 		return sign_data
 
 	@staticmethod
+	def deformatted_chest(formatted_data, filepath):	# this will need to change as this class's constructor does.
+		""" deformatted_chest( ? ) -> ChestData
+
+		Take a tuplet of primitive data loaded from a file and turn it into a usable ChestData object.
+		"""
+		chest_data = ChestData(formatted_data[0], formatted_data[1], filepath)
+		chest_data.contents_key = formatted_data[4]
+		return chest_data
+
+
+	@staticmethod
 	def deformatted_cutscene_trigger(formatted_data, filepath):	# this will need to change as this class's constructor does.
 		""" deformatted_cutscene_trigger( ( str, str, int, int, str ), str ) -> CutsceneTriggerData
 
@@ -198,5 +210,6 @@ class RoomData(object):
 
 TILE_INIT_MAP = {
 	DEFAULT_SIGN:RoomData.deformatted_sign,
+	DEFAULT_CHEST:RoomData.deformatted_chest,
 	DEFAULT_CUTSCENE_TRIGGER:RoomData.deformatted_cutscene_trigger
 }

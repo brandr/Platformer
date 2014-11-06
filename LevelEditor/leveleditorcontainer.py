@@ -116,6 +116,7 @@ class LevelEditorContainer(Box):
 		self.additional_entity_data_pane.deselect_tile()
 
 	def closeEditor(self):	
+		self.additional_entity_data_pane.save_data()
 		self.level_cell.bg_filename = self.current_bg
 		self.master_window.level_select_container.resume()
 		self.level_cell.updateSunlit(self.sunlit)

@@ -78,7 +78,7 @@ class FileManagerContainer(Box):
 		return label
 
 	def filename_entry(self, x, y):
-		entry = Entry("                  ") #all these spaces are only to determine the size
+		entry = Entry("                  ") # all these spaces are only to set the size
 		entry.set_text("")
 		entry.topleft = x, y
 		return entry
@@ -102,7 +102,8 @@ class FileManagerContainer(Box):
 		dungeon_data = self.dungeon_save_data()
 		save_data = dungeon_data.formatted_data()
 		json.dump(save_data, dungeon_file)
-		
+		self.file_select_window.set_directory('./dungeon_map_files')
+		#TODO: update the save pane here.
 		dev_filepath = "/home/robert/Documents/python_stuff/Platformer/dungeon_map_files"
 		if(path.exists(dev_filepath)):
 			dev_filename = dev_filepath + "/" + current_filename

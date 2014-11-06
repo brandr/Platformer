@@ -43,6 +43,7 @@ class Monster(Being):
         self.active = True
         self.sightdist = 6
         self.max_speed = 6
+        self.contact_damage = 1 # TEMP: grab this from the MONSTER_DATA_MAP instead
         self.direction_val = -1 # -1 for left, 1 for right
         self.direction_id = 'left'
         self.changeAnimation('idle','left')

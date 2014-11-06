@@ -8,5 +8,5 @@ class World:
 	"""
 	def __init__(self, dungeon):
 		self.dungeon = dungeon
-		#TODO: intstead of this, grab connected dungeons from this dungeon
+		#TODO: intstead of doing this, grab connected dungeons from this dungeon (maybe only as they are needed though)
 #TODO: A whole new woooooooooooooooooorld

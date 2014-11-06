@@ -1,5 +1,6 @@
 from tiledata import TileData
 from signdata import SignData
+from chestdata import ChestData
 from cutscenetriggerdata import CutsceneTriggerData
 #import other children of tiledata separately
 
@@ -17,9 +18,11 @@ BMP_FILETYPE = 33204 #not sure if this will work cross-platform. (Then again, a 
 #TODO: instead of showing current entity image in the pane, blit current entity image over a white square the size of max-sized image.
 
 DEFAULT_SIGN = "default_sign"
+DEFAULT_CHEST = "default_chest"
 DEFAULT_CUTSCENE_TRIGGER = "default_cutscene_trigger"
 ENTITY_CONSTRUCTOR_MAP = {
 		DEFAULT_SIGN:SignData,
+		DEFAULT_CHEST:ChestData,
 		DEFAULT_CUTSCENE_TRIGGER:CutsceneTriggerData
 }
 
@@ -47,6 +50,7 @@ class EntitySelectContainer(Box):
 
 	def build_tile_data(self, tile_key, filepath):
 		if tile_key in ENTITY_CONSTRUCTOR_MAP:
+			print tile_key
 			constructor = ENTITY_CONSTRUCTOR_MAP[tile_key]
 			return constructor(tile_key, filepath)
 		return TileData(tile_key, filepath) 

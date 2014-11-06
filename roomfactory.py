@@ -1,6 +1,7 @@
 from tilefactory import TileFactory
 from entityfactory import EntityFactory
 from signfactory import SignFactory
+from chestfactory import ChestFactory
 from doorfactory import DoorFactory
 from pickupfactory import *
 from cutscenetriggerfactory import *
@@ -12,9 +13,11 @@ from roomdata import ROOM_WIDTH, ROOM_HEIGHT
 
 DEFAULT_SIGN = "default_sign"
 DEFAULT_DOOR = "default_door"
+DEFAULT_CHEST = "default_chest"
 NON_DEFAULT_ENTITY_MAP = {
 	DEFAULT_SIGN:SignFactory,	
 	DEFAULT_DOOR:DoorFactory,
+	DEFAULT_CHEST:ChestFactory,
 	OIL_PICKUP:PickupFactory,
 	DEFAULT_CUTSCENE_TRIGGER:CutsceneTriggerFactory
 }

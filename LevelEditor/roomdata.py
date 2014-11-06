@@ -1,5 +1,6 @@
 from signdata import *
 from cutscenetriggerdata import *
+from chestdata import ChestData
 
 ROOM_WIDTH = 28
 ROOM_HEIGHT = 20
@@ -29,7 +30,7 @@ class RoomData(object):
 		self.tiles[row][col] = tile_data #might benefit from a special setter if tiledata becomes more complex.
 
 	def formatted_data(self):
-		return (self.global_x, self.global_y, self.formatted_tile_set()) #might need to format tiles
+		return ( self.global_x, self.global_y, self.formatted_tile_set() ) #might need to format tiles
 
 	def formatted_tile_set(self):
 		tiles = []
@@ -109,6 +110,17 @@ class RoomData(object):
 		sign_data.text_panes = formatted_data[4]
 		return sign_data
 
+	#TODO: make sure this copies Platformer/chestdata.py
+	@staticmethod
+	def deformatted_chest(formatted_data, filepath):	# this will need to change as this class's constructor does.
+		""" deformatted_chest( ? ) -> ChestData
+
+		Take a tuplet of primitive data loaded from a file and turn it into a usable ChestData object.
+		"""
+		chest_data = ChestData(formatted_data[0], formatted_data[1], filepath)
+		chest_data.contents_key = formatted_data[4]
+		return chest_data
+
 	@staticmethod
 	def deformatted_cutscene_trigger(formatted_data, filepath):	#this will need to change as this class's constructor does.
 		trigger_data = CutsceneTriggerData(formatted_data[0], formatted_data[1], filepath)
@@ -126,5 +138,6 @@ class RoomData(object):
 
 TILE_INIT_MAP = {
 	DEFAULT_SIGN:RoomData.deformatted_sign, # TODO: add deformatted cutscene trigger.
+	DEFAULT_CHEST:RoomData.deformatted_chest,
 	DEFAULT_CUTSCENE_TRIGGER:RoomData.deformatted_cutscene_trigger
 }

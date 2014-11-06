@@ -28,6 +28,10 @@ DEFAULT_DOOR = "default_door"
 LANTERNS = "lanterns"
 DEFAULT_LANTERN = "default_lantern"
 
+#chests
+CHESTS = "chests"
+DEFAULT_CHEST = "default_chest"
+
 #pickups
 PICKUPS = "pickups"
 OIL_PICKUP = "oil_pickup"
@@ -58,6 +62,7 @@ ENTITY_CATEGORY_MAP = {
 	DEFAULT_SIGN:SIGNS,
 	DEFAULT_DOOR:DOORS,
 	DEFAULT_LANTERN:LANTERNS, 
+	DEFAULT_CHEST:CHESTS,
 	OIL_PICKUP:PICKUPS,
 	BAT:MONSTERS, GIANT_FROG:MONSTERS,
 	MINER:NPCS,
