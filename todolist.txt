@@ -1,6 +1,8 @@
 
     #KNOWN BUGS
 
+# when traveling from one level to another, the player often "bounces" back into the first level.
+
 # pressing X too rapidly when opening a chest (and possibly talking to NPCs or signs) will cause the dialog to skip by without appearing at all.
     - to fix this, consider setting a brief timer before the player is allowed to speed up the dialog by pressing X.
 
@@ -34,15 +36,16 @@ INSTRUCTIONS FOR ADDING NEW OBJECT TYPES:
 5. Add the object to the getters in level.py and change the update() method so that it will blit the new object in the proper order. (objects in front are blitted further down.)
 
 -ONLY NECESSARY FOR NONSTANDARD OBJECTS-
+(also still only applies to objects added through level editor)
 
-6. If the object has a nonstandard init (like signs and cutscene triggers), add it to roomdata.py by creating an init method and adding that method to TILE_INIT_MAP.\
+6. If the object has a nonstandard init (like signs and cutscene triggers), add it to roomdata.py by creating an init method and adding that method to TILE_INIT_MAP.
     - this is the case for objects that are created in the level editor and are not all interchangeable. For instance, if a monster's HP is set via the level editor, it 
       will need its own init method.
     - also add a deformatted method for the object. (ex: deformatted_chest)
 7. Create a data class for the object (ex: chestdata.py). 
     - This will handle whatever data is necessary in addition to entity key, animation set, and coordinates.
     - This needs to be done in both Platformer and LevelEditor.
-    - Be sure to create methods for create_copy() and formatted_data().
+    - Be sure to code methods for create_copy() and formatted_data().
 8. Create a factory for the object (ex: chestfactory.py). 
     - This will define how the object's additional data is added by its data class.
 9. Import this new factory in roomfactory.py and add it to NON_DEFAULT_ENTITY_MAP.
@@ -74,7 +77,7 @@ LONG-TERM GOALS: (short summaries, does not include all TODOs)
 # monsters
     - more general mapping to AI
     - look for patterns while developing more AI routines and try to minimize redundancy
-    - consider the ability to set varying monster data, based on what monster data turns out to be useful
+    - consider the ability to set varying monster data through level editor, based on what monster data turns out to be useful
     - maybe have different sprites/animation sets for the same monster (this might not be worth the effort)
 # cutscenes/events
     - consider cutscenes with dialog options, different possible endings, world data checks, etc.
@@ -106,11 +109,33 @@ OVERARCHING MAIN GOAL: Build a demo showing off combat, exploration, dialogs, cu
 
 IMMEDIATE STUFF: most immediate
 
-# add torches in dark areas (they should behave the same as lanterns used to)
+# NOTE: the player's updateView() method is currently not called because the place in player.update() where it is normally called is commented out.
 
-# IDEA: throwable light source (might need to fix how multiple light sources are processed)
+# TODO: explore  ways of having ambient light as part of the new lighting system.
 
-# figure out more exploration stuff. maybe experiment with more weird darkness stuff like torches.
+# IDEA: massive lighting system overhaul
+    - note that this has eliminated some aspects of exploration, like walls blocking light.
+    - assuming I keep using this system, the next goal is to make blocks near the edge of the light radius appear as special, darkened versions of their usual sprites.
+        * these alternate sprites should be created and stored when the object is created.
+
+# TODO: reduce lag by calling convert() before blitting surfaces. This may be useful if I go back to the black rectangle method of handling lighting.
+
+# IDEA TO REDUCE LAG: instead of having every still object load its own image, have the level keep a dict (filename:image) of all still images on the level, and only load new ones
+    if an object's filename is not found in the dict.
+    - one major advantage is that I can call convert() on each of these images, which will make blitting much more efficient.
+    - In case this somehow makes lag worse, be sure to keep the old image system commented out and not deleted
+    - This will involve changing a *lot* of classes, but it should probably reduce lag significantly by reducing the amount of information each still object has to store.
+    - Can probably do this for tiles as well as blocks.
+
+# consider re-implementing multiple light sources, although I have no idea how to handle their intersection. It might be too hard to be worth the effort.
+
+# add some kind of oil meter (can be basic, like HP)
+
+# IDEA: lantern upgrades
+    - give the player the ability to increase the lantern's radius at the cost of cost of consuming oil faster
+    - use up a burst of lantern oil to reveal hidden objects within the lantern's radius, preferably with a cool visual effect.
+
+# figure out more exploration stuff. maybe experiment with interesting areas based on the darkness mechanics.
     - goal: an interesting maze-type area
     - breakable blocks? fake walls? hidden objects? 
 
@@ -322,6 +347,7 @@ IMMEDIATE STUFF: cutscenes
 
 # Add pigs (simon)
 # make a bicycle weapon (simon)
+# make the character less bright compared to the surrounding environment (/vg/)
 
 ---------------------------------------------------------------
 

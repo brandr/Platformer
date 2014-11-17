@@ -7,15 +7,23 @@ from entityfactory import *
 from effect import *
 from tilefactory import TileFactory
 from cutscenescripts import ACTOR_GROUP_MAP
+from gameimage import DEFAULT_COLORKEY
 
+import pygame
 from pygame import Surface, Color
 from pygame.font import Font
 
+import math
 import thread
 from multiprocessing import Process
 
 BLACK = Color ("#000000")
 EXPLORED_GREY = Color("#222222")
+CLOSE_EXPLORED_GREY = Color("#444444")
+
+MAX_LIGHT_RINGS = 20
+RING_INNER = "ring_inner"
+RING_OUTER = "ring_outer"
 
 class Level(object):
 	""" Level( Dungeon, LevelData, ( int, int ), [ [ Room ] ] ) -> Level
@@ -93,6 +101,8 @@ class Level(object):
 		total_level_height = self.height*32
 		self.level_camera = Camera(total_level_width, total_level_height) #might not be the best way to make the camera
 		self.outdoors = level_data.sunlit
+		self.light_ring_map = None
+		if(not self.outdoors): self.light_ring_map = self.load_light_rings()
 		self.current_light_map = self.empty_light_map()
 
 		if(self.outdoors): self.setTilesOutdoors() #TEMP
@@ -258,6 +268,27 @@ class Level(object):
 			block_x = 32*(x + direction[0])
 			block_y = 32*(y + direction[1])
 			self.level_objects.addBlock(Platform(exit_platform, block_x, block_y))
+
+	#NOTE: if levels take too long to load, try moving this to the dungeon init so that it only has to be done once when the dungeon is loaded.
+	def load_light_rings(self):
+		""" l.load_light_rings( ) -> [ str: { str:Surface } ]
+
+		Loads an array of dicts mapping string constants to light ring images.
+		These images are used to light the area around the player if the level is dark.
+		"""
+		ring_map = []
+		for i in range(1, MAX_LIGHT_RINGS):
+			next_map = {}
+			inner_ring = pygame.image.load("./light_rings/inner_ring_" + str(i) + ".bmp")
+			outer_ring = pygame.image.load("./light_rings/outer_ring_" + str(i) + ".bmp")
+			inner_ring.set_colorkey(DEFAULT_COLORKEY)
+			outer_ring.set_colorkey(DEFAULT_COLORKEY)
+			inner_ring.convert()
+			outer_ring.convert()
+			next_map[ RING_INNER ] = inner_ring
+			next_map[ RING_OUTER ] = outer_ring
+			ring_map.append(next_map)
+		return ring_map
 
 	def init_explored(self):
 		""" l.init_explored( ) -> None 
@@ -752,6 +783,84 @@ class Level(object):
 		from 0 to 256. I'm considering using ambient light in some places but I might need to find a way to 
 		speed up the game first.
 		"""
+		player = self.getPlayer()
+		if not player: return
+		ring_map = self.light_ring_map
+		if not ring_map: return
+		origin_x, origin_y = self.level_camera.origin()
+		player_coords = player.center_rect_coords()		
+		center_x, center_y = player_coords[0], player_coords[1]
+		lantern = player.get_lantern()
+		alpha = lantern.base_alpha()
+		circle_count = max(1, lantern.light_distance() )
+		radius = 32*( circle_count )
+		darkness_multiplier = lantern.darkness_multiplier()
+		circle_images = []
+		index = 0
+		for i in xrange( circle_count ):
+			alpha = alpha*darkness_multiplier
+			circle_image = ring_map[i][RING_INNER]
+			circle_image.set_alpha(alpha)
+			circle_images.append(circle_image)
+			index = i
+
+		outer_circle_image = ring_map[ max( 0, index ) ][RING_OUTER]
+		circle_images.append(outer_circle_image)
+
+		count = len(circle_images)
+		for i in xrange( count ):
+			circle_image = circle_images[i]
+			self.screen.blit( circle_image, ( center_x + origin_x - circle_image.get_width()/2, center_y + origin_y - circle_image.get_height()/2) )
+
+		outer_rect = outer_circle_image.get_rect()
+		rect_left = center_x + origin_x - outer_rect.width/2
+		rect_right = center_x + origin_x + outer_rect.width/2
+		rect_top = center_y + origin_y - outer_rect.height/2
+		rect_bottom = center_y + origin_y + outer_rect.height/2
+		fill_area_data = [ ( 0, 0, WIN_WIDTH, rect_top ), ( 0, rect_bottom, WIN_WIDTH, max( 0, WIN_HEIGHT - rect_bottom ) ),
+		( 0, rect_top, rect_left, outer_rect.height ), ( rect_right, rect_top, max( 0, WIN_WIDTH - rect_right ), outer_rect.height ) ]
+		for data in fill_area_data:
+			x, y, width, height = data[0], data[1], data[2], data[3]
+			if( width <= 0 or height <= 0 ): continue
+			fill_rect = Surface( ( width, height ) )
+			self.screen.blit( fill_rect, ( x, y ) )
+
+		if circle_count == 1: return # is this right? I forget why I did this
+		# IDEA: make unexplored but close tiles look cleaner by setting them to very dark versions of their actual sprites.
+			# should definitely save this image for each block when it is created by setting its "unseen image" value properly.
+		# TODO: remove the lighting map process, except for flagging tiles as mapped. (also maybe find a new way to flag when blocks have been ampped)
+		# TODO: more sophisticated checks for explored tiles (only check if they are outside the circle)
+		"""
+		explored = Surface((32, 32))
+		explored.fill(EXPLORED_GREY)
+		explored.convert()	
+
+		explored_close = Surface((32, 32))
+		explored_close.fill(CLOSE_EXPLORED_GREY)
+		explored_close.convert()	
+		
+		for y in xrange(len(light_map)):
+			for x in xrange(len(light_map[y])):
+				grey_flag = False
+				x1 = x*32 + origin_x
+				y1 = y*32 + origin_y
+				x_check = x1 >= -32 and x1 < WIN_WIDTH + 32 
+				y_check = y1 >= -32 and y1 < WIN_HEIGHT + 32 
+				x_dist = ( x1 + 16 ) - ( center_x + origin_x ) 
+				y_dist = ( y1 + 16 ) - ( center_y + origin_y ) 
+				dist = math.sqrt( math.pow( x_dist, 2 ) + math.pow( y_dist, 2 ) )
+				block_dist = dist - radius
+				if x_check and y_check and block_dist > -32:
+					check_tile = self.getTiles()[y][x]
+					if check_tile.mapped and not check_tile.passable():
+						if block_dist > -16:
+							self.screen.blit(explored, (x1, y1))
+						else:
+							self.screen.blit(explored_close, (x1, y1))				
+		self.current_light_map = light_map
+		"""
+		"""
+		#OLD CODE (use for square-based darkness.)
 		origin_x, origin_y = self.level_camera.origin()
 		dark = Surface((32, 32))	
 		for y in xrange(len(light_map)):
@@ -773,6 +882,7 @@ class Level(object):
 					if grey_flag:
 						dark.fill(BLACK)				
 		self.current_light_map = light_map
+		"""
 
 	def empty_light_map(self):
 		""" l.empty_light_map( ) -> [ [ double ] ]

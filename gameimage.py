@@ -71,6 +71,13 @@ class GameImage(pygame.sprite.Sprite):
         """
         return (self.rect.left, self.rect.top)
 
+    def center_rect_coords(self):
+        """ gi.center_rect_coords -> ( int, int )
+
+        Returns the pixel coordinates of this GameImage's rect center.
+        """
+        return (self.rect.left + self.rect.width/2, self.rect.top + self.rect.height/2)
+
     def tile_dimensions(self):
         """ gi.tile_dimensions -> int, int 
 

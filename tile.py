@@ -60,11 +60,22 @@ class Tile(GameImage):
                 return
         GameImage.updateimage(self, lightvalue)
 
-    def emit_light(self, dist, tiles, light_map, otherlights = []):
+    #CHANGED TO NEW METHOD
+    #def emit_light(self, dist, tiles, light_map, otherlights = []):
+    def emit_light(self, dist, tiles, light_map):
         """ emit_light( int, [ [ Tile ] ], [ [ double ] ], [ ? ]) -> None
 
         Light is emitted in a circle from the tile, stopping at solid walls.
         This is a very complicated algortihm so hopefully we won't have to change it.
+        """
+        if dist == 0: return
+        coords = self.coordinates()
+        light_map[coords[1]][coords[0]] = 1
+        directions = ((-1, 0), (1, 0), (0, -1), (0, 1))
+        for d in directions:
+            nexttile = self.relativetile((d[0], d[1]), tiles)
+            if nexttile != None:
+                nexttile.spreadlight(dist - 1, tiles, light_map, 1, (d[0], d[1]) )
         """
     	if otherlights != None:
     	    for o in otherlights:
@@ -77,8 +88,11 @@ class Tile(GameImage):
             nexttile = self.relativetile((d[0], d[1]), tiles)
             if nexttile != None:
                 nexttile.spreadlight(dist - 1, tiles, light_map, 1, (d[0], d[1]), False, None, otherlights)
+        """
 
-    def spreadlight(self, dist, tiles, light_map, iteration = 0, direction = None, lineflag = False, brightness = None, otherlights = []):
+    #OLD METHOD DECLARATION (change back if we switch back to the old system)
+    #def spreadlight(self, dist, tiles, light_map, iteration = 0, direction = None, lineflag = False, brightness = None, otherlights = []):
+    def spreadlight(self, dist, tiles, light_map, iteration = 0, direction = None, lineflag = False, light_flag = 1):
         """ t.spreadlight( int, [ [ Tile ] ], [ [ double ] ], int, ( int, int ), bool, int, [ ? ] ) -> None
 
         After many iterations, this is the most efficient algortihm I have come up with to handle light spreading. 
@@ -105,6 +119,51 @@ class Tile(GameImage):
 
         The otherlights arg is a list of other nearby light sources that may intersect with the light being spread in this method.
         """
+        #NEW METHOD
+        coords = self.coordinates()
+        self.map()
+        #if brightness == None:
+        #    brightness = ((0.9*dist + 1)/(max(dist + iteration, 1)))*256
+        #maxbrightness = brightness
+        #if otherlights != None:
+        #    for o in otherlights:
+        #        if o.withindist(self, o.light_distance()):
+        #            checkbrightness = o.calculate_brightness(coords, tiles)
+        #            maxbrightness = max(checkbrightness, brightness)
+        light_map[coords[1]][coords[0]] = light_flag
+        if dist <= 0:
+            return               #once the light reaches its max distance, stop
+        if self.block != None and self.block.is_solid:
+            d1 = (-1*direction[1], direction[0])
+            d2 = (direction[1], -1*direction[0])
+            nexttile1 = self.relativetile(d1, tiles)
+            nexttile2 = self.relativetile(d2, tiles)
+            if nexttile1 != None:
+                nexttile1.spreadlight(0, tiles, light_map, iteration, d1, True)
+            if nexttile2 != None:
+                nexttile2.spreadlight(0, tiles, light_map, iteration, d2, True)   
+            light_flag = 0
+            #return
+        starttile = self.relativetile(direction, tiles)
+        if starttile != None:
+            starttile.spreadlight(dist - 1, tiles, light_map, iteration + 1, direction, lineflag)
+        if lineflag: return
+        
+        #non-lineflag case (still going in one of the four intial directions)
+        d1 = (-1*direction[1], direction[0])
+        d2 = (direction[1], -1*direction[0])
+
+        nexttile1 = self.relativetile(d1, tiles)
+        nexttile2 = self.relativetile(d2, tiles)
+        nextdist = sqrt(pow(iteration + dist - 1 , 2) - pow(iteration - 1, 2))
+
+        if nexttile1:
+            nexttile1.spreadlight(nextdist, tiles, light_map, iteration + 1, d1, True, light_flag)  
+        if nexttile2:
+            nexttile2.spreadlight(nextdist, tiles, light_map, iteration + 1, d2, True, light_flag)
+
+        """
+        #OLD  METHOD (change back if I switch back to square-based lighting)
         coords = self.coordinates()
         self.map()
         if brightness == None:
@@ -145,6 +204,7 @@ class Tile(GameImage):
             nexttile1.spreadlight(nextdist, tiles, light_map, iteration + 1, d1, True, None, otherlights)  
         if nexttile2 != None:
             nexttile2.spreadlight(nextdist, tiles, light_map, iteration + 1, d2, True, None, otherlights)
+        """
 
     def relativetile(self, coords, tiles):
         """ t.relativetile( ( int, int ), [ [ Tile ] ] ) -> Tile

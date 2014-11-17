@@ -157,14 +157,21 @@ class Entity(GameImage):
         coords = self.coordinates()  
         return Tile.tileat(coords, tiles)
 
-    def emit_light(self, dist, tiles, light_map, otherlights = None):
+    #CHANGED TO NEW METHOD
+    #def emit_light(self, dist, tiles, light_map, otherlights = None):
+    def emit_light(self, dist, tiles, light_map):
         """ e.emit_light( int, [ [ Tile ] ], [ [ double ] ], [ Entity/Lantern/? ] ) -> None
 
         Start spreading light outwards in a circle.
         """
         starttile = self.current_tile()
         if not (starttile == None):
+            starttile.emit_light(dist, tiles, light_map)
+        """
+        starttile = self.current_tile()
+        if not (starttile == None):
             starttile.emit_light(dist, tiles, light_map, otherlights)
+        """
 
     def calculate_brightness(self, coords):
         # this may be outdated. Delete if we don't end up using it anywhere.

@@ -2,6 +2,7 @@
 """
 
 from entity import *
+import math
 
 FLICKER_CONSTANT = 80
 
@@ -29,7 +30,7 @@ class Lantern(Entity):	#lantern which can help the player see
 
         # TODO: figure out a good oil system
         self.oil_meter = [5999, 5999]
-        self.light_multiplier = 6
+        self.light_multiplier = 7
 
     def update(self, player):
         """ l.update( Player ) -> None
@@ -63,13 +64,34 @@ class Lantern(Entity):	#lantern which can help the player see
 
         Returns the current light radius of the lantern.
         """
-        if not self.oil_meter[0]:
+        oil_ratio = float(self.oil_meter[0])/(self.oil_meter[1])
+        if oil_ratio <= 0:
             return 0
-        oil_ratio = float(self.oil_meter[0])/float(self.oil_meter[1])
         distance = int(oil_ratio*self.light_multiplier)
         if self.flicker_index < FLICKER_CONSTANT/2:
             distance -= 1 
         return distance
+
+    def darkness_multiplier(self):
+        """ l.darkness_multiplier( ) -> float
+
+        Returns the current multiplier for darkness between light layers.
+        A higher value means a dimmer lantern, though it will still cover the same radius.
+        """
+        radius = self.light_distance()
+        if radius == 0: return 255
+        base_alpha = self.base_alpha()
+        multiplier = math.pow( ( float( 250.0/base_alpha ) ), float( 1.0/radius ) )
+        return multiplier 
+
+    def base_alpha(self):
+        """ l.base_alpha( ) -> float
+
+        Returns a value used to calculate light levels in other methods.
+        A higher base alpha represents more darkness.
+        """
+        oil_ratio = float(self.oil_meter[0])/(self.oil_meter[1])
+        return 60.0 - float( oil_ratio*20.0 )
 
     def update_light(self, tiles, light_map):
         """ l.update_light( [ [ Tile ] ] ) -> [ [ double ] ] ) -> None

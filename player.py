@@ -293,7 +293,8 @@ class Player(Being):
         for f in far_light_sources:
        	    f.update_light(all_tiles, light_map)
         """
-        self.emit_light(self.sight_dist(), all_tiles, light_map, nearby_light_sources)
+        #self.emit_light(self.sight_dist(), all_tiles, light_map, nearby_light_sources)
+        #self.emit_light(self.sight_dist(), all_tiles, light_map)
 
     def sight_dist(self):
         """ p.sight_dist( ) -> int 
