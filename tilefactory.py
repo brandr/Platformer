@@ -1,6 +1,8 @@
 """ A factory used to build tiles. Not done yet.
 """
-from gameimage import *
+from gameimage import GameImage
+from pygame import Rect
+from spritesheet import SpriteSheet
 
 class TileFactory(object):
 	""" TileFactory( Surface, ( int, int ) ) -> TileFactory

@@ -1,10 +1,10 @@
 """ A single square on a level that has an image on it and may contain a block.
 """
 
+from gameimage import GameImage
 import pygame
 from pygame import Rect, Color, Surface
 from math import *
-from gameimage import *
 
 class Tile(GameImage):
     """ Tile( AnimationSet, int, int ) -> Tile

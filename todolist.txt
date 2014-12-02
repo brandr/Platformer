@@ -1,6 +1,8 @@
 
     #KNOWN BUGS
 
+# if the player holds down ctrl, then he will run in place. (this might be ok but I should at least ask people if it looks ok, and also make sure running is even necessary.)
+
 # when traveling from one level to another, the player often "bounces" back into the first level.
 
 # pressing X too rapidly when opening a chest (and possibly talking to NPCs or signs) will cause the dialog to skip by without appearing at all.
@@ -91,6 +93,7 @@ LONG-TERM GOALS: (short summaries, does not include all TODOs)
         * includes relatively temporary things like which enemies have been killed and which blocks have been broken, 
           as well as permanent things like "morality" data, which cutscenes have been viewed, which shortcuts have been opened, etc.
 # exploration/hidden objects
+    - lantern modes?
     - Breakable blocks? Pick/shovel item? "Hidden" tiles that appear as solid block until the player's light strikes them?
     - Need more ideas before I can really start fleshing out exploration system
     - Keep in mind how the map will work
@@ -109,14 +112,38 @@ OVERARCHING MAIN GOAL: Build a demo showing off combat, exploration, dialogs, cu
 
 IMMEDIATE STUFF: most immediate
 
-# NOTE: the player's updateView() method is currently not called because the place in player.update() where it is normally called is commented out.
+# finish the sloped block algorithm in block.py
+    - test it on more slope types
 
-# TODO: explore  ways of having ambient light as part of the new lighting system.
+# IDEA: instead of always showing explored blocks as grey, have another lantern mode that makes only the player (maybe a grey silhouette of the player?)
+        and explored blocks appear. Everything else is invisible in this mode, including background tiles, enemies, and chests.
+    - change the critera for exploring blocks to touching them. (consult people about this since they might like the other way better)
+    - figure out a way to draw unexplored sloped blocks properly
+    - consider drawing the player darker (or different) in some modes. (consult people first)
+    - NOTE: to do this, it might be a good idea to first plan out several possible lantern modes and try to think of a tidy way to implement them.
+    - IDEA: some button can be held to access the lantern. This is animated as the player holding up the lantern. While this button is held, arrow keys will change the lantern mode.
+        * alterately, could just use keys like AS or QW.
+    - think of special cases, such as what happens when an event like a cutscene occurs when the player is in a non-default lantern mode.
+        * also make sure the player's lantern oil does not drain during events. (this might already be the case.)
+    - when using memory mode, the criteria for "exploring" blocks should probably be limited to contact with them, or getting within 1 block.
+
+# IDEA: show the lantern attached to the player's belt area and center the light rings on it pixel-wise.
+    - in light areas when the lantern is off, make it visibly clear that it is not lit.
+
+# might be able to draw the player towards some places in the darkness by blitting transparent white rings (or some other visual effect) over important spots
+
+# TODO: explore ways of having ambient light as part of the new lighting system.
+
+# IDEA: make it less jarring when the lantern's light goes down one level by resetting the flicker index such that flickering will not occur again for a full cycle.
+    - I believe this means setting it to either zero or (max flicker index)/2, but I'm not sure which.
 
 # IDEA: massive lighting system overhaul
-    - note that this has eliminated some aspects of exploration, like walls blocking light.
+    - note that this has eliminated some aspects of exploration, like walls blocking light. It should be possible to design around this, however.
     - assuming I keep using this system, the next goal is to make blocks near the edge of the light radius appear as special, darkened versions of their usual sprites.
         * these alternate sprites should be created and stored when the object is created.
+
+# fix the issue where the player runs in place when ctrl is held.
+    - this is low priority since this might end up being what I want.
 
 # TODO: reduce lag by calling convert() before blitting surfaces. This may be useful if I go back to the black rectangle method of handling lighting.
 
@@ -130,6 +157,7 @@ IMMEDIATE STUFF: most immediate
 # consider re-implementing multiple light sources, although I have no idea how to handle their intersection. It might be too hard to be worth the effort.
 
 # add some kind of oil meter (can be basic, like HP)
+    - can also show the current lantern mode, whether lantern is on/off, etc.
 
 # IDEA: lantern upgrades
     - give the player the ability to increase the lantern's radius at the cost of cost of consuming oil faster

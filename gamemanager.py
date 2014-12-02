@@ -5,6 +5,8 @@ from screenmanager import *
 from dungeonfactory import build_dungeon
 from cutscene import *
 from world import World
+from player import Player
+from gameaction import GameAction
 
 from os import listdir
 from os.path import isfile, join
@@ -91,7 +93,7 @@ class GameManager:
 
 	@staticmethod	#TEMP FOR TESTING (therefore, no docstring)
 	def temp_player_right(arg, player):
-		player.right = True
+		player.button_press_map["right"] = True
 
 	def draw_screen(self, screen_manager):
 		""" gm.draw_screen( ScreenManager) -> None

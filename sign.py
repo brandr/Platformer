@@ -2,8 +2,9 @@
 """ A sign that the player can read. No one else can, though.
 """
 
-from block import *
-from gameevent import *
+from block import Block
+from gameevent import GameEvent
+from camera import WIN_WIDTH, WIN_HEIGHT
 
 DIALOG_BOX_WIDTH = WIN_WIDTH - 32
 DIALOG_BOX_HEIGHT = WIN_HEIGHT/6

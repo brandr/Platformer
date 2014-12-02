@@ -1,7 +1,7 @@
 """ A treasure chest that the player can open.
 """
 
-from block import * #Block
+from block import Block
 from chestcontents import *
 from gameevent import GameEvent
 from dialog import Dialog, SIGN, DIALOG_BOX_WIDTH, DIALOG_BOX_HEIGHT

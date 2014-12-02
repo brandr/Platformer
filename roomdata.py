@@ -1,9 +1,10 @@
 """ A data object used to generate a room.
 """
 
-from signdata import *
-from cutscenetriggerdata import *
+from signdata import SignData
+from cutscenetriggerdata import CutsceneTriggerData
 from chestdata import ChestData
+from tiledata import TileData, BlockedTileData, DEFAULT_SIGN, DEFAULT_CHEST, DEFAULT_CUTSCENE_TRIGGER
 
 ROOM_WIDTH = 28
 ROOM_HEIGHT = 20

@@ -5,10 +5,16 @@ from being import *
 from lantern import *
 from exitblock import *
 from platform import *
+from animationset import AnimationSet
+
 from weaponfactory import build_weapon, SWORD
 from inventory import Inventory, LANTERN
-
+from maingamecontrols import LEFT, RIGHT, DOWN, UP, SPACE, CONTROL, X
 #from sword import * #TEMP
+STARTING_BUTTON_PRESS_MAP = {
+    LEFT:False, RIGHT:False, DOWN:False, UP:False,
+    SPACE:False, CONTROL:False, X:False
+}
 
 class Player(Being):
     """ Player( AnimationSet, Level ) -> Player
@@ -38,7 +44,8 @@ class Player(Being):
         self.can_leave_level = True
         self.active = True
         self.can_jump = True
-        self.left, self.right, self.down, self.up, self.space, self.control, self.x = False, False, False, False, False, False, False
+        self.button_press_map = STARTING_BUTTON_PRESS_MAP
+        #self.left, self.right, self.down, self.up, self.space, self.control, self.x = False, False, False, False, False, False, False
         self.movement_state = DEFAULT_MOVEMENT_STATE
         #self.lantern = None
         self.inventory = Inventory()
@@ -107,7 +114,8 @@ class Player(Being):
         Make the player unable to move, as for a cutscene.
         """
         self.active = False
-        self.up, self.down, self.left, self.right, self.space, self.control, self.x = False, False, False, False, False, False, False
+        for button in self.button_press_map:
+            self.button_press_map[button] = False
 
     def activate(self):
         """ p.activate( ) -> None
@@ -143,7 +151,7 @@ class Player(Being):
         Check which buttons are currently being pressed and move the player accordingly.
         This is a little complicated, so I can go more in-depth if necessary.
         """
-        up, down, left, right, space, running, x = self.up, self.down, self.left, self.right, self.space, self.control, self.x
+        up, down, left, right, space, running, x = self.button_press_map[UP], self.button_press_map[DOWN], self.button_press_map[LEFT], self.button_press_map[RIGHT], self.button_press_map[SPACE], self.button_press_map[CONTROL], self.button_press_map[X]
         self.xvel = 0
         if x:
             if self.x_action_check(): return
@@ -239,8 +247,17 @@ class Player(Being):
         Update the player's lantern (draining oil) if the player is underground and holding a lantern.
         """
         lantern = self.get_lantern()
-        if lantern and self.active and not self.current_level.outdoors:
-            lantern.oil_update()
+        if lantern and not self.current_level.outdoors:
+            lantern.active_update(self.active)
+
+    def toggle_lantern_mode(self, direction):
+        """ p.toggle_lantern_mode( int ) -> None
+
+        Change the mode of the player's lantern to create different effects.
+        """
+        lantern = self.get_lantern()
+        if not lantern: return
+        lantern.change_mode(direction)
 
     def x_action_check(self):
         """ p.x_action_check( ) -> None
@@ -293,8 +310,7 @@ class Player(Being):
         for f in far_light_sources:
        	    f.update_light(all_tiles, light_map)
         """
-        #self.emit_light(self.sight_dist(), all_tiles, light_map, nearby_light_sources)
-        #self.emit_light(self.sight_dist(), all_tiles, light_map)
+        self.emit_light(self.sight_dist(), all_tiles, light_map)
 
     def sight_dist(self):
         """ p.sight_dist( ) -> int 

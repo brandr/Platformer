@@ -1,12 +1,15 @@
 """ The most abstract type of object that can appear in the game.
 """
 
-import os
-from gameevent import *
-from animationset import *
 
-WIN_WIDTH = 800
-WIN_HEIGHT = 640
+from animationset import AnimationSet
+from spritestripanimator import SpriteStripAnimator
+from camera import WIN_WIDTH, WIN_HEIGHT
+
+import pygame
+from pygame import Surface, Color, Rect
+import os
+import copy
 
 BACKGROUND_COLOR = Color("#000000")
 DEFAULT_COLORKEY = Color("#FF00FF")

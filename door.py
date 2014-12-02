@@ -1,7 +1,7 @@
 """ A door that the player can open, often hiding a monster or treasure.
 """
 
-from block import *
+from block import Block
 
 class Door(Block): #not sure how to handle a 2-part block yet
 	""" Door ( AnimationSet, int, int ) -> AnimationSet

@@ -1,7 +1,9 @@
 """ An entity is more specific than a GameImage, but less specific than a Being or Block.
 """
 
-from tile import *
+from tile import Tile, GameImage
+from gameimage import BACKGROUND_COLOR
+from pygame import Color
 
 class Entity(GameImage):
     """ Entity( AnimationSet ) -> Entity

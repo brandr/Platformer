@@ -1,7 +1,7 @@
 """ A ladder that the player (and maybe monsters) can climb up or down.
 """
 
-from block import *
+from block import Block
 
 class Ladder(Block):
 	""" Ladder( AnimationSet, int, int ) -> Ladder

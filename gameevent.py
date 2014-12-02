@@ -1,8 +1,8 @@
 """ A scripted game event, like a sign displaying text or a cutscene.
 """
 
-from dialog import *
-from gameaction import *
+#from dialog import *
+#from gameaction import *
 
 # IDEA: make  a gameevent instant only
 

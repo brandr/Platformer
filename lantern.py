@@ -26,11 +26,11 @@ class Lantern(Entity):	#lantern which can help the player see
         self.rect.centerx += x
         self.rect.centery += y
         self.animated = True
+        self.available_modes = ALL_LANTERN_MODES
+        self.mode = DEFAULT_MODE
         self.flicker_index = 0
-
-        # TODO: figure out a good oil system
         self.oil_meter = [5999, 5999]
-        self.light_multiplier = 7
+        self.light_multiplier = 7           # Note that light multiplier is technically meant to determine light radius, but there is an off-by-one or off-by-two error of some sort.
 
     def update(self, player):
         """ l.update( Player ) -> None
@@ -38,18 +38,47 @@ class Lantern(Entity):	#lantern which can help the player see
         Calls the flicker update, which may temporarily change the light radius.
         This method should only be called when the lantern is sitting on the ground.
         Other methods are called separately if the player is holding the lantern.
+
+        NOTE: this method may end up being unused.
         """
         self.flicker_update()
         self.updateAnimation()
 
-    def oil_update(self):
+    def active_update(self, player_active):
+        """ l.active_update( bool ) -> None
+
+        If the lantern is held by the player and is currently being used, update it proprely.
+        player_active will be false if the player is in an event. It will keep the lantern's oil from draining
+        and also turn off non-default lantern modes.
+        """
+        if not player_active: self.mode = DEFAULT_MODE
+        update_method = UPDATE_MODE_MAP[self.mode]
+        update_method(self)
+
+    def default_update(self):
+        """ l.default_update( ) -> None
+
+        Basic update for when the lantern is in its default mode.
+        """
+        self.flicker_update()
+        self.oil_update(1)
+
+    def memory_update(self):
+        """ l.memory_update( ) -> None
+
+        Update for when the lantern is in memory mode.
+        Note that an empty lantern might want to switch modes. Not sure.
+        """
+        self.oil_update(1) 
+
+    def oil_update(self, oil_decrement):
         """ l.oil_update( ) -> None
 
         Causes 1 unit of oil to drain from the lantern.
+        Also adjusts the flicker, making the lantern's radius swell and shrink slightly.
         """
-        self.flicker_update()
         if self.oil_meter[0] > 0:
-            self.oil_meter[0] -= 1
+            self.oil_meter[0] -= oil_decrement
 
     def flicker_update(self):
         """ l.flicker_update( ) -> None
@@ -58,6 +87,21 @@ class Lantern(Entity):	#lantern which can help the player see
         """
         self.flicker_index += 1
         if self.flicker_index >= FLICKER_CONSTANT: self.flicker_index = 0
+
+    def change_mode(self, direction):
+        """ l.change_mode( direction ) -> None
+
+        Change the lantern mode to create different visual effects.
+        """
+        if len(self.available_modes) < 2: return
+        mode_index = -1
+        if self.mode in ALL_LANTERN_MODES:
+            mode_index = ALL_LANTERN_MODES.index(self.mode)
+        #TODO: error case???
+        mode_index = (mode_index + direction)%(len(ALL_LANTERN_MODES))
+        while ALL_LANTERN_MODES[mode_index] not in self.available_modes:
+            mode_index = (mode_index + direction)%(len(ALL_LANTERN_MODES))
+        self.mode = ALL_LANTERN_MODES[mode_index]
 
     def light_distance(self): #may have different lantern with different light functions for different gameplay
         """ l.light_distance( ) -> int
@@ -127,3 +171,11 @@ class Lantern(Entity):	#lantern which can help the player see
         temp_dist = max(0, light_value - temp_dist + 1)
         temp_brightness = ((0.9*temp_dist)/(light_value)*256)
         return min(temp_brightness, 255)
+
+DEFAULT_MODE = "default_mode"
+MEMORY_MODE = "memory_mode"
+ALL_LANTERN_MODES = [DEFAULT_MODE, MEMORY_MODE]
+UPDATE_MODE_MAP = {
+    DEFAULT_MODE:Lantern.default_update,
+    MEMORY_MODE:Lantern.memory_update
+}

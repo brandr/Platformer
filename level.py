@@ -2,12 +2,32 @@
 """
 
 from dungeonfactory import build_dungeon
-from room import *
-from entityfactory import *
-from effect import *
+from camera import Camera
 from tilefactory import TileFactory
+from gameimage import GameImage
+from effect import Effect
+
+from nonplayercharacter import NonPlayerCharacter
+from levelobjects import LevelObjects
+from entity import Entity
+from cutscenetrigger import CutsceneTrigger
+from pickup import Pickup
+from platform import Platform
+from ladder import Ladder
+from sign import Sign
+from door import Door
+from monster import Monster
+from nonplayercharacter import NonPlayerCharacter
+from lantern import Lantern
+from chest import Chest
+from exitblock import ExitBlock
+
+from camera import WIN_WIDTH, WIN_HEIGHT
+from roomdata import ROOM_WIDTH, ROOM_HEIGHT
 from cutscenescripts import ACTOR_GROUP_MAP
 from gameimage import DEFAULT_COLORKEY
+from lantern import DEFAULT_MODE, MEMORY_MODE
+from block import EXPLORED_GREY
 
 import pygame
 from pygame import Surface, Color
@@ -18,9 +38,6 @@ import thread
 from multiprocessing import Process
 
 BLACK = Color ("#000000")
-EXPLORED_GREY = Color("#222222")
-CLOSE_EXPLORED_GREY = Color("#444444")
-
 MAX_LIGHT_RINGS = 20
 RING_INNER = "ring_inner"
 RING_OUTER = "ring_outer"
@@ -103,7 +120,7 @@ class Level(object):
 		self.outdoors = level_data.sunlit
 		self.light_ring_map = None
 		if(not self.outdoors): self.light_ring_map = self.load_light_rings()
-		self.current_light_map = self.empty_light_map()
+		#self.current_light_map = self.empty_light_map()
 
 		if(self.outdoors): self.setTilesOutdoors() #TEMP
 		
@@ -707,74 +724,137 @@ class Level(object):
 		light_map = self.empty_light_map()
 		if(player != None):
 			self.update_explored()
-			self.level_camera.update(player)						# try calling this at the end of this method if there are weird visual effects.
+			self.level_camera.update( player )						# try calling this at the end of this method if there are weird visual effects.
 			player.update(all_tiles, light_map)
 			platforms = self.getPlatforms()
-			# TODO: fix the lag that occurs somewhere around here
-			for row in tiles:
-				for t in row:
-					self.screen.blit(t.image, self.level_camera.apply(t))
+			display_mode = self.display_mode( player )
+			display_method = DISPLAY_MODE_MAP[display_mode]
+			display_method(self, tiles, player)
+			pygame.display.update()
 
-			# stationary update
-			for p in self.getPlatforms():
-				self.screen.blit(p.image, self.level_camera.apply(p))
-			for l in self.getLadders():
-				self.screen.blit(l.image, self.level_camera.apply(l))
-			for s in self.getSigns():
-				self.screen.blit(s.image, self.level_camera.apply(s))
-			for c in self.getChests():
-				self.screen.blit(c.image, self.level_camera.apply(c))
-			for d in self.getDoors():
-				self.screen.blit(d.image, self.level_camera.apply(d))
+	def display_outdoors(self, tiles, player):
+		""" l.display_outdoors( [ [ Tile ] ], Player ) -> None
 
-			# non-stationary update
-			for l in self.getLanterns():
-				self.screen.blit(l.image, self.level_camera.apply(l))
-			for n in self.getNPCs():
-				self.screen.blit(n.image, self.level_camera.apply(n))
-			for m in self.getMonsters():
-				self.screen.blit(m.image, self.level_camera.apply(m))
+		Display method for sunlit levels.
+		"""
+		self.draw_level_contents(tiles, player)
+		if (player.invincibility_frames % 2) == 0: self.screen.blit(player.image, self.level_camera.apply(player))
+		if not self.current_event:
+			self.update_player_hud(player) 
+		if(self.has_effects): 
+			self.update_effects()
 
-			# TODO: blit subentites and then entity effects of non-player objects starting here
+	def display_dark(self, tiles, player):
+		""" l.display_dark( [ [ Tile ] ], Player ) -> None
 
-			for m in self.getMonsters():
-				monster_subs = m.active_subentities
-				if monster_subs:
-					for s in monster_subs:
-						s.update()
-						if s.active:
-							self.screen.blit(s.image, self.level_camera.apply(s))
-				monster_effects = player.entity_effects
-				if monster_effects:
-					for e in monster_effects:
-						e.update()
-						self.screen.blit(e.image, self.level_camera.apply(e))	
+		Display method for dark levels when the player has a lit lantern.
+		"""
+		self.draw_level_contents(tiles, player)
+		light_map = self.empty_light_map( )
+		if light_map: self.update_light(light_map)	
+		if (player.invincibility_frames % 2) == 0: self.screen.blit(player.image, self.level_camera.apply(player))
+		if not self.current_event:
+			self.update_player_hud(player) 
+		if(self.has_effects): 
+			self.update_effects()
+		
+	def display_full_dark(self, tiles, player):
+		""" l.display_full_dark( [ [ Tile ] ], Player ) -> None
 
+		Display method for complete darkness. This is similar to display_outdoors,
+		except that nothing is drawn but the player.
+		"""
+		if (player.invincibility_frames % 2) == 0: self.screen.blit(player.image, self.level_camera.apply(player))
+		if not self.current_event:
+			self.update_player_hud(player) 
+		if(self.has_effects): 
+			self.update_effects()
+
+	def display_memory(self, tiles, player):
+		""" l.display_memory( [ [ Tile ] ], Player ) -> None
+
+		Display method for when the player is using the lantern's memory mode.
+		"""
+		explored = Surface((32, 32))
+		explored.fill(EXPLORED_GREY)
+		explored.convert()	
+
+		dimensions = self.get_dimensions()
+		origin_x, origin_y = self.level_camera.origin()
+		for y in xrange(dimensions[1]):
+			for x in xrange(dimensions[0]):
+				grey_flag = False
+				x1 = x*32 + origin_x
+				y1 = y*32 + origin_y
+				x_check = x1 >= -32 and x1 < WIN_WIDTH + 32 
+				y_check = y1 >= -32 and y1 < WIN_HEIGHT + 32 
+				if x_check and y_check:
+					check_tile = self.getTiles()[y][x]
+					if check_tile.mapped and not check_tile.passable():
+						if check_tile.block and check_tile.block.is_sloped:
+							self.screen.blit(check_tile.block.unseen_image, (x1, y1))
+						else:
+							self.screen.blit(explored, (x1, y1))
+
+		self.screen.blit(player.image, self.level_camera.apply(player)) #TODO: make this a grey silhouette of the player
+
+	def draw_level_contents(self, tiles, player):
+		""" l.draw_level_contents( [ [  Tile ] ], Player ) -> None
+
+		Draw the level's tiles, platforms, chests, doors, etc. along with moving entities like monsters and the player.
+		"""
+		for row in tiles:
+			for t in row:
+				self.screen.blit(t.image, self.level_camera.apply(t))
+
+		# stationary update
+		for p in self.getPlatforms():
+			self.screen.blit(p.image, self.level_camera.apply(p))
+		for l in self.getLadders():
+			self.screen.blit(l.image, self.level_camera.apply(l))
+		for s in self.getSigns():
+			self.screen.blit(s.image, self.level_camera.apply(s))
+		for c in self.getChests():
+			self.screen.blit(c.image, self.level_camera.apply(c))
+		for d in self.getDoors():
+			self.screen.blit(d.image, self.level_camera.apply(d))
+
+		# non-stationary update
+		for l in self.getLanterns():
+			self.screen.blit(l.image, self.level_camera.apply(l))
+		for n in self.getNPCs():
+			self.screen.blit(n.image, self.level_camera.apply(n))
+		for m in self.getMonsters():
+			self.screen.blit(m.image, self.level_camera.apply(m))
+
+		# TODO: blit subentites and then entity effects of non-player objects starting here
+
+		for m in self.getMonsters():
+			monster_subs = m.active_subentities
+			if monster_subs:
+				for s in monster_subs:
+					s.update()
+					if s.active:
+						self.screen.blit(s.image, self.level_camera.apply(s))
+			monster_effects = player.entity_effects
+			if monster_effects:
+				for e in monster_effects:
+					e.update()
+					self.screen.blit(e.image, self.level_camera.apply(e))	
 			# ...and ending here
 
 			#TEMP
-			player_subs = player.active_subentities
-			if player_subs:
-				for s in player_subs:
-					s.update()
-					if s.active:
-						self.screen.blit(s.image, self.level_camera.apply(s))	
-
-			player_effects = player.entity_effects
-			if player_effects:
-				for e in player_effects:
-					e.update()
-					self.screen.blit(e.image, self.level_camera.apply(e))				
-			#TEMP
-
-			# light update
-			if light_map: self.update_light(light_map)
-			if (player.invincibility_frames % 2) == 0: self.screen.blit(player.image, self.level_camera.apply(player))
-			if not self.current_event:
-				self.update_player_hud(player) #TODO: blit player HUD
-			if(self.has_effects): 
-				self.update_effects()
-			pygame.display.update()
+		player_subs = player.active_subentities
+		if player_subs:
+			for s in player_subs:
+				s.update()
+				if s.active:
+					self.screen.blit(s.image, self.level_camera.apply(s))	
+		player_effects = player.entity_effects
+		if player_effects:
+			for e in player_effects:
+				e.update()
+				self.screen.blit(e.image, self.level_camera.apply(e))
 
 	def update_light(self, light_map):
 		""" l.update_light( [ [ double ] ] ) -> None 
@@ -807,11 +887,6 @@ class Level(object):
 		outer_circle_image = ring_map[ max( 0, index ) ][RING_OUTER]
 		circle_images.append(outer_circle_image)
 
-		count = len(circle_images)
-		for i in xrange( count ):
-			circle_image = circle_images[i]
-			self.screen.blit( circle_image, ( center_x + origin_x - circle_image.get_width()/2, center_y + origin_y - circle_image.get_height()/2) )
-
 		outer_rect = outer_circle_image.get_rect()
 		rect_left = center_x + origin_x - outer_rect.width/2
 		rect_right = center_x + origin_x + outer_rect.width/2
@@ -825,64 +900,22 @@ class Level(object):
 			fill_rect = Surface( ( width, height ) )
 			self.screen.blit( fill_rect, ( x, y ) )
 
-		if circle_count == 1: return # is this right? I forget why I did this
-		# IDEA: make unexplored but close tiles look cleaner by setting them to very dark versions of their actual sprites.
-			# should definitely save this image for each block when it is created by setting its "unseen image" value properly.
-		# TODO: remove the lighting map process, except for flagging tiles as mapped. (also maybe find a new way to flag when blocks have been ampped)
-		# TODO: more sophisticated checks for explored tiles (only check if they are outside the circle)
-		"""
-		explored = Surface((32, 32))
-		explored.fill(EXPLORED_GREY)
-		explored.convert()	
+		count = len(circle_images)
+		for i in xrange( count ):
+			circle_image = circle_images[i]
+			self.screen.blit( circle_image, ( center_x + origin_x - circle_image.get_width()/2, center_y + origin_y - circle_image.get_height()/2) )
 
-		explored_close = Surface((32, 32))
-		explored_close.fill(CLOSE_EXPLORED_GREY)
-		explored_close.convert()	
-		
-		for y in xrange(len(light_map)):
-			for x in xrange(len(light_map[y])):
-				grey_flag = False
-				x1 = x*32 + origin_x
-				y1 = y*32 + origin_y
-				x_check = x1 >= -32 and x1 < WIN_WIDTH + 32 
-				y_check = y1 >= -32 and y1 < WIN_HEIGHT + 32 
-				x_dist = ( x1 + 16 ) - ( center_x + origin_x ) 
-				y_dist = ( y1 + 16 ) - ( center_y + origin_y ) 
-				dist = math.sqrt( math.pow( x_dist, 2 ) + math.pow( y_dist, 2 ) )
-				block_dist = dist - radius
-				if x_check and y_check and block_dist > -32:
-					check_tile = self.getTiles()[y][x]
-					if check_tile.mapped and not check_tile.passable():
-						if block_dist > -16:
-							self.screen.blit(explored, (x1, y1))
-						else:
-							self.screen.blit(explored_close, (x1, y1))				
-		self.current_light_map = light_map
+	def display_mode(self, player):
+		""" l.display_mode( Player ) -> str
+
+		Figure out how the level should display the objects it contains.
 		"""
-		"""
-		#OLD CODE (use for square-based darkness.)
-		origin_x, origin_y = self.level_camera.origin()
-		dark = Surface((32, 32))	
-		for y in xrange(len(light_map)):
-			for x in xrange(len(light_map[y])):
-				grey_flag = False
-				x1 = x*32 + origin_x
-				y1 = y*32 + origin_y
-				x_check = x1 >= -32 and x1 < WIN_WIDTH + 32
-				y_check = y1 >= -32 and y1 < WIN_HEIGHT + 32
-				if x_check and y_check:
-					light_value = light_map[y][x]
-					check_tile = self.getTiles()[y][x]
-					if light_value == 0 and check_tile.mapped and not check_tile.passable():
-						dark.fill(EXPLORED_GREY)
-						grey_flag = True
-					dark.set_alpha(256 - light_value)
-					#dark.set_alpha(256 - ambient_light - light_value)	# might do this if I can make it less laggy
-					self.screen.blit(dark, (x1, y1))
-					if grey_flag:
-						dark.fill(BLACK)				
-		self.current_light_map = light_map
-		"""
+		if self.outdoors:
+			return DISPLAY_OUTDOORS
+		lantern = player.get_lantern()
+		if ( not lantern or not lantern.light_distance() ):
+			return DISPLAY_FULL_DARK
+		return LANTERN_MODE_MAP[lantern.mode]
 
 	def empty_light_map(self):
 		""" l.empty_light_map( ) -> [ [ double ] ]
@@ -1130,4 +1163,21 @@ class Level(object):
 		
 ACTOR_GETTER_MAP = {
 	NonPlayerCharacter:Level.get_NPC_actor
+}
+
+DISPLAY_OUTDOORS = "display_outdoors"
+DISPLAY_DARK = "display_dark"
+DISPLAY_FULL_DARK = "display_full_dark"
+DISPLAY_MEMORY = "display_memory"
+
+DISPLAY_MODE_MAP = {
+	DISPLAY_OUTDOORS:Level.display_outdoors,
+	DISPLAY_DARK:Level.display_dark,
+	DISPLAY_FULL_DARK:Level.display_full_dark,
+	DISPLAY_MEMORY:Level.display_memory
+}
+
+LANTERN_MODE_MAP = {
+	DEFAULT_MODE:DISPLAY_DARK,
+	MEMORY_MODE:DISPLAY_MEMORY
 }

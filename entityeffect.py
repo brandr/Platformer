@@ -1,7 +1,7 @@
 """ A subentity that only exists as a visual effect.
 """
 
-from subentity import *
+from subentity import SubEntity
 
 class EntityEffect(SubEntity):
 	""" EntityEffect( Entity, AnimationSet, int, int ) -> EntityEffect

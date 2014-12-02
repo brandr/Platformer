@@ -1,7 +1,10 @@
 """ A melee weapon that is swung and made active (able to hit enemies) and can cause damage.
 """
 
-from entityeffect import *
+from entityeffect import EntityEffect
+from subentity import SubEntity
+from gameimage import GameImage
+from subentity import LEFT, RIGHT
 
 class MeleeWeapon(SubEntity):
 	""" TODO: docstrings errywhere

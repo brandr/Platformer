@@ -3,13 +3,17 @@ from entityfactory import EntityFactory
 from signfactory import SignFactory
 from chestfactory import ChestFactory
 from doorfactory import DoorFactory
-from pickupfactory import *
-from cutscenetriggerfactory import *
+from pickupfactory import PickupFactory
+from cutscenetriggerfactory import CutsceneTriggerFactory
 from levelobjects import LevelObjects
 from room import Room
 from block import Block
+from tile import Tile
+from gameimage import GameImage
 from tiledata import *#TileData, BlockedTileData, DEFAULT_TILE_SIZE, DEFAULT_CUTSCENE_TRIGGER
 from roomdata import ROOM_WIDTH, ROOM_HEIGHT
+
+from pygame import Rect
 
 DEFAULT_SIGN = "default_sign"
 DEFAULT_DOOR = "default_door"

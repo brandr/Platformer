@@ -1,9 +1,9 @@
 """ A non-hostile character that the player can walk past and not bounce off of.
 """
 
-from being import *
-from gameevent import *
-from dialogchoice import *
+from being import Being
+from gameevent import GameEvent
+from dialogchoice import DialogChoice
 from monster import Monster
 
 class NonPlayerCharacter(Being):

@@ -3,7 +3,8 @@
 #TODO: divide what is in this screen into gamescreen (abstract) and maingamescreen (specfic)
 
 from controlmanager import *
-from player import *
+from camera import WIN_WIDTH, WIN_HEIGHT
+from pygame import Surface
 
 DISPLAY = (WIN_WIDTH, WIN_HEIGHT)
 DEPTH = 32

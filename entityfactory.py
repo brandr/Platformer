@@ -1,19 +1,20 @@
 """ A factory that creates different kinds of entities, initializing them as appropriate.
 """
 
-from platformfactory import *
-from pickupfactory import *
+#from pickupfactory import *
 
-from ladder import *
-from lantern import *
+from ladder import Ladder
+from lantern import Lantern
 from chest import Chest
-from exitblock import *
-from monster import *
-from sign import *
-from cutscenetrigger import *
-
-from npcfactory import *
-from roomdata import *
+from platform import Platform
+from monster import Monster
+from sign import Sign
+from cutscenetrigger import CutsceneTrigger
+from block import Block
+from door import Door
+from nonplayercharacter import NonPlayerCharacter
+from npcfactory import NPCFactory
+from tiledata import * 
 
 ENTITY_CONSTRUCTOR_MAP = { #TODO: try to figure out why signs aren't in here
 	DEFAULT_PLATFORM:Platform,
@@ -88,6 +89,7 @@ class EntityFactory(object):
 		platform.is_sloped = True
 		platform.is_square = False
 		platform.is_solid = True 
+		platform.draw_memory_image()
 
 ENTITY_BUILD_MAP = {
 	SLOPING_PLATFORM:EntityFactory.initSlopingPlatform,

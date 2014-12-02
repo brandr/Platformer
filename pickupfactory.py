@@ -1,7 +1,9 @@
 """ A factory for creating pickups.
 """
 
-from pickup import *
+#from pickup import *
+from gameimage import GameImage
+from pickup import OilPickup
 from tiledata import OIL_PICKUP	#TODO: import other pickup keys as necessary
 
 PICKUP_CONSTRUCTOR_MAP = {

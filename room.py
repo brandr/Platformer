@@ -1,9 +1,7 @@
 """ A rectangular container for tiles and entites that will be added into a level.
 """
 
-from camera import *
-from levelobjects import *
-from gameimage import *
+from roomdata import ROOM_WIDTH, ROOM_HEIGHT
 
 class Room(object):
 	""" Room( LevelObjects, Dungeon, ( int, int ), ( int, int ) ) -> Room

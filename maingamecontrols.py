@@ -3,6 +3,8 @@
 
 from controls import *
 
+LEFT, RIGHT, DOWN, UP, SPACE, CONTROL, X = "left", "right", "down", "up", "space", "control", "x"
+
 class MainGameControls(Controls):
 	""" MainGameControls( Player ) -> MainGameControls
 
@@ -19,10 +21,10 @@ class MainGameControls(Controls):
 	def __init__(self, player):
 		Controls.__init__(self)
 		self.player = player
-		self.direction_map = {
-			K_LEFT:self.player.left, K_RIGHT:self.player.right, K_UP:self.player.up, K_DOWN:self.player.down,
-			K_SPACE:self.player.space, K_LCTRL:self.player.control
-		}
+		#self.direction_map = {
+		#	K_LEFT:self.player.left, K_RIGHT:self.player.right, K_UP:self.player.up, K_DOWN:self.player.down,
+		#	K_SPACE:self.player.space, K_LCTRL:self.player.control
+		#}
 		self.initialize_control_map(MAIN_GAME_CONTROL_MAP)
 
 	def move_up(self, key, toggle):
@@ -30,50 +32,66 @@ class MainGameControls(Controls):
 
 		Up key action.
 		"""
-		self.player.up = toggle
+		self.player.button_press_map[UP] = toggle
 
 	def move_down(self, key, toggle):
 		""" mgc.move_down( str, bool ) -> None
 
 		Down key action.
 		"""
-		self.player.down = toggle
+		self.player.button_press_map[DOWN] = toggle
 
 	def move_left(self, key, toggle):
 		""" mgc.move_left( str, bool ) -> None
 
 		Left key action.
 		"""
-		self.player.left = toggle
+		self.player.button_press_map[LEFT] = toggle
 
 	def move_right(self, key, toggle):
 		""" mgc.move_right( str, bool ) -> None
 
 		Right key action.
 		"""
-		self.player.right = toggle
+		self.player.button_press_map[RIGHT] = toggle
 
 	def move_space(self, key, toggle):
 		""" mgc.move_space( str, bool ) -> None
 
 		Space key action.
 		"""
-		self.player.space = toggle
+		self.player.button_press_map[SPACE] = toggle
 
 	def move_control(self, key, toggle):
 		""" mgc.move_control( str, bool ) -> None
 
 		Control key action.
 		"""
-		self.player.control = toggle
+		self.player.button_press_map[CONTROL] = toggle
 
 	def press_x(self, key, toggle):
 		""" mgc.press_x( str, bool ) -> None
 
 		x key action.
 		"""
-		self.player.x = toggle
+		self.player.button_press_map[X] = toggle
 
+	def press_q(self, key, toggle):
+		""" mgc.press_q( str, bool ) -> None
+
+		q key action.
+		"""
+		if toggle:
+			self.player.toggle_lantern_mode(-1)
+
+	def press_w(self, key, toggle):
+		""" mgc.press_w( str, bool ) -> None
+
+		w key action.
+		"""
+		if toggle:
+			self.player.toggle_lantern_mode(1)
+			
 	def press_z(self, key, toggle):
 		""" mgc.press_z( str, bool ) -> None
 
@@ -100,6 +118,8 @@ move_control = MainGameControls.move_control
 
 press_x = MainGameControls.press_x
 press_z = MainGameControls.press_z
+press_q = MainGameControls.press_q
+press_w = MainGameControls.press_w
 
 pause = MainGameControls.pause
 
@@ -108,5 +128,7 @@ MAIN_GAME_CONTROL_MAP = {
 	K_SPACE:move_space, K_LCTRL:move_control,
 	K_x:press_x,
 	K_z:press_z,
+	K_q:press_q,
+	K_w:press_w,
 	K_RETURN:pause
 }

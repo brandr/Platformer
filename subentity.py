@@ -1,7 +1,8 @@
 """An entity linked to (and usually dependent upon) another entity.
 """
 
-from being import *
+from gameimage import GameImage
+from being import Being
 
 LEFT = 'left'
 RIGHT = 'right'
