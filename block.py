@@ -78,6 +78,7 @@ class Block(Entity):
 		corners = [ ( 0, 0 ), ( 31, 0), ( 0, 31 ), ( 31, 31 ) ]
 		empty_corners = []
 		point_list = []
+		increment_map = {0:1, 31:-1}
 		for c in corners:
 			if self.image.get_at(c) == DEFAULT_COLORKEY:
 				empty_corners.append(c)
@@ -85,36 +86,66 @@ class Block(Entity):
 		if len(empty_corners) == 1:
 			empty_corner = empty_corners[0]
 			opposite_corner = ( abs(empty_corner[0] - 31), abs(empty_corner[1] - 31))	
-			increment_map = {0:1, 31:-1}
 			corner1, corner2 = empty_corner, empty_corner
-			x_incr_1, y_incr_1 = 0, increment_map[corner2[1]]	#(0, 0) -> +(1,0) -> (32, 0)
-			x_incr_2, y_incr_2 = increment_map[corner1[0]], 0	#(0, 0) -> +(0,1) -> (0, 32)
-			checkflag = True
-			next_vertex = None
+			x_incr_1, y_incr_1 = 0, increment_map[corner1[1]]	#(0, 0) -> +(1,0) -> (32, 0)
+			x_incr_2, y_incr_2 = increment_map[corner2[0]], 0	#(0, 0) -> +(0,1) -> (0, 32)
+			next_vertex_1 = None
 			for i in xrange(31):
 				corner1 = (corner1[0] + x_incr_1, corner1[1] + y_incr_1)
-				if checkflag and self.image.get_at(corner1) != DEFAULT_COLORKEY:
-					next_vertex = corner1	# a copy is necessary because we will keep changing corner1, but we don't want it to change in the list.
-					checkflag = False
-			if next_vertex: point_list.append(next_vertex)
+				if not next_vertex_1 and self.image.get_at(corner1) != DEFAULT_COLORKEY:
+					next_vertex_1 = corner1	# a copy is necessary because we will keep changing corner1, but we don't want it to change in the list.
+			if next_vertex_1: point_list.append(next_vertex_1)
 			point_list.append(corner1)
 			point_list.append(opposite_corner)
-			next_vertex = None
-			checkflag = True
+			next_vertex_2 = None
 			for i in xrange(31):
 				corner2 = (corner2[0] + x_incr_2, corner2[1] + y_incr_2)
-				if checkflag and self.image.get_at(corner2) != DEFAULT_COLORKEY:
-					next_vertex = corner2	# a copy is necessary because we will keep changing corner2, but we don't want it to change in the list.
-					checkflag = False
+				if not next_vertex_2 and self.image.get_at(corner2) != DEFAULT_COLORKEY:
+					next_vertex_2 = corner2	# a copy is necessary because we will keep changing corner2, but we don't want it to change in the list.
 			point_list.append(corner2)
-			if next_vertex: point_list.append(next_vertex)
+			if next_vertex_2: point_list.append(next_vertex_2)
 			return point_list
-		if len(c) == 2:
-			#TODO
+		if len(empty_corners) == 2:
+			corner1, corner2 = empty_corners[0], empty_corners[1]
+			opposite_corner_1, opposite_corner_2 = ( abs(corner1[0] - 31), abs(corner1[1] - 31) ), ( abs(corner2[0] - 31), abs(corner2[1] - 31) )	
+			x_incr = abs( ( corner1[1] - corner2[1] )/32 ) * increment_map[corner1[0]]
+			y_incr = abs( ( corner1[0] - corner2[0] )/32 ) * increment_map[corner1[1]]
+			next_vertex_1 = None
+			for i in xrange(31):
+				corner1 = ( corner1[0] + x_incr, corner1[1] + y_incr )
+				if not next_vertex_1 and self.image.get_at(corner1) != DEFAULT_COLORKEY:
+					next_vertex_1 = corner1
+			if next_vertex_1: point_list.append(next_vertex_1)
+			point_list.append(corner1)
+			next_vertex_2 = None
+			for i in xrange(31):			
+				corner2 = (corner2[0] + x_incr, corner2[1] + y_incr)
+				if not next_vertex_2 and self.image.get_at(corner2) != DEFAULT_COLORKEY:
+					next_vertex_2 = corner2
+			point_list.append(corner2)
+			if next_vertex_2: point_list.append(next_vertex_2)	
 			return point_list
-		if len(c) == 3:
-			#TODO
-			return point_list
+		if len(empty_corners) == 3:
+			for c in corners:
+				if c not in empty_corners:
+					start_corner = c
+					point_list.append(c)
+					corner1, corner2 = start_corner, start_corner
+					x_incr_1, y_incr_1 = increment_map[corner1[0]], 0	#(0, 0) -> +(1,0) -> (32, 0)
+					x_incr_2, y_incr_2 = 0, increment_map[corner2[1]]	#(0, 0) -> +(0,1) -> (0, 32)
+					for i in xrange(31):
+						corner1 = (corner1[0] + x_incr_1, corner1[1] + y_incr_1)
+						if self.image.get_at(corner1) == DEFAULT_COLORKEY:				
+							corner1 = (corner1[0] - x_incr_1, corner1[1] - y_incr_1)
+							point_list.append(corner1)
+							break
+					for i in xrange(31):
+						corner2 = (corner2[0] + x_incr_2, corner2[1] + y_incr_2)
+						if self.image.get_at(corner2) == DEFAULT_COLORKEY:
+							corner2 = (corner2[0] - x_incr_2, corner2[1] - y_incr_2)
+							point_list.append(corner2)
+							break
+					return point_list
 		return None
 
 		"""

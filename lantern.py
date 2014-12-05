@@ -31,6 +31,7 @@ class Lantern(Entity):	#lantern which can help the player see
         self.flicker_index = 0
         self.oil_meter = [5999, 5999]
         self.light_multiplier = 7           # Note that light multiplier is technically meant to determine light radius, but there is an off-by-one or off-by-two error of some sort.
+        self.radius_counter = self.light_distance()
 
     def update(self, player):
         """ l.update( Player ) -> None

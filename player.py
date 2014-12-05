@@ -9,6 +9,7 @@ from animationset import AnimationSet
 
 from weaponfactory import build_weapon, SWORD
 from inventory import Inventory, LANTERN
+from level import DISPLAY_MEMORY
 from maingamecontrols import LEFT, RIGHT, DOWN, UP, SPACE, CONTROL, X
 #from sword import * #TEMP
 STARTING_BUTTON_PRESS_MAP = {
@@ -108,11 +109,51 @@ class Player(Being):
 
         return animation_set
 
+    @staticmethod
+    def load_player_silhouette_animation_set():
+        """ load_player_silhouette_animation_set( ) -> AnimationSet
+
+        Load all animations that will show the player as a grey silhouette.
+        """
+        player_rect = Rect(0, 0, 32, 64)
+        filepath = './LevelEditor/animations/player/'
+
+        player_idle_left = GameImage.load_animation(filepath, 'player_1_idle_left_silhouette.bmp', player_rect, -1)
+        player_idle_right = GameImage.load_animation(filepath, 'player_1_idle_right_silhouette.bmp', player_rect, -1)
+
+        player_walking_left = GameImage.load_animation(filepath, 'player_1_walking_left_silhouette.bmp', player_rect, -1, True, 6)
+        player_walking_right = GameImage.load_animation(filepath, 'player_1_walking_right_silhouette.bmp', player_rect, -1, True, 6)
+
+        player_running_left = GameImage.load_animation(filepath, 'player_1_walking_left_silhouette.bmp', player_rect, -1) # TODO: GameImage.load_animation(filepath, 'player_1_running_left.bmp', player_rect, -1, True, 5)
+        player_running_right = GameImage.load_animation(filepath, 'player_1_walking_right_silhouette.bmp', player_rect, -1) # TODO: GameImage.load_animation(filepath, 'player_1_running_right.bmp', player_rect, -1, True, 5)
+
+        player_jumping_left = GameImage.load_animation(filepath, 'player_1_idle_left_silhouette.bmp', player_rect, -1) # TODO: GameImage.load_animation(filepath, 'player_1_jumping_left.bmp', player_rect, -1, True, 12)
+        player_jumping_right = GameImage.load_animation(filepath, 'player_1_idle_right_silhouette.bmp', player_rect, -1) # TODO: GameImage.load_animation(filepath, 'player_1_jumping_right.bmp', player_rect, -1, True, 12)
+
+        animation_set = AnimationSet(player_idle_right)
+        animation_set.insertAnimation(player_idle_left,'left', 'idle')
+        animation_set.insertAnimation(player_idle_right,'right', 'idle')
+
+        animation_set.insertAnimation(player_walking_left,'left', 'walking')
+        animation_set.insertAnimation(player_walking_right,'right','walking') 
+
+        animation_set.insertAnimation(player_running_left,'left', 'running')
+        animation_set.insertAnimation(player_running_right,'right', 'running')
+
+        animation_set.insertAnimation(player_jumping_left,'left', 'jumping')
+        animation_set.insertAnimation(player_jumping_right,'right', 'jumping')
+
+        #TODO: jumping, falling, and (maybe) terminal velocity
+        #TODO: attacking, other sprite animations
+
+        return animation_set
+
     def deactivate(self):
         """ p.deactivate( ) -> None
 
         Make the player unable to move, as for a cutscene.
         """
+        self.refresh_animation_set()
         self.active = False
         for button in self.button_press_map:
             self.button_press_map[button] = False
@@ -250,6 +291,18 @@ class Player(Being):
         if lantern and not self.current_level.outdoors:
             lantern.active_update(self.active)
 
+    def refresh_animation_set(self):
+        """ p.refresh_animation_set( ) -> None
+
+        Set the player's animation set based on current lantern mode.
+        """
+        animations = None
+        if self.current_level.display_mode(self) == DISPLAY_MEMORY:
+            animations = Player.load_player_silhouette_animation_set()
+        else:
+            animations = Player.load_player_animation_set()
+        self.change_animation_set(animations)
+
     def toggle_lantern_mode(self, direction):
         """ p.toggle_lantern_mode( int ) -> None
 
@@ -258,6 +311,7 @@ class Player(Being):
         lantern = self.get_lantern()
         if not lantern: return
         lantern.change_mode(direction)
+        self.refresh_animation_set()
 
     def x_action_check(self):
         """ p.x_action_check( ) -> None
@@ -297,19 +351,6 @@ class Player(Being):
         GameImage.updateAnimation(self, 256)         
         if(self.current_level.outdoors):
             return
-        nearby_light_sources = []
-        far_light_sources = []
-        #TODO: just do this for light sources in general
-        """
-        for l in lanterns:
-            l.update(self)
-            if self.in_vision_range(l):
-                nearby_light_sources.append(l)
-            else:
-                far_light_sources.append(l)
-        for f in far_light_sources:
-       	    f.update_light(all_tiles, light_map)
-        """
         self.emit_light(self.sight_dist(), all_tiles, light_map)
 
     def sight_dist(self):

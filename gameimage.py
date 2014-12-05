@@ -118,6 +118,15 @@ class GameImage(pygame.sprite.Sprite):
         self.rect.left += x_offset
         self.rect.top += y_offset
 
+    def change_animation_set(self, animations):
+        """ gi.change_animation_set( AnimationSet ) -> None
+
+        A rarely-used method to change the entire animation set for this game image.
+        Note that this assumes the new set will use the same keys as the current one.
+        """
+        self.animation_set = animations
+        self.animation = self.animation_set.animations[self.direction_id][self.animation_id[0]]
+
     def changeAnimation(self, ID, direction):
         """ gi.changeAnimation( str, str ) -> None
 

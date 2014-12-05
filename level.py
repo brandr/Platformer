@@ -795,7 +795,6 @@ class Level(object):
 							self.screen.blit(check_tile.block.unseen_image, (x1, y1))
 						else:
 							self.screen.blit(explored, (x1, y1))
-
 		self.screen.blit(player.image, self.level_camera.apply(player)) #TODO: make this a grey silhouette of the player
 
 	def draw_level_contents(self, tiles, player):
