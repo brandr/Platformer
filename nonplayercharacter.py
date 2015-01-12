@@ -3,8 +3,11 @@
 
 from being import Being
 from gameevent import GameEvent
+from dialog import Dialog
 from dialogchoice import DialogChoice
 from monster import Monster
+
+from dialog import SIGN, DIALOG_BOX_WIDTH, DIALOG_BOX_HEIGHT
 
 class NonPlayerCharacter(Being):
 	""" NonPlayerCharacter( AnimationSet, int, int ) -> NonPlayerCharacter

@@ -30,7 +30,7 @@ class Lantern(Entity):	#lantern which can help the player see
         self.mode = DEFAULT_MODE
         self.flicker_index = 0
         self.oil_meter = [5999, 5999]
-        self.light_multiplier = 7           # Note that light multiplier is technically meant to determine light radius, but there is an off-by-one or off-by-two error of some sort.
+        self.light_multiplier = 5           # Note that light multiplier is technically meant to determine light radius, but sometimes there is an off-by-one or off-by-two error of some sort.
         self.radius_counter = self.light_distance()
 
     def update(self, player):
@@ -104,6 +104,33 @@ class Lantern(Entity):	#lantern which can help the player see
             mode_index = (mode_index + direction)%(len(ALL_LANTERN_MODES))
         self.mode = ALL_LANTERN_MODES[mode_index]
 
+    def activate_ability(self, level, center_x, center_y):
+        """ l.activate_ability( Level ) -> None
+
+        Depending on the current mode, activate some special ability.
+        """
+        if self.oil_meter[0] <= 0: return
+        oil_cost = ABILITY_COST_MAP[self.mode]
+        if oil_cost >= self.oil_meter[0]: return # check if there is enough oil for the given ability
+        ability = ABILITY_MAP[self.mode]
+        ability(self, level, center_x, center_y)
+        self.oil_meter[0] -= oil_cost
+
+    def default_ability(self, level, center_x, center_y):
+        """ l.default_ability( Level, int, int ) -> None
+
+        Executes the default lantern ability, which is destroying breakable blocks.
+        """
+        radius = self.light_distance()
+        level.destroy_blocks_in_radius( radius, center_x, center_y )
+
+    def memory_ability(self, level, center_x, center_y):
+        """ l.memory_ability( Level, int, int ) -> None
+
+        Executest the lantern ability associated with memory mode. Not sure what that is yet.
+        """
+        pass #TODO. not sure what it should be though.
+
     def light_distance(self): #may have different lantern with different light functions for different gameplay
         """ l.light_distance( ) -> int
 
@@ -114,8 +141,13 @@ class Lantern(Entity):	#lantern which can help the player see
             return 0
         distance = int(oil_ratio*self.light_multiplier)
         if self.flicker_index < FLICKER_CONSTANT/2:
-            distance -= 1 
-        return distance
+            prev_ratio = float(self.oil_meter[0] + 1)/(self.oil_meter[1])
+            prev_distance = int(prev_ratio*self.light_multiplier)
+            if prev_distance != distance:
+                self.flicker_index = FLICKER_CONSTANT/2
+            else:      
+                distance -= 1 
+        return distance + 1
 
     def darkness_multiplier(self):
         """ l.darkness_multiplier( ) -> float
@@ -160,23 +192,22 @@ class Lantern(Entity):	#lantern which can help the player see
         """
         return self.oil_meter[0] <= 0 
 
-    def calculate_brightness(self, coords, tiles):
-        """ l.calculate_brightness( ( int, int ), [ [ Tile ] ] ) -> int
-
-        Figure out the light level (according to this lantern only) at the given coordinates.
-        If another light source calcualtes a higehr brigihtness, then that one is used instead.
-        """
-        light_value = self.light_distance()
-        other = Tile.tileat(coords,tiles)
-        temp_dist = max(1, self.dist_from(other))
-        temp_dist = max(0, light_value - temp_dist + 1)
-        temp_brightness = ((0.9*temp_dist)/(light_value)*256)
-        return min(temp_brightness, 255)
-
 DEFAULT_MODE = "default_mode"
 MEMORY_MODE = "memory_mode"
 ALL_LANTERN_MODES = [DEFAULT_MODE, MEMORY_MODE]
+
 UPDATE_MODE_MAP = {
     DEFAULT_MODE:Lantern.default_update,
     MEMORY_MODE:Lantern.memory_update
+}
+
+ABILITY_MAP = {
+    DEFAULT_MODE:Lantern.default_ability,
+    MEMORY_MODE:Lantern.memory_ability
+}
+
+# costs to use lantern abilities, measured in oil units
+ABILITY_COST_MAP = {
+    DEFAULT_MODE:300,
+    MEMORY_MODE:250 
 }

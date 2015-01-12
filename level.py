@@ -38,9 +38,13 @@ import thread
 from multiprocessing import Process
 
 BLACK = Color ("#000000")
+
 MAX_LIGHT_RINGS = 20
 RING_INNER = "ring_inner"
 RING_OUTER = "ring_outer"
+
+LANTERN_BAR_MIN_WIDTH = 128
+LANTERN_BAR_MAX_WIDTH = 300
 
 class Level(object):
 	""" Level( Dungeon, LevelData, ( int, int ), [ [ Room ] ] ) -> Level
@@ -118,9 +122,8 @@ class Level(object):
 		total_level_height = self.height*32
 		self.level_camera = Camera(total_level_width, total_level_height) #might not be the best way to make the camera
 		self.outdoors = level_data.sunlit
-		self.light_ring_map = None
-		if(not self.outdoors): self.light_ring_map = self.load_light_rings()
-		#self.current_light_map = self.empty_light_map()
+		self.concentric_circle_map = None
+		if(not self.outdoors): self.concentric_circle_map = self.load_concentric_circles()
 
 		if(self.outdoors): self.setTilesOutdoors() #TEMP
 		
@@ -287,6 +290,7 @@ class Level(object):
 			self.level_objects.addBlock(Platform(exit_platform, block_x, block_y))
 
 	#NOTE: if levels take too long to load, try moving this to the dungeon init so that it only has to be done once when the dungeon is loaded.
+	#NOTE: get rid of this if the other way solves the lag.
 	def load_light_rings(self):
 		""" l.load_light_rings( ) -> [ str: { str:Surface } ]
 
@@ -306,6 +310,17 @@ class Level(object):
 			next_map[ RING_OUTER ] = outer_ring
 			ring_map.append(next_map)
 		return ring_map
+
+	def load_concentric_circles(self):
+		""" TODO: docstring if this actually works and fixes the lag.
+		"""
+		concentric_circle_map = []
+		for i in range(1, MAX_LIGHT_RINGS):
+			image = pygame.image.load("./concentric_circles/concentric_circle_" + str(i) + ".png")
+			image.convert_alpha()
+			image.convert()
+			concentric_circle_map.append(image)
+		return concentric_circle_map
 
 	def init_explored(self):
 		""" l.init_explored( ) -> None 
@@ -478,8 +493,6 @@ class Level(object):
 		self.removePlayer()
 		self.adjacent_dungeon.add_player(self.screen_manager, self.screen, player, next_level, adjusted_coords, pixel_remainder)
 
-		#TODO: player goes to the other dungeon. Hardest part.
-
 	def addPlayer(self, player, coords = None, pixel_remainder = (0, 0)):
 		""" l.addPlayer( Player, ( int, int ) ) -> None
 
@@ -496,7 +509,7 @@ class Level(object):
 		player.moveRect(pixel_remainder[0], pixel_remainder[1])
 		self.level_camera.update(player)
 		player.update(self.getTiles(), self.empty_light_map())
-		pygame.display.update()
+		player.refresh_animation_set()
 
 	def begin_loading_adjacent_dungeon(self, travel_data):
 		""" l.begin_loading_adjacent_dungeon( ( str, str, str ) ) -> None
@@ -729,7 +742,7 @@ class Level(object):
 			platforms = self.getPlatforms()
 			display_mode = self.display_mode( player )
 			display_method = DISPLAY_MODE_MAP[display_mode]
-			display_method(self, tiles, player)
+			display_method( self, tiles, player )
 			pygame.display.update()
 
 	def display_outdoors(self, tiles, player):
@@ -749,7 +762,7 @@ class Level(object):
 
 		Display method for dark levels when the player has a lit lantern.
 		"""
-		self.draw_level_contents(tiles, player)
+		self.draw_level_contents( tiles, player, True )
 		light_map = self.empty_light_map( )
 		if light_map: self.update_light(light_map)	
 		if (player.invincibility_frames % 2) == 0: self.screen.blit(player.image, self.level_camera.apply(player))
@@ -777,8 +790,7 @@ class Level(object):
 		"""
 		explored = Surface((32, 32))
 		explored.fill(EXPLORED_GREY)
-		explored.convert()	
-
+		explored.convert()
 		dimensions = self.get_dimensions()
 		origin_x, origin_y = self.level_camera.origin()
 		for y in xrange(dimensions[1]):
@@ -796,15 +808,32 @@ class Level(object):
 						else:
 							self.screen.blit(explored, (x1, y1))
 		self.screen.blit(player.image, self.level_camera.apply(player)) #TODO: make this a grey silhouette of the player
+		if not self.current_event:
+			self.update_player_hud(player) 
 
-	def draw_level_contents(self, tiles, player):
+	def draw_level_contents(self, tiles, player, dark = False):
 		""" l.draw_level_contents( [ [  Tile ] ], Player ) -> None
 
 		Draw the level's tiles, platforms, chests, doors, etc. along with moving entities like monsters and the player.
 		"""
-		for row in tiles:
-			for t in row:
-				self.screen.blit(t.image, self.level_camera.apply(t))
+		# if it's dark, don't blit tiles that are too far from the player. otherswise, blit every tile onscreen.
+		if dark:
+			lantern = player.get_lantern()
+			if lantern:
+				radius = lantern.light_distance()
+				width = len(tiles[0])
+				height = len(tiles)
+				player_x, player_y = player.rect.center
+				start_x, start_y = min( width, max( 0, player_x/32 - radius ) ), min( height, max ( 0, player_y/32 - radius ) )
+				end_x, end_y = min( width, max( 0, player_x/32 + radius + 1 ) ), min( height, max ( 0, player_y/32 + radius + 1 ) )
+				for y in range(  start_y , end_y ):
+					for x in range ( start_x, end_x ):
+						t = tiles[y][x]
+						self.screen.blit(t.image, self.level_camera.apply(t))
+		else:
+			for row in tiles:
+				for t in row:
+					self.screen.blit(t.image, self.level_camera.apply(t))
 
 		# stationary update
 		for p in self.getPlatforms():
@@ -858,35 +887,19 @@ class Level(object):
 	def update_light(self, light_map):
 		""" l.update_light( [ [ double ] ] ) -> None 
 
-		Go through the light map (basically a grid of floating-point values) and set each to a light value 
-		from 0 to 256. I'm considering using ambient light in some places but I might need to find a way to 
-		speed up the game first.
+		Draw concentric circles around the player to light his immediate surroundings.
 		"""
 		player = self.getPlayer()
 		if not player: return
-		ring_map = self.light_ring_map
-		if not ring_map: return
+		concentric_circle_map = self.concentric_circle_map
+		if not concentric_circle_map: return
 		origin_x, origin_y = self.level_camera.origin()
 		player_coords = player.center_rect_coords()		
 		center_x, center_y = player_coords[0], player_coords[1]
 		lantern = player.get_lantern()
-		alpha = lantern.base_alpha()
 		circle_count = max(1, lantern.light_distance() )
-		radius = 32*( circle_count )
-		darkness_multiplier = lantern.darkness_multiplier()
-		circle_images = []
-		index = 0
-		for i in xrange( circle_count ):
-			alpha = alpha*darkness_multiplier
-			circle_image = ring_map[i][RING_INNER]
-			circle_image.set_alpha(alpha)
-			circle_images.append(circle_image)
-			index = i
-
-		outer_circle_image = ring_map[ max( 0, index ) ][RING_OUTER]
-		circle_images.append(outer_circle_image)
-
-		outer_rect = outer_circle_image.get_rect()
+		circle_image = concentric_circle_map[circle_count]
+		outer_rect = circle_image.get_rect()
 		rect_left = center_x + origin_x - outer_rect.width/2
 		rect_right = center_x + origin_x + outer_rect.width/2
 		rect_top = center_y + origin_y - outer_rect.height/2
@@ -898,11 +911,7 @@ class Level(object):
 			if( width <= 0 or height <= 0 ): continue
 			fill_rect = Surface( ( width, height ) )
 			self.screen.blit( fill_rect, ( x, y ) )
-
-		count = len(circle_images)
-		for i in xrange( count ):
-			circle_image = circle_images[i]
-			self.screen.blit( circle_image, ( center_x + origin_x - circle_image.get_width()/2, center_y + origin_y - circle_image.get_height()/2) )
+		self.screen.blit( circle_image, ( center_x + origin_x - circle_image.get_width()/2, center_y + origin_y - circle_image.get_height()/2) )	# this line is causing the lag
 
 	def display_mode(self, player):
 		""" l.display_mode( Player ) -> str
@@ -945,8 +954,18 @@ class Level(object):
 
 		Blit visual effects like the player's current health and lantern oil onto the screen.
 		"""
-		self.update_heatlh_display(player)
+		self.update_lantern_mode_display( player )
+		self.update_heatlh_display( player )
+		self.update_oil_display( player )
 		#TODO: other components of HUD
+
+	def update_lantern_mode_display(self, player):
+		""" l.update_lantern_mode_display( Player ) -> None
+
+		Show the current lantern mode the player is using.
+		"""
+		lantern_mode_image = player.current_lantern_mode_image()
+		self.screen.blit( lantern_mode_image, ( 8, 8 ) )
 
 	def update_heatlh_display(self, player):
 		""" l.update_heatlh_display( Player ) -> None
@@ -955,17 +974,50 @@ class Level(object):
 		"""
 		hp = player.hit_points
 		current_hp, max_hp = hp[0], hp[1]
+		hp_bar_start_empty, hp_bar_middle_empty, hp_bar_end_empty, hp_bar_start_filled, hp_bar_middle_filled, hp_bar_end_filled = player.load_hp_bar_images()
+		if current_hp == 0:
+			self.screen.blit( hp_bar_start_empty, ( 72, 8 ) )
+		else:
+			self.screen.blit( hp_bar_start_filled, ( 72, 8 ) )
+		for i in xrange( 1, min( current_hp, max_hp - 1) ):
+			self.screen.blit( hp_bar_middle_filled, ( 72 + 32*i, 8 ) )
+		for i in xrange( current_hp, max_hp - 1 ):
+			self.screen.blit( hp_bar_middle_empty, ( 72 + 32*i, 8 ) )
+		if current_hp == max_hp:
+			self.screen.blit( hp_bar_end_filled, ( 72 + 32*( max_hp - 1), 8 ) )
+		else:
+			self.screen.blit( hp_bar_end_empty, ( 72 + 32*( max_hp - 1), 8 ) )
 
-		#TEMP
-		font = Font("./fonts/FreeSansBold.ttf", 20)
-		hp_text = "HP: " + str(current_hp) + "/" + str(max_hp)
-		hp_bg = 255, 255, 255 #Surface( (100, 28) )
-		#hp_bg.fill(Color("#FFFFFF"))
-		hp_image = font.render(hp_text, False, Color("#FF0000"), hp_bg)
-		#TEMP
+	def update_oil_display(self, player):
+		""" l.update_oil_display( Player ) -> None
 
-		self.screen.blit(hp_image, (8, 8) )
-		#TODO
+		Show the player's current lantern information on the screen.
+		"""
+		lantern = player.get_lantern( )
+		if lantern:
+			current_oil, max_oil = lantern.oil_meter[0], lantern.oil_meter[1]
+			bar_width = max_oil/40	# can probably determine this other way
+			bar_image = Surface( ( bar_width + 4, 32 ) )
+			inner_bar_image = Surface( ( bar_width, 28 ) )
+			inner_bar_image.fill( Color( "#222222" ) )
+			bar_ratio = ( ( float ) ( current_oil ) / ( float ) ( max_oil ) )
+			filled_width = bar_ratio*bar_width
+			filled_bar_image = Surface( ( filled_width, 28 ) )
+			filled_bar_image.fill( Color( "#FFFF00" ) )
+			inner_bar_image.blit( filled_bar_image, ( 0, 0 ) )
+			bar_image.blit( inner_bar_image, ( 2, 2 ) )
+			self.screen.blit( bar_image, ( 72, 40 ) )
+
+	def destroy_blocks_in_radius(self, radius, center_x, center_y):
+		""" l.destroy_blocks_in_radius( int, int, int ) -> None
+
+		Destroys all destructible blocks within the given radius,
+		centered around the given center.
+		"""
+		pass 
+		# TODO: create another player dict for the light flash image sets, lock the player's lantern so it stops flickering,
+		# and create an entityeffect that follows the player and expands
+		# not sure about detecting collisions-- might need something besides an entityeffect. Make breakable blocks first and see what I can do.
 
 	def level_end_coords(self):
 		""" l.level_end_coords( ) -> ( int, int )

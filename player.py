@@ -11,11 +11,41 @@ from weaponfactory import build_weapon, SWORD
 from inventory import Inventory, LANTERN
 from level import DISPLAY_MEMORY
 from maingamecontrols import LEFT, RIGHT, DOWN, UP, SPACE, CONTROL, X
-#from sword import * #TEMP
+from lantern import DEFAULT_MODE, MEMORY_MODE
+
 STARTING_BUTTON_PRESS_MAP = {
     LEFT:False, RIGHT:False, DOWN:False, UP:False,
     SPACE:False, CONTROL:False, X:False
 }
+
+LANTERN_MODE_MAP = {
+    DEFAULT_MODE:"default",
+    MEMORY_MODE:"memory"
+}
+
+HUD_LANTERN_MODE_NONE = "hud_lantern_mode_none"
+HUD_LANTERN_MODE_DEFAULT = "hud_lantern_mode_default"
+HUD_LANTERN_MODE_MEMORY = "hud_lantern_mode_memory"
+HUD_LANTERN_MODE_SUNLIT = "hud_lantern_mode_sunlit"
+HUD_HP_BAR_START_EMPTY = "hud_hp_bar_start_empty"
+HUD_HP_BAR_MIDDLE_EMPTY = "hud_hp_bar_middle_empty"
+HUD_HP_BAR_END_EMPTY = "hud_hp_bar_end_empty"
+HUD_HP_BAR_START_FILLED = "hud_hp_bar_start_filled"
+HUD_HP_BAR_MIDDLE_FILLED = "hud_hp_bar_middle_filled"
+HUD_HP_BAR_END_FILLED = "hud_hp_bar_end_filled"
+
+HUD_COMPONENT_LIST = [
+    HUD_LANTERN_MODE_NONE,
+    HUD_LANTERN_MODE_DEFAULT,
+    HUD_LANTERN_MODE_MEMORY,
+    HUD_LANTERN_MODE_SUNLIT,
+    HUD_HP_BAR_START_EMPTY,
+    HUD_HP_BAR_MIDDLE_EMPTY,
+    HUD_HP_BAR_END_EMPTY,
+    HUD_HP_BAR_START_FILLED,
+    HUD_HP_BAR_MIDDLE_FILLED,
+    HUD_HP_BAR_END_FILLED
+]
 
 class Player(Being):
     """ Player( AnimationSet, Level ) -> Player
@@ -46,10 +76,9 @@ class Player(Being):
         self.active = True
         self.can_jump = True
         self.button_press_map = STARTING_BUTTON_PRESS_MAP
-        #self.left, self.right, self.down, self.up, self.space, self.control, self.x = False, False, False, False, False, False, False
         self.movement_state = DEFAULT_MOVEMENT_STATE
-        #self.lantern = None
         self.inventory = Inventory()
+        self.hud_map = self.load_hud_map()
 
         #TODO: come up with a more general system for swords/weapons
         self.viewed_cutscene_keys = []
@@ -303,6 +332,18 @@ class Player(Being):
             animations = Player.load_player_animation_set()
         self.change_animation_set(animations)
 
+    def activate_lantern_ability(self):
+        """ p.activate_lantern_ability( ) -> None
+
+        Activate some action using the player's lantern,
+        based on its current mode.
+        """
+        lantern = self.get_lantern()
+        if not lantern: return
+        level = self.current_level
+        if level.outdoors: return
+        lantern.activate_ability(level, self.rect.centerx, self.rect.centery)
+
     def toggle_lantern_mode(self, direction):
         """ p.toggle_lantern_mode( int ) -> None
 
@@ -339,20 +380,28 @@ class Player(Being):
         Use the given light map of the level to figure out how bright each tile should be (assuming the player is underground).
         This updates the player's view and makes visible light sources emit light.
         """
-        level = self.current_level
-        #lanterns = level.getLanterns() #TODO: just do this for light sources in general
+        GameImage.updateAnimation(self, 256)  
+        self.explore_adjacent_tiles(all_tiles)       
+        #if(self.current_level.outdoors):
+        #    return
+        #self.emit_light(self.sight_dist(), all_tiles, light_map)
 
-        coords = self.coordinates()
-        start_x = max(0, coords[0] - self.sight_dist() - 2)
-        end_x = min(len(all_tiles[0]), coords[0] + self.sight_dist() + 2)
-        start_y = max(0, coords[1] - self.sight_dist() - 2)
-        end_y = min(len(all_tiles), coords[1] + self.sight_dist() + 2)
+    def explore_adjacent_tiles(self, tiles):
+        """ p.explore_adjacent_tiles( [ [ Tile ] ] ) -> None
 
-        GameImage.updateAnimation(self, 256)         
-        if(self.current_level.outdoors):
-            return
-        self.emit_light(self.sight_dist(), all_tiles, light_map)
-
+        Mark tiles adjacent to the player as explored so that they will appear in memory mode.
+        """
+        #print len(tiles)
+        #print len(tiles[0])
+        center_x, center_y = (self.rect.left + 1)/32, (self.rect.top + 1)/32
+        width, height = len(tiles[0]), len(tiles) 
+        x1, y1 = center_x - 2, center_y - 2
+        x2, y2 = center_x + 2, center_y + 3
+        for y in xrange( y1, y2 ):
+            if( 0 <= y <= height ):
+                for x in xrange( x1, x2 ):
+                    if( 0 <= x < width ):
+                        tiles[y][x].map()
     def sight_dist(self):
         """ p.sight_dist( ) -> int 
 
@@ -373,6 +422,37 @@ class Player(Being):
         else:
             return False 
 
+    def load_hud_map(self):
+        """ p.load_hud_map( ) -> { str:Surface }
+        
+        Load all of the image components that can be used in the player hud.
+        """
+        hud_map = {}
+        for hud_component_name in HUD_COMPONENT_LIST:
+            image = pygame.image.load("./hud/" + hud_component_name + ".bmp")
+            hud_map[hud_component_name] = image
+        return hud_map
+
+    def current_lantern_mode_image(self):
+        """ p.current_lantern_mode_image( ) -> Surface
+
+        Figure out which image should be used for the player's current lantern mode.
+        """
+        if self.current_level.outdoors:
+            return self.hud_map[HUD_LANTERN_MODE_SUNLIT]
+        lantern = self.get_lantern()
+        if not lantern:
+            return self.hud_map[HUD_LANTERN_MODE_NONE]
+        mode_name = LANTERN_MODE_MAP[lantern.mode]
+        return self.hud_map["hud_lantern_mode_" + mode_name]
+
+    def load_hp_bar_images(self):
+        """ p.load_hp_bar_images( ) -> Surface, Surface, Surface, Surface, Surface, Surface
+
+        Load all of the images associated with the player's HP bar.
+        """ 
+        return self.hud_map[HUD_HP_BAR_START_EMPTY], self.hud_map[HUD_HP_BAR_MIDDLE_EMPTY], self.hud_map[HUD_HP_BAR_END_EMPTY], self.hud_map[HUD_HP_BAR_START_FILLED], self.hud_map[HUD_HP_BAR_MIDDLE_FILLED], self.hud_map[HUD_HP_BAR_END_FILLED]
+
             #this could probably be moved up in inheritance
     def get_point(self, start, end, slope, x):
         # this seems to be unused, but I don't want to get rid of it unless I'm sure.
@@ -392,7 +472,7 @@ class Player(Being):
         Since the game would be a pain to test if the player could die, this is not yet implemented.
         """
         if damage <= 0: return
-        self.hit_points[0] -= damage
+        self.hit_points[0] = max( self.hit_points[0] - damage, 0 )
 
 
     def collide(self, xvel, yvel):
@@ -476,13 +556,7 @@ class Player(Being):
         The player absorbs a pickup, removing it from the level.
         """
         pickup.delete()
-        pickup.take_effect(self)
-
-        #TEMP METHOD (therefore no docstring)
-    #def pick_up_lantern(self, lantern):
-    #   lantern.delete()
-    #   self.lantern = lantern
-        #TEMP METHOD
+        pickup.take_effect( self )
 
     def collideMonsters(self, xvel, yvel):
         """ p.collideMonsters( int, int ) -> None

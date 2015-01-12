@@ -3,6 +3,7 @@ a block or monster. A being is an entity that does not occupy a specific tile
 (like a block/platform does). Beings can be stationary, though they almost always move.
 """
 
+from gameimage import GameImage
 from entity import Entity
 from door import Door
 from platform import Platform

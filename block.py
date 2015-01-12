@@ -57,7 +57,8 @@ class Block(Entity):
 		Mark that the player has seen this block, causing it to be visible as a grey square in complete darkness.
 		"""
 		self.mapped = True
-		self.unseen_image = self.mapped_block_image()
+		#if not self.unseen_image:
+		#	self.unseen_image = self.draw_memory_image()
 
 	def draw_memory_image(self):
 		""" b.draw_memory_image( ) -> None

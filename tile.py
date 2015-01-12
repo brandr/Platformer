@@ -76,19 +76,6 @@ class Tile(GameImage):
             nexttile = self.relativetile((d[0], d[1]), tiles)
             if nexttile != None:
                 nexttile.spreadlight(dist - 1, tiles, light_map, 1, (d[0], d[1]) )
-        """
-    	if otherlights != None:
-    	    for o in otherlights:
-    		    o.update_light(tiles, light_map)
-        if dist == 0: return
-        coords = self.coordinates()
-        light_map[coords[1]][coords[0]] = 256
-        directions = ((-1, 0), (1, 0), (0, -1), (0, 1))
-        for d in directions:
-            nexttile = self.relativetile((d[0], d[1]), tiles)
-            if nexttile != None:
-                nexttile.spreadlight(dist - 1, tiles, light_map, 1, (d[0], d[1]), False, None, otherlights)
-        """
 
     #OLD METHOD DECLARATION (change back if we switch back to the old system)
     #def spreadlight(self, dist, tiles, light_map, iteration = 0, direction = None, lineflag = False, brightness = None, otherlights = []):
@@ -121,15 +108,6 @@ class Tile(GameImage):
         """
         #NEW METHOD
         coords = self.coordinates()
-        self.map()
-        #if brightness == None:
-        #    brightness = ((0.9*dist + 1)/(max(dist + iteration, 1)))*256
-        #maxbrightness = brightness
-        #if otherlights != None:
-        #    for o in otherlights:
-        #        if o.withindist(self, o.light_distance()):
-        #            checkbrightness = o.calculate_brightness(coords, tiles)
-        #            maxbrightness = max(checkbrightness, brightness)
         light_map[coords[1]][coords[0]] = light_flag
         if dist <= 0:
             return               #once the light reaches its max distance, stop
