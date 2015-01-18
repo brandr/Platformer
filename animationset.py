@@ -1,10 +1,8 @@
 """Uses spritestripanimator (not made by me) to animate images.
 """
 
-#from spritestripanimator import SpriteStripAnimator
-
 class AnimationSet(object):
-	"""AnimationSet (default_animation) -> AnimationSet
+	"""AnimationSet ( SpriteStripAnimator ) -> AnimationSet
 
 	This is a set of animations which can be used by a GameImage object
 	to change its sprite based on its current state. Some animations will

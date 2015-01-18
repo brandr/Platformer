@@ -1,7 +1,11 @@
 """ A special factory for making doors.
 """
 
-from door import *
+#from door import *
+from door import Door
+from gameimage import GameImage
+
+from pygame import Rect
 
 class DoorFactory:
 	""" No constructor.

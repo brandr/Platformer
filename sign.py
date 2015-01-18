@@ -4,6 +4,7 @@
 
 from block import Block
 from gameevent import GameEvent
+from dialog import Dialog, SIGN
 from camera import WIN_WIDTH, WIN_HEIGHT
 
 DIALOG_BOX_WIDTH = WIN_WIDTH - 32

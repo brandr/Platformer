@@ -1,5 +1,6 @@
 from tilefactory import TileFactory
 from entityfactory import EntityFactory
+from platformfactory import PlatformFactory
 from signfactory import SignFactory
 from chestfactory import ChestFactory
 from doorfactory import DoorFactory
@@ -10,15 +11,13 @@ from room import Room
 from block import Block
 from tile import Tile
 from gameimage import GameImage
-from tiledata import *#TileData, BlockedTileData, DEFAULT_TILE_SIZE, DEFAULT_CUTSCENE_TRIGGER
+from tiledata import TileData, BlockedTileData, DEFAULT_TILE_SIZE, DEFAULT_CUTSCENE_TRIGGER, PLAYER_START, DESTRUCTIBLE_PLATFORM, DEFAULT_SIGN, DEFAULT_DOOR, DEFAULT_CHEST, OIL_PICKUP
 from roomdata import ROOM_WIDTH, ROOM_HEIGHT
 
 from pygame import Rect
 
-DEFAULT_SIGN = "default_sign"
-DEFAULT_DOOR = "default_door"
-DEFAULT_CHEST = "default_chest"
 NON_DEFAULT_ENTITY_MAP = {
+	DESTRUCTIBLE_PLATFORM:PlatformFactory,
 	DEFAULT_SIGN:SignFactory,	
 	DEFAULT_DOOR:DoorFactory,
 	DEFAULT_CHEST:ChestFactory,
@@ -105,7 +104,7 @@ class RoomFactory(object):
 		start_coords = (False, 0, 0)
 		x = y = 0
 
-		# TODO: change this part to be more efficient if necessary, since the test tiles will be overridden anyway.
+		# TODO: remove test tiles to make this part more efficient if necessary, since the test tiles will be overwritten anyway.
 
 		tile_images = GameImage.load_image_file('./data/', 'test_tiles_1.bmp') 
 		tile_factory = TileFactory(tile_images, (2, 1))
@@ -126,7 +125,6 @@ class RoomFactory(object):
 					else:
 
 						#TODO: remember that this part may need some checks if the object created is larger than 32*32.
-
 						raw_entity_image = next_tile_data.get_image("./LevelEditor/")
 						entity_width, entity_height = next_tile_data.width, next_tile_data.height
 						entity_rect = Rect(0, 0, entity_width*DEFAULT_TILE_SIZE, entity_height*DEFAULT_TILE_SIZE)

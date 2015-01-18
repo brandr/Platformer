@@ -20,8 +20,8 @@ class Tile(GameImage):
 
     mapped: Marks whether the Tile has been seen by the player. This is generally only relevant if there is a block in the tile.
     """
-    def __init__(self, tile_sprites, x , y): 
-        GameImage.__init__(self, tile_sprites) #TODO: replace with some getter (or arg) representing the tile's sprite. (Note: what did I mean when I wrote this)
+    def __init__(self, animations, x , y): 
+        GameImage.__init__(self, animations) 
         self.unseen_color = Color("#000000")
         self.rect = Rect(x, y, 32, 32)
         self.block = None
@@ -41,9 +41,9 @@ class Tile(GameImage):
 
         Refresh the tile so that it is empty and shows its default image properly.
         """
-        brightness = self.image.get_alpha()
+        #brightness = self.image.get_alpha()
         self.image = self.default_image
-        self.image.set_alpha(brightness)
+        #self.image.set_alpha(brightness)
         self.image.convert()
         self.block = None
 
@@ -52,12 +52,11 @@ class Tile(GameImage):
 
         Updates the tile image as a black square with this tile's block behind it, or just set this tile's image to the default image if there's no block.
         """
-        if(self.block != None): 
+        if(self.block != None and self.block.is_square): 
             self.image = Surface((32, 32))
             self.image.blit(self.block.image, (0, 0))
             self.block.updateimage(lightvalue)
-            if self.block.is_square:        #TODO: if people are bothered by the effect, make it so non-square blocks are not transparent in caves.
-                return
+            return
         GameImage.updateimage(self, lightvalue)
 
     #CHANGED TO NEW METHOD

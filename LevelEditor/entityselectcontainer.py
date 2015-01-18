@@ -1,4 +1,5 @@
-from tiledata import TileData
+from tiledata import TileData, DESTRUCTIBLE_PLATFORM, DEFAULT_SIGN, DEFAULT_CHEST, DEFAULT_CUTSCENE_TRIGGER
+from platformdata import PlatformData, DestructiblePlatformData
 from signdata import SignData
 from chestdata import ChestData
 from cutscenetriggerdata import CutsceneTriggerData
@@ -17,10 +18,8 @@ BMP_FILETYPE = 33204 #not sure if this will work cross-platform. (Then again, a 
 
 #TODO: instead of showing current entity image in the pane, blit current entity image over a white square the size of max-sized image.
 
-DEFAULT_SIGN = "default_sign"
-DEFAULT_CHEST = "default_chest"
-DEFAULT_CUTSCENE_TRIGGER = "default_cutscene_trigger"
 ENTITY_CONSTRUCTOR_MAP = {
+		DESTRUCTIBLE_PLATFORM:DestructiblePlatformData,
 		DEFAULT_SIGN:SignData,
 		DEFAULT_CHEST:ChestData,
 		DEFAULT_CUTSCENE_TRIGGER:CutsceneTriggerData

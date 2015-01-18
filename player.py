@@ -1,17 +1,23 @@
 """ The only being directly controlled by the person playing the game.
 """
+import os
 
 from being import *
 from lantern import *
 from exitblock import *
-from platform import *
+from platform import Platform, DestructiblePlatform
+from platformdata import DESTROY_STEP_ON
 from animationset import AnimationSet
+from lightflash import LightFlash
 
 from weaponfactory import build_weapon, SWORD
 from inventory import Inventory, LANTERN
 from level import DISPLAY_MEMORY
 from maingamecontrols import LEFT, RIGHT, DOWN, UP, SPACE, CONTROL, X
 from lantern import DEFAULT_MODE, MEMORY_MODE
+
+MAX_LIGHT_FLASH_RADIUS = 10 #might move this somewhere else
+LIGHT_FLASH_ALPHA = 100
 
 STARTING_BUTTON_PRESS_MAP = {
     LEFT:False, RIGHT:False, DOWN:False, UP:False,
@@ -79,7 +85,9 @@ class Player(Being):
         self.movement_state = DEFAULT_MOVEMENT_STATE
         self.inventory = Inventory()
         self.hud_map = self.load_hud_map()
-
+        self.light_flash_animations = self.load_light_flash_animations()
+        self.light_flash = None
+        #self.light_flash_circles = self.load_light_flash_circles()
         #TODO: come up with a more general system for swords/weapons
         self.viewed_cutscene_keys = []
         #TEMP
@@ -101,7 +109,7 @@ class Player(Being):
         Load all animations that the player can use and put them into an AnimationSet object.
         """
         player_rect = Rect(0, 0, 32, 64)
-        filepath = './LevelEditor/animations/player/'
+        filepath = './animations/'
         
         # could probably use the same system used for loading monster animations, and simply store
         # player animation keys in tiledata with the other keys.
@@ -145,7 +153,7 @@ class Player(Being):
         Load all animations that will show the player as a grey silhouette.
         """
         player_rect = Rect(0, 0, 32, 64)
-        filepath = './LevelEditor/animations/player/'
+        filepath = './animations/'
 
         player_idle_left = GameImage.load_animation(filepath, 'player_1_idle_left_silhouette.bmp', player_rect, -1)
         player_idle_right = GameImage.load_animation(filepath, 'player_1_idle_right_silhouette.bmp', player_rect, -1)
@@ -183,6 +191,7 @@ class Player(Being):
         Make the player unable to move, as for a cutscene.
         """
         self.refresh_animation_set()
+        #self.get_lantern().deactivate()
         self.active = False
         for button in self.button_press_map:
             self.button_press_map[button] = False
@@ -190,10 +199,10 @@ class Player(Being):
     def activate(self):
         """ p.activate( ) -> None
 
-        >setters in python
-        >2014
+        Makes the player active, such as after a cutscene is over.
         """
         self.active = True
+        #self.get_lantern.activate()
 
     def update(self, tiles, light_map):
         """ p.update( [ [ Tile ] ], [ [ double ] ]) -> None
@@ -253,9 +262,9 @@ class Player(Being):
                 self.yvel = max(self.yvel, 0)
                 self.can_jump = False
             #TODO: consider a separate falling animation at terminal velocity.
-        else:
-            self.running = running
-        if(self.running):
+        #else:
+        #    self.running = running
+        if(running):#self.running):
             self.xvel *= 1.6
             if(self.onGround):
                 self.changeAnimation('running', self.direction_id)
@@ -284,7 +293,7 @@ class Player(Being):
         only if he actually "grabs" it by pressing up.
         """
         #TODO: ladder climbing animations go here
-        up, down, left, right, space, running, x = self.up, self.down, self.left, self.right, self.space, self.control, self.x
+        up, down, left, right, space, running, x = self.button_press_map[UP], self.button_press_map[DOWN], self.button_press_map[LEFT], self.button_press_map[RIGHT], self.button_press_map[SPACE], self.button_press_map[CONTROL], self.button_press_map[X]
         self.xvel, self.yvel = 0, 0
         if not self.collide_ladder():
             self.movement_state = DEFAULT_MOVEMENT_STATE
@@ -338,11 +347,12 @@ class Player(Being):
         Activate some action using the player's lantern,
         based on its current mode.
         """
+        if self.light_flash and self.light_flash.active: return #might want to replace this with a more general check to see if the lantern is "busy"
         lantern = self.get_lantern()
         if not lantern: return
         level = self.current_level
         if level.outdoors: return
-        lantern.activate_ability(level, self.rect.centerx, self.rect.centery)
+        lantern.activate_ability(self, self.rect.centerx, self.rect.centery)
 
     def toggle_lantern_mode(self, direction):
         """ p.toggle_lantern_mode( int ) -> None
@@ -353,6 +363,30 @@ class Player(Being):
         if not lantern: return
         lantern.change_mode(direction)
         self.refresh_animation_set()
+
+    def lock_lantern(self):
+        """ p.lock_lantern( ) -> None
+
+        Locks the lantern, preventing it from flickering.
+        """
+        self.get_lantern().lock()
+
+    def unlock_lantern(self):
+        """ p.unlock_lantern( ) -> None
+
+        Unlocks the lantern, resuming its flickering.
+        """
+        self.get_lantern().unlock()
+
+    def destroy_blocks_in_radius( self, radius, center_x, center_y ):
+        """ p.destroy_blocks_in_radius( int, int, int ) -> None
+
+        After the lantern ability that causes this event is confirmed, the player 
+        emits a flash of light that destroys all valid blocks in the given radius.
+        """
+        flash_animation = self.light_flash_animations[ min( radius, MAX_LIGHT_FLASH_RADIUS ) ]
+        self.light_flash = LightFlash( self, flash_animation )
+        self.light_flash.activate()
 
     def x_action_check(self):
         """ p.x_action_check( ) -> None
@@ -398,7 +432,7 @@ class Player(Being):
         x1, y1 = center_x - 2, center_y - 2
         x2, y2 = center_x + 2, center_y + 3
         for y in xrange( y1, y2 ):
-            if( 0 <= y <= height ):
+            if( 0 <= y < height ):
                 for x in xrange( x1, x2 ):
                     if( 0 <= x < width ):
                         tiles[y][x].map()
@@ -441,7 +475,7 @@ class Player(Being):
         if self.current_level.outdoors:
             return self.hud_map[HUD_LANTERN_MODE_SUNLIT]
         lantern = self.get_lantern()
-        if not lantern:
+        if not lantern or not lantern.oil_meter[0]:
             return self.hud_map[HUD_LANTERN_MODE_NONE]
         mode_name = LANTERN_MODE_MAP[lantern.mode]
         return self.hud_map["hud_lantern_mode_" + mode_name]
@@ -452,6 +486,23 @@ class Player(Being):
         Load all of the images associated with the player's HP bar.
         """ 
         return self.hud_map[HUD_HP_BAR_START_EMPTY], self.hud_map[HUD_HP_BAR_MIDDLE_EMPTY], self.hud_map[HUD_HP_BAR_END_EMPTY], self.hud_map[HUD_HP_BAR_START_FILLED], self.hud_map[HUD_HP_BAR_MIDDLE_FILLED], self.hud_map[HUD_HP_BAR_END_FILLED]
+
+    def load_light_flash_animations(self):
+        """ p.load_light_flash_animations( ) -> [ AnimationSet ]
+
+        Loads the animations used to represent expanding bursts of light when the lantern is used
+        to reveal hidden areas.
+        """
+        animations = []
+        filepath = "./light_flash_circles"
+        for i in range(1, MAX_LIGHT_FLASH_RADIUS):
+            filename = "circle_strip_" + str(i) + ".png"
+            rect = Rect( 0, 0, i*64, i*64 )
+            anim = GameImage.load_animation(filepath, filename, rect)
+            anim.set_all_alphas(LIGHT_FLASH_ALPHA)
+            animation_set = AnimationSet(anim)
+            animations.append(animation_set)
+        return animations
 
             #this could probably be moved up in inheritance
     def get_point(self, start, end, slope, x):
@@ -474,7 +525,6 @@ class Player(Being):
         if damage <= 0: return
         self.hit_points[0] = max( self.hit_points[0] - damage, 0 )
 
-
     def collide(self, xvel, yvel):
         """ p.collide( int, int ) -> None
 
@@ -482,11 +532,15 @@ class Player(Being):
         This includes stopping against platforms, being hit by monsters, absorb pickups, etc.
         """
         level = self.current_level
-        platforms = level.get_impassables() #TODO: remember that it might be possible to pass through some platforms in some directions.
+        platforms = level.get_impassables() #TODO: remember that it might be possible to pass through some platforms in some directions. 
+        destructible_platforms = []
         slopes = []
         default_platforms = []
         for p in platforms:
+            if self.pixel_dist_from(p) > self.rect.height: continue # this check should help reduce lag.
             if pygame.sprite.collide_mask(self, p) and p.is_solid:
+                if isinstance(p, DestructiblePlatform):
+                    destructible_platforms.append(p)
                 if p.is_sloped:
                     slopes.append(p)
                 else:
@@ -495,6 +549,9 @@ class Player(Being):
             Being.collideWith(self, xvel, yvel, s)
         for p in default_platforms:
             Being.collideWith(self, xvel, yvel, p)
+        for dp in destructible_platforms:         
+            if Being.standing_on_object(self, xvel, yvel, dp):
+                dp.receive_catalyst(DESTROY_STEP_ON, level)
         #self.collideExits()
         self.collidePickups()
         self.collideLanterns() #might not need this with the new lantern system (if lantern is obtained  from a chest or something)
@@ -586,7 +643,6 @@ class Player(Being):
         self.invincibility_frames = 100
         source.bounceAgainst(self)
         
-
     def bounce(self):
         """ p.bounce( ) -> None
 

@@ -6,7 +6,7 @@
 from ladder import Ladder
 from lantern import Lantern
 from chest import Chest
-from platform import Platform
+from platform import Platform, DestructiblePlatform, PassablePlatform
 from monster import Monster
 from sign import Sign
 from cutscenetrigger import CutsceneTrigger
@@ -19,6 +19,8 @@ from tiledata import *
 ENTITY_CONSTRUCTOR_MAP = { #TODO: try to figure out why signs aren't in here
 	DEFAULT_PLATFORM:Platform,
 	SLOPING_PLATFORM:Platform,
+	DESTRUCTIBLE_PLATFORM:DestructiblePlatform,
+	PASSABLE_PLATFORM:PassablePlatform,
 
 	DEFAULT_LADDER:Ladder,
 
@@ -55,6 +57,7 @@ class EntityFactory(object):
 		return entity 					
 
 	#add other monster init stuff as necessary.
+
 	@staticmethod
 	def initMonster(monster, name):
 		""" initMonster( Monster, str ) -> None

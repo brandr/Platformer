@@ -1,6 +1,9 @@
-from signdata import *
-from cutscenetriggerdata import *
+
+from signdata import SignData
+from cutscenetriggerdata import CutsceneTriggerData
 from chestdata import ChestData
+from platformdata import PlatformData, DestructiblePlatformData
+from tiledata import TileData, BlockedTileData, DEFAULT_SIGN, DEFAULT_CHEST, DEFAULT_CUTSCENE_TRIGGER, DESTRUCTIBLE_PLATFORM
 
 ROOM_WIDTH = 28
 ROOM_HEIGHT = 20
@@ -128,6 +131,16 @@ class RoomData(object):
 		return trigger_data
 
 	@staticmethod
+	def deformatted_destructible_platform(formatted_data, filepath):	# this will need to change as this class's constructor does.
+		""" deformatted_destructible_platform( ( str, str, int, int, str ), str ) -> DestructiblePlatformData
+
+		Take a tuplet of primitive data loaded from a file and turn it into a usable DestructiblePlatformData object.
+		"""
+		platform_data = DestructiblePlatformData(formatted_data[0], formatted_data[1], filepath)
+		platform_data.catalyst = formatted_data[4]
+		return platform_data
+
+	@staticmethod
 	def empty_tile_set(width,height):
 		tiles = []
 		for y in xrange(height):
@@ -137,7 +150,8 @@ class RoomData(object):
 		return tiles
 
 TILE_INIT_MAP = {
-	DEFAULT_SIGN:RoomData.deformatted_sign, # TODO: add deformatted cutscene trigger.
+	DEFAULT_SIGN:RoomData.deformatted_sign,
 	DEFAULT_CHEST:RoomData.deformatted_chest,
-	DEFAULT_CUTSCENE_TRIGGER:RoomData.deformatted_cutscene_trigger
+	DEFAULT_CUTSCENE_TRIGGER:RoomData.deformatted_cutscene_trigger,
+	DESTRUCTIBLE_PLATFORM:RoomData.deformatted_destructible_platform
 }

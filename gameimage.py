@@ -212,12 +212,12 @@ class GameImage(pygame.sprite.Sprite):
         animation_keys = tile_data.animation_keys()
         if animation_keys == None: return None
 
-        animation_filepath = tile_data.animation_filepath('./LevelEditor/')
-
+        #animation_filepath = tile_data.animation_filepath('./LevelEditor/')
+        animation_filepath = "./animations"
         default_key = animation_keys[0][0]
         
         default_animation_filename = key + "_" + default_key + ".bmp"
-        default_animation = GameImage.load_animation(animation_filepath, default_animation_filename, image_rect, colorkey)
+        default_animation = GameImage.load_animation("./animations", default_animation_filename, image_rect, colorkey)
         animation_set = AnimationSet(default_animation)
         
         for n in xrange(1, len(animation_keys)):
@@ -240,9 +240,24 @@ class GameImage(pygame.sprite.Sprite):
         
         Load an animation given two parts of a filepath and some other data.
         """
-        animation_strip = GameImage.load_image_file("./animations", filename)   # TEMP
+        #animation_strip = GameImage.load_image_file("./animations", filename)  
+        animation_strip = GameImage.load_image_file(filepath, filename)  
         count = animation_strip.get_width()/rect.width                          # assume that the animation strip is wide only, not long
         return SpriteStripAnimator(animation_strip, rect, count, colorkey, loop, frames)
+
+    @staticmethod
+    def load_animation_from_images(images, rect, colorkey = None, loop = True, frames = 10): #change frames to 50 if necessary for testing
+        """ load_animation_from_images( [ Surface ], Rect, str, bool, int ) -> SpriteStripAnimator
+        
+        Load an animation given a set of images and some other data.
+        """
+        count = len(images)
+        animation_strip = Surface( ( rect.width*count, rect.height ) )
+        for i in xrange(count):
+            animation_strip.blit(images[i], ( rect.width*i, 0 ) )
+        animation = SpriteStripAnimator(animation_strip, rect, count, colorkey, loop, frames)
+        return animation
+        #return SpriteStripAnimator(animation_strip, rect, count, colorkey, loop, frames)
 
     @staticmethod
     def load_image_file(path, name, colorkey = None):

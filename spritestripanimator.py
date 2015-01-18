@@ -54,6 +54,10 @@ class SpriteStripAnimator(object):
         self.i = other.i
         self.f = other.f
 
+    def set_all_alphas(self, alpha):
+        for i in self.images:
+            i.set_alpha(alpha)
+
     def __add__(self, ss):
         self.images.extend(ss.images)
         return self

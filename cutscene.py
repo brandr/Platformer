@@ -39,6 +39,7 @@ class Cutscene(GameEvent):
 
 		Determine whether the event should continue by checking whether any of its actions are still occurring.
 		"""
+		if not self.level: return True
 		if self.current_actions:
 			should_continue = False
 			for a in reversed(self.current_actions):

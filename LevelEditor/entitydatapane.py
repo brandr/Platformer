@@ -11,6 +11,8 @@ from pygame.draw import polygon
 
 from cutscenescripts import MASTER_CUTSCENE_MAP
 from chestcontents import MASTER_CHEST_CONTENTS_MAP
+from platformdata import MASTER_CATALYST_MAP
+from tiledata import DEFAULT_CUTSCENE_TRIGGER, DESTRUCTIBLE_PLATFORM, DEFAULT_SIGN, DEFAULT_DOOR, DEFAULT_CHEST
 
 WHITE = Color("#FFFFFF")
 BLACK = Color("#000000")
@@ -59,6 +61,32 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 			if SAVE in function_map:
 				save_function = function_map[SAVE]
 				save_function(self)
+
+	# DESTRUCTIBLE PLATFROM
+	def update_destructible_platform(self):
+		platform_data = self.current_selection
+		self.platform_label = Label("Destruction Catalyst: None")
+		catalyst_key = platform_data.catalyst
+		if catalyst_key: self.platform_label.set_text("Destruction Catalyst: " + catalyst_key) 
+		self.set_children([self.platform_label])
+		self.catalyst_select_list = self.build_catalyst_select_list(self.platform_label.rect.left, self.platform_label.rect.bottom + 8, 360, 200)
+		self.add_child(self.catalyst_select_list)
+
+	def build_catalyst_select_list(self, x, y, width, height):
+		catalyst_select_list = ScrolledList(width, height)
+		for catalyst_key in MASTER_CATALYST_MAP:
+			catalyst_select_list.items.append(TextListItem(catalyst_key))
+		catalyst_select_list.topleft = x, y
+		catalyst_select_list.connect_signal(SIG_SELECTCHANGED, self.change_platform_catalyst_selection, catalyst_select_list)
+		return catalyst_select_list
+
+	def change_platform_catalyst_selection(self, catalyst_select_list):
+		text_list_item = catalyst_select_list.get_selected()[0]
+		if not text_list_item: return
+		catalyst_key = text_list_item._text
+		self.platform_label.set_text("Destruction Catalyst: " + catalyst_key) 
+		self.current_selection.catalyst = catalyst_key
+
 	# SIGN
 	def update_sign(self):
 		self.pane_index = 0
@@ -211,16 +239,12 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 		contents_select_list.connect_signal(SIG_SELECTCHANGED, self.change_chest_contents_selection, contents_select_list)
 		return contents_select_list
 
-	#def save_chest_data(self):
-	#	pass #TODO
-
 	def change_chest_contents_selection(self, contents_select_list):
 		text_list_item = contents_select_list.get_selected()[0]
 		if not text_list_item: return
 		self.current_chest_contents_key = text_list_item._text
 		self.chest_label.set_text("Chest contents: " + self.current_chest_contents_key)
 		self.current_selection.contents_key = self.current_chest_contents_key
-
 
 	# CUTSCENE TRIGGER
 	def update_cutscene_trigger(self):
@@ -258,10 +282,11 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 UPDATE = "update"
 SAVE = "save"
 
-DEFAULT_SIGN = "default_sign"
-DEFAULT_CHEST = "default_chest"
-DEFAULT_CUTSCENE_TRIGGER = "default_cutscene_trigger"
 ENTITY_DATA_MAP = {
+		DESTRUCTIBLE_PLATFORM:
+		{
+			UPDATE: EntityDataPane.update_destructible_platform
+		},
 		DEFAULT_SIGN:
 		{
 			UPDATE: EntityDataPane.update_sign,
@@ -270,7 +295,6 @@ ENTITY_DATA_MAP = {
 		DEFAULT_CHEST:
 		{
 			UPDATE: EntityDataPane.update_chest
-		#	SAVE: EntityDataPane.save_chest_data
 		},
 		DEFAULT_CUTSCENE_TRIGGER:
 		{

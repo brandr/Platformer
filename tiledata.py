@@ -13,6 +13,8 @@ PLAYER_START = "player_start"
 PLATFORMS = "platforms"
 DEFAULT_PLATFORM = "default_platform"
 SLOPING_PLATFORM = "sloping_platform"
+DESTRUCTIBLE_PLATFORM = "destructible_platform"
+PASSABLE_PLATFORM = "passable_platform"
 
 #ladders
 LADDERS = "ladders"
@@ -50,6 +52,7 @@ MINER = "miner"
 #triggers
 TRIGGERS = "triggers"
 DEFAULT_CUTSCENE_TRIGGER = "default_cutscene_trigger"
+
 #---------TEMPORARY------------------
 
 KENSTAR = "kenstar"
@@ -59,7 +62,7 @@ KENSTAR = "kenstar"
 #category map
 ENTITY_CATEGORY_MAP = {
 	PLAYER_START:None,
-	DEFAULT_PLATFORM:PLATFORMS, SLOPING_PLATFORM:PLATFORMS,
+	DEFAULT_PLATFORM:PLATFORMS, SLOPING_PLATFORM:PLATFORMS, DESTRUCTIBLE_PLATFORM:PLATFORMS, PASSABLE_PLATFORM:PLATFORMS,
 	DEFAULT_LADDER:LADDERS,
 	DEFAULT_SIGN:SIGNS,
 	DEFAULT_DOOR:DOORS,

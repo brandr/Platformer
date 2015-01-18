@@ -41,7 +41,8 @@ class GameManager:
 
 		player_animations = Player.load_player_animation_set()
 		start_level = start_dungeon.start_level()
-		
+		if not start_level: raise SystemExit, "ERROR: no starting level specified."
+
 		player = Player(player_animations, start_level)
 		start_level.addPlayer(player)
 

@@ -1,7 +1,8 @@
 """ A factory for adding text to signs.
 """
 
-from sign import *
+from gameimage import GameImage
+from sign import Sign
 
 class SignFactory:
 	""" No constructor.

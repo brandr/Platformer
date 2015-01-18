@@ -12,7 +12,7 @@ from levelobjects import LevelObjects
 from entity import Entity
 from cutscenetrigger import CutsceneTrigger
 from pickup import Pickup
-from platform import Platform
+from platform import Platform, DestructiblePlatform, PassablePlatform
 from ladder import Ladder
 from sign import Sign
 from door import Door
@@ -739,7 +739,12 @@ class Level(object):
 			self.update_explored()
 			self.level_camera.update( player )						# try calling this at the end of this method if there are weird visual effects.
 			player.update(all_tiles, light_map)
-			platforms = self.getPlatforms()
+			player_subs = player.active_subentities
+			if player_subs:
+				for s in player_subs: s.update()
+			destructible_platforms = self.getDestructiblePlatforms()
+			for dp in destructible_platforms:
+				dp.update(player)
 			display_mode = self.display_mode( player )
 			display_method = DISPLAY_MODE_MAP[display_mode]
 			display_method( self, tiles, player )
@@ -752,6 +757,7 @@ class Level(object):
 		"""
 		self.draw_level_contents(tiles, player)
 		if (player.invincibility_frames % 2) == 0: self.screen.blit(player.image, self.level_camera.apply(player))
+		self.display_passable_blocks()
 		if not self.current_event:
 			self.update_player_hud(player) 
 		if(self.has_effects): 
@@ -764,8 +770,9 @@ class Level(object):
 		"""
 		self.draw_level_contents( tiles, player, True )
 		light_map = self.empty_light_map( )
-		if light_map: self.update_light(light_map)	
 		if (player.invincibility_frames % 2) == 0: self.screen.blit(player.image, self.level_camera.apply(player))
+		self.display_passable_blocks()
+		if light_map: self.update_light(light_map)	
 		if not self.current_event:
 			self.update_player_hud(player) 
 		if(self.has_effects): 
@@ -836,8 +843,12 @@ class Level(object):
 					self.screen.blit(t.image, self.level_camera.apply(t))
 
 		# stationary update
+		# no need to blit all platforms, since this is already handled by tiles.
+		for dp in self.getDestructiblePlatforms():
+			self.screen.blit(dp.image, self.level_camera.apply(dp))
 		for p in self.getPlatforms():
-			self.screen.blit(p.image, self.level_camera.apply(p))
+			if p.is_sloped:
+				self.screen.blit(p.image, self.level_camera.apply(p))
 		for l in self.getLadders():
 			self.screen.blit(l.image, self.level_camera.apply(l))
 		for s in self.getSigns():
@@ -856,7 +867,6 @@ class Level(object):
 			self.screen.blit(m.image, self.level_camera.apply(m))
 
 		# TODO: blit subentites and then entity effects of non-player objects starting here
-
 		for m in self.getMonsters():
 			monster_subs = m.active_subentities
 			if monster_subs:
@@ -871,18 +881,16 @@ class Level(object):
 					self.screen.blit(e.image, self.level_camera.apply(e))	
 			# ...and ending here
 
-			#TEMP
 		player_subs = player.active_subentities
 		if player_subs:
 			for s in player_subs:
-				s.update()
 				if s.active:
 					self.screen.blit(s.image, self.level_camera.apply(s))	
 		player_effects = player.entity_effects
 		if player_effects:
 			for e in player_effects:
 				e.update()
-				self.screen.blit(e.image, self.level_camera.apply(e))
+				self.screen.blit(e.image, self.level_camera.apply(e))		
 
 	def update_light(self, light_map):
 		""" l.update_light( [ [ double ] ] ) -> None 
@@ -912,6 +920,14 @@ class Level(object):
 			fill_rect = Surface( ( width, height ) )
 			self.screen.blit( fill_rect, ( x, y ) )
 		self.screen.blit( circle_image, ( center_x + origin_x - circle_image.get_width()/2, center_y + origin_y - circle_image.get_height()/2) )	# this line is causing the lag
+
+	def display_passable_blocks(self):
+		""" l.display_passable_blocks( ) -> None
+
+		Display all blocks the player can pass through.
+		"""
+		for p in self.getPassablePlatforms():
+			self.screen.blit(p.image, self.level_camera.apply(p))	
 
 	def display_mode(self, player):
 		""" l.display_mode( Player ) -> str
@@ -1008,17 +1024,6 @@ class Level(object):
 			bar_image.blit( inner_bar_image, ( 2, 2 ) )
 			self.screen.blit( bar_image, ( 72, 40 ) )
 
-	def destroy_blocks_in_radius(self, radius, center_x, center_y):
-		""" l.destroy_blocks_in_radius( int, int, int ) -> None
-
-		Destroys all destructible blocks within the given radius,
-		centered around the given center.
-		"""
-		pass 
-		# TODO: create another player dict for the light flash image sets, lock the player's lantern so it stops flickering,
-		# and create an entityeffect that follows the player and expands
-		# not sure about detecting collisions-- might need something besides an entityeffect. Make breakable blocks first and see what I can do.
-
 	def level_end_coords(self):
 		""" l.level_end_coords( ) -> ( int, int )
 
@@ -1085,6 +1090,15 @@ class Level(object):
 		"""
 		self.level_objects.remove(entity)
 		if(self.outdoors): self.calibrateLighting()
+
+	def remove_block(self, block):
+		""" l.remove( Block ) -> None
+
+		Remove a block from the level.
+		"""
+		tile = block.current_tile()
+		self.remove(block)
+		tile.reset()
 
 	def getTilesOnScreen(self):
 		""" l.getTilesOnScreen( ) -> [ [ Tile ] ]
@@ -1155,6 +1169,20 @@ class Level(object):
 		Returns all platforms in the level.
 		"""
 		return self.level_objects.get_entities(Platform)
+
+	def getDestructiblePlatforms(self):
+		""" l.getDestructiblePlatforms( ) -> [ DestructiblePlatform ]
+
+		Returns all destructible platforms in the level.
+		"""
+		return self.level_objects.get_entities(DestructiblePlatform)
+
+	def getPassablePlatforms(self):
+		""" l.getPassablePlatforms( ) -> [ getPassablePlatforms ]
+
+		Returns all passable platforms in the level.
+		"""
+		return self.level_objects.get_entities(PassablePlatform)
 
 	def getLadders(self):
 		""" l.getLadders( ) -> [ Ladder ]

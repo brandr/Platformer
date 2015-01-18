@@ -4,7 +4,7 @@
 from entity import *
 import math
 
-FLICKER_CONSTANT = 80
+FLICKER_CONSTANT = 120
 
 class Lantern(Entity):	#lantern which can help the player see
     """ Lantern( AnimationSet, int, int ) -> Lantern
@@ -29,9 +29,10 @@ class Lantern(Entity):	#lantern which can help the player see
         self.available_modes = ALL_LANTERN_MODES
         self.mode = DEFAULT_MODE
         self.flicker_index = 0
+        self.flicker_lock = False
         self.oil_meter = [5999, 5999]
         self.light_multiplier = 5           # Note that light multiplier is technically meant to determine light radius, but sometimes there is an off-by-one or off-by-two error of some sort.
-        self.radius_counter = self.light_distance()
+        #self.active = False
 
     def update(self, player):
         """ l.update( Player ) -> None
@@ -54,23 +55,23 @@ class Lantern(Entity):	#lantern which can help the player see
         """
         if not player_active: self.mode = DEFAULT_MODE
         update_method = UPDATE_MODE_MAP[self.mode]
-        update_method(self)
+        update_method(self, player_active)
 
-    def default_update(self):
-        """ l.default_update( ) -> None
+    def default_update(self, player_active):
+        """ l.default_update( bool ) -> None
 
         Basic update for when the lantern is in its default mode.
         """
         self.flicker_update()
-        self.oil_update(1)
+        if player_active: self.oil_update(1)
 
-    def memory_update(self):
+    def memory_update(self, player_active):
         """ l.memory_update( ) -> None
 
         Update for when the lantern is in memory mode.
         Note that an empty lantern might want to switch modes. Not sure.
         """
-        self.oil_update(1) 
+        if player_active: self.oil_update(1)
 
     def oil_update(self, oil_decrement):
         """ l.oil_update( ) -> None
@@ -78,6 +79,7 @@ class Lantern(Entity):	#lantern which can help the player see
         Causes 1 unit of oil to drain from the lantern.
         Also adjusts the flicker, making the lantern's radius swell and shrink slightly.
         """
+        if self.flicker_lock: return
         if self.oil_meter[0] > 0:
             self.oil_meter[0] -= oil_decrement
 
@@ -86,8 +88,27 @@ class Lantern(Entity):	#lantern which can help the player see
 
         Updates the lantern's flicker index, possibly changing its light radius temporarily.
         """
+        if self.flicker_lock: return
         self.flicker_index += 1
         if self.flicker_index >= FLICKER_CONSTANT: self.flicker_index = 0
+
+    def lock(self):
+        """ l.lock( ) -> None
+
+        Locks the lantern, preventing it from flickering.
+        """
+        if self.flicker_index < FLICKER_CONSTANT/2: self.flicker_index = 0
+        else: self.flicker_index = FLICKER_CONSTANT/2
+        self.flicker_lock = True
+    
+    def unlock(self):
+        """ unlock( ) -> None
+
+        Unocks the lantern, resuming its flickering.
+        """
+        if self.flicker_index < FLICKER_CONSTANT/2: self.flicker_index = 0
+        else: self.flicker_index = FLICKER_CONSTANT/2
+        self.flicker_lock = False
 
     def change_mode(self, direction):
         """ l.change_mode( direction ) -> None
@@ -104,25 +125,26 @@ class Lantern(Entity):	#lantern which can help the player see
             mode_index = (mode_index + direction)%(len(ALL_LANTERN_MODES))
         self.mode = ALL_LANTERN_MODES[mode_index]
 
-    def activate_ability(self, level, center_x, center_y):
-        """ l.activate_ability( Level ) -> None
+    def activate_ability(self, player, center_x, center_y):
+        """ l.activate_ability( Player ) -> None
 
         Depending on the current mode, activate some special ability.
         """
         if self.oil_meter[0] <= 0: return
         oil_cost = ABILITY_COST_MAP[self.mode]
         if oil_cost >= self.oil_meter[0]: return # check if there is enough oil for the given ability
+        if self.mode == DEFAULT_MODE and self.light_distance() == 0: return 
         ability = ABILITY_MAP[self.mode]
-        ability(self, level, center_x, center_y)
+        ability(self, player, center_x, center_y)
         self.oil_meter[0] -= oil_cost
 
-    def default_ability(self, level, center_x, center_y):
-        """ l.default_ability( Level, int, int ) -> None
+    def default_ability(self, player, center_x, center_y):
+        """ l.default_ability( Player, int, int ) -> None
 
         Executes the default lantern ability, which is destroying breakable blocks.
         """
         radius = self.light_distance()
-        level.destroy_blocks_in_radius( radius, center_x, center_y )
+        player.destroy_blocks_in_radius( radius, center_x, center_y )
 
     def memory_ability(self, level, center_x, center_y):
         """ l.memory_ability( Level, int, int ) -> None

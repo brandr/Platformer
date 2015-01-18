@@ -9,6 +9,8 @@ from door import Door
 from platform import Platform
 import pygame
 
+ON_TOP_CONSTANT = 4
+
 class Being(Entity):
     """ Being ( animations ) -> Being
 
@@ -151,6 +153,18 @@ class Being(Entity):
                 self.yvel = 0
             if yvel < 0:
                 self.rect.top = collide_object.rect.bottom
+
+    def standing_on_object(self, xvel, yvel, collide_object):
+        """ b.standing_on_object (double, double, Platform) -> None
+
+        Returns True if the Being is standing on top of the given object.
+        """
+        if not self.onGround: return
+        if abs(self.rect.bottom - collide_object.rect.top) < ON_TOP_CONSTANT:  #may need collide_mask in some cases, not sure.
+            self.mask = pygame.mask.from_surface(self.image)
+            #if pygame.sprite.collide_mask(self, collide_object):
+            if self.rect.centery > collide_object.rect.centery: return False
+            return True #TEMP
 
     def collide_with_slope(self, xvel, yvel, slope): #NOTE: this only works for slopes on the ground, not on the ceiling.
         """ b.collide_with_slope( double, double, Block ) -> None

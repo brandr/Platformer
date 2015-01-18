@@ -37,6 +37,7 @@ class SubEntity(Being): #NOTE: should lanterns be a subentity?
 		if self.active: return
 		self.active = True
 		self.superentity.add_subentity(self)
+		self.active_count = 20
 
 	def deactivate(self):
 		""" se.deactivate( ) -> None

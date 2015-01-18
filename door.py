@@ -3,6 +3,8 @@
 
 from block import Block
 
+PIXEL_DIST_THRESHOLD = 36
+
 class Door(Block): #not sure how to handle a 2-part block yet
 	""" Door ( AnimationSet, int, int ) -> AnimationSet
 
@@ -27,7 +29,8 @@ class Door(Block): #not sure how to handle a 2-part block yet
 
 		Checks whether this door is close enough for the player to open.
 		"""
-		return self.pixel_dist_from(player) < 16 #TEMP: check distance first
+		#print self.pixel_dist_from(player)
+		return self.pixel_dist_from(player) < PIXEL_DIST_THRESHOLD
 
 	def execute_x_action(self, level, player):
 		""" d.execute_x_action( Level, Player ) -> None

@@ -5,6 +5,8 @@ from tile import Tile, GameImage
 from gameimage import BACKGROUND_COLOR
 from pygame import Color
 
+import math
+
 class Entity(GameImage):
     """ Entity( AnimationSet ) -> Entity
 
@@ -104,14 +106,16 @@ class Entity(GameImage):
             xdist -= ((self.rect.width/2) + (other.rect.width/2))
         if not yaligned:
             ydist -= ((self.rect.height/2) + (other.rect.height/2))
-        return (sqrt(pow(xdist, 2) + pow(ydist, 2)))/32 + 0.0
+        return (math.sqrt(pow(xdist, 2) + pow(ydist, 2)))/32 + 0.0
 
     def pixel_dist_from(self, other):
         """ e.pixel_dist_from( Entity ) -> double
 
         Returns the straight-line distance (in pixels) between this entity and another.
         """
-        return 32.0*self.dist_from(other)
+        xdist = self.x_dist_from(other)
+        ydist = self.y_dist_from(other)  
+        return (math.sqrt(pow(xdist, 2) + pow(ydist, 2))) + 0.0
 
     def x_dist_from(self, other, absolute = True):
         """ e.x_dist_from( Entity, bool ) -> int
@@ -142,6 +146,13 @@ class Entity(GameImage):
         """
         return self.dist_from(other) < dist
 
+    def within_pixel_dist(self, other, dist):
+        """ e.within_pixel_dist( Entity, int ) -> bool
+
+        checks if the entity is close enough to another (in pixels).
+        """
+        return self.pixel_dist_from(other) < dist        
+
     def delete(self):
         """ e.delete( ) -> None
 
@@ -169,11 +180,6 @@ class Entity(GameImage):
         starttile = self.current_tile()
         if not (starttile == None):
             starttile.emit_light(dist, tiles, light_map)
-        """
-        starttile = self.current_tile()
-        if not (starttile == None):
-            starttile.emit_light(dist, tiles, light_map, otherlights)
-        """
 
     def calculate_brightness(self, coords):
         # this may be outdated. Delete if we don't end up using it anywhere.
