@@ -9,7 +9,7 @@ from roomdata import ROOM_WIDTH, ROOM_HEIGHT
 # fit neatly into one grid, etc) then we might make it possible to travel between LevelGroups.
 
 class Dungeon(object):
-	""" Dungeon( [ LevelData ], [ [ RoomData ] ] ) -> Dungeon
+	""" Dungeon( [ LevelData ], [ [ RoomData ] ], str ) -> Dungeon
 
 	A dungeon is effectively a set of levels. Functionally, the rooms are not processed individually after the dungeon is created--
 	instead, the player's current level is constantly updated and is connected to other levels.
@@ -19,14 +19,15 @@ class Dungeon(object):
 	rooms: The set of square, same-sized rooms that make up the dungeon.
 
 	dungeon_levels: The set of levels (each containing one or more rooms) that make up the dungeon.
+
+	dungeon_name: A string representing the name of the dungeon. Note that this is not the name that will display on the map.
 	"""
-	def __init__(self, level_data_set, room_data_set): #Dungeon builds the dungeon from a single map along with some other data about the level.
+	def __init__(self, level_data_set, room_data_set, dungeon_name): #Dungeon builds the dungeon from a single map along with some other data about the level.
 		factory = LevelFactory()
 		print "Building dungeon rooms..."
 		rooms = factory.dungeon_rooms(self, room_data_set) 
 		self.dungeon_levels = factory.dungeon_levels(self, rooms, level_data_set)
-		#for L in self.dungeon_levels:
-		#	L.calibrateExits() # needed in case there are ways out of levels that don't lead to other levels.
+		self.dungeon_name = dungeon_name
 		
 	def start_level(self):
 		""" d.start_level( ) -> Level 

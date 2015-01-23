@@ -30,9 +30,8 @@ class Lantern(Entity):	#lantern which can help the player see
         self.mode = DEFAULT_MODE
         self.flicker_index = 0
         self.flicker_lock = False
-        self.oil_meter = [5999, 5999]
+        self.oil_meter = [9999, 9999]
         self.light_multiplier = 5           # Note that light multiplier is technically meant to determine light radius, but sometimes there is an off-by-one or off-by-two error of some sort.
-        #self.active = False
 
     def update(self, player):
         """ l.update( Player ) -> None
@@ -56,6 +55,8 @@ class Lantern(Entity):	#lantern which can help the player see
         if not player_active: self.mode = DEFAULT_MODE
         update_method = UPDATE_MODE_MAP[self.mode]
         update_method(self, player_active)
+        cost = OIL_COST_MAP[self.mode]
+        self.oil_update(cost)
 
     def default_update(self, player_active):
         """ l.default_update( bool ) -> None
@@ -63,7 +64,7 @@ class Lantern(Entity):	#lantern which can help the player see
         Basic update for when the lantern is in its default mode.
         """
         self.flicker_update()
-        if player_active: self.oil_update(1)
+        #if player_active: self.oil_update(1)
 
     def memory_update(self, player_active):
         """ l.memory_update( ) -> None
@@ -71,7 +72,8 @@ class Lantern(Entity):	#lantern which can help the player see
         Update for when the lantern is in memory mode.
         Note that an empty lantern might want to switch modes. Not sure.
         """
-        if player_active: self.oil_update(1)
+        pass
+        #if player_active: self.oil_update(1)
 
     def oil_update(self, oil_decrement):
         """ l.oil_update( ) -> None
@@ -228,8 +230,14 @@ ABILITY_MAP = {
     MEMORY_MODE:Lantern.memory_ability
 }
 
+# oil costs per frame when different lantern modes are on
+OIL_COST_MAP = {
+    DEFAULT_MODE:2,
+    MEMORY_MODE:1
+}
+
 # costs to use lantern abilities, measured in oil units
 ABILITY_COST_MAP = {
     DEFAULT_MODE:300,
-    MEMORY_MODE:250 
+    MEMORY_MODE:250
 }

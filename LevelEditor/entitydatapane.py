@@ -47,10 +47,14 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 				update_method = function_map[UPDATE]
 				update_method(self)
 		else:
-			self.update_empty()
+			self.update_key(entity_key)
 
 	def update_empty(self):
-		data_label = Label("No additional data.")
+		data_label = Label("Nothing selected.")
+		self.set_children([data_label])
+
+	def update_key(self, entity_key):
+		data_label = Label(entity_key + " selected. No additional data.")
 		self.set_children([data_label])
 
 	def save_data(self):
@@ -110,14 +114,11 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 			self.add_child(s)
 
 		bottom_entry = self.sign_entry_set[-1]
-		#save_sign_button = self.save_sign_button(bottom_entry.left, bottom_entry.bottom + 8)
 		self.prev_pane_button = self.build_prev_pane_button(bottom_entry.left, bottom_entry.bottom + 8, False)
 		self.next_pane_button = self.build_next_pane_button(self.prev_pane_button.right + 8, self.prev_pane_button.top, len(self.sign_text_panes) > 1)
 		add_sign_pane_button = self.add_sign_pane_button(self.next_pane_button.right + 8, self.next_pane_button.top)
 		remove_sign_pane_button = self.remove_sign_pane_button(add_sign_pane_button.right + 8, add_sign_pane_button.top)
 		self.sign_pane_index_label = self.build_sign_pane_index_label(remove_sign_pane_button.right + 8, remove_sign_pane_button.top)
-
-		#self.add_child(save_sign_button)
 		self.add_child(self.prev_pane_button)
 		self.add_child(self.next_pane_button)
 		self.add_child(add_sign_pane_button)
@@ -229,7 +230,6 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 		self.set_children([self.chest_label])
 		self.contents_select_list = self.build_contents_select_list(self.chest_label.rect.left, self.chest_label.rect.bottom + 8, 360, 200)
 		self.add_child(self.contents_select_list)
-		#TODO: make it possible to set the chest's contents
 
 	def build_contents_select_list(self, x, y, width, height):
 		contents_select_list = ScrolledList(width, height)

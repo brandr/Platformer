@@ -173,7 +173,7 @@ class RoomFactory(object):
 		start_coords = (False, 0, 0)
 		x = y = 0
 
-		tile_images = GameImage.load_image_file('./data/', 'test_tiles_1.bmp') 
+		tile_images = GameImage.load_image_file('./images/', 'test_tiles_1.bmp') 
 		tile_factory = TileFactory(tile_images, (2, 1))
 		default_cave_tile = tile_factory.tile_at((0, 0))
 		default_sky_tile = tile_factory.tile_at((1, 0))

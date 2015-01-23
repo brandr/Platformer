@@ -1,6 +1,10 @@
 """ A manager which controls the flow of gameplay, including switching between screens and controls.
 """
 
+DUNGEON_NAME_MAP = {
+	"Cave_test":"Caves of Mystery"
+}
+
 from screenmanager import *
 from dungeonfactory import build_dungeon
 from cutscene import *
@@ -70,6 +74,11 @@ class GameManager:
 			pygame.display.update()
 
 	def build_dungeon_and_screen(self):
+		#use the commented out section for developers only
+		dungeon_path = "./dungeon_map_files/"
+		"""
+		print "Select a starting dungeon by number: "
+		
 		print "Select a starting dungeon by number: "
 		dungeon_path = "./dungeon_map_files/"
 		dungeon_files = [ f for f in listdir(dungeon_path) if isfile(join(dungeon_path, f)) ]
@@ -86,11 +95,16 @@ class GameManager:
 			print "Invalid dungeon number. Try again.", "\n"
 			return self.build_dungeon_and_screen()
 		dungeon_name = dungeon_files[dungeon_index - 1]
+		"""
+		dungeon_name = "Cave_test"
 		print "Building dungeon..."
+		dungeon_display_name = "???"
+		if dungeon_name in DUNGEON_NAME_MAP:
+			dungeon_display_name = DUNGEON_NAME_MAP[dungeon_name]
 		master_screen = pygame.display.set_mode(DISPLAY, FLAGS, DEPTH)
-		dungeon = build_dungeon(dungeon_path + dungeon_name)
+		dungeon = build_dungeon(dungeon_path + dungeon_name, dungeon_display_name)
 		print "Dungeon built."
-		return dungeon, dungeon_name, master_screen
+		return dungeon, dungeon_display_name, master_screen
 
 	@staticmethod	#TEMP FOR TESTING (therefore, no docstring)
 	def temp_player_right(arg, player):

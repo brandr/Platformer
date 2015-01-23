@@ -91,14 +91,16 @@ class Player(Being):
         #TODO: come up with a more general system for swords/weapons
         self.viewed_cutscene_keys = []
         #TEMP
-        self.sword = build_weapon(SWORD, self)
+        sword = build_weapon(SWORD, self)
+        self.acquire_item(sword, SWORD)
+        #self.sword = build_weapon(SWORD, self)
         self.hit_points = [10, 10]
         #TEMP
 
     def temp_z_method(self):    
         #TEMP (no docstring)
         #TODO: find some way to pass this directional check into the sword itself.
-        self.sword.activate(32, 0, self.direction_id) 
+        self.get_sword().activate(32, 0, self.direction_id) 
         #TODO: make a sword-swinging animation for the player, and set it so that the player cannot face the other way if moving left while swinging right (i.e., he just walks backwards)
         #TEMP
 
@@ -744,6 +746,13 @@ class Player(Being):
         """
         return self.inventory.get_item(LANTERN)
 
+    def get_sword(self):
+        """ p.get_sword( ) -> Sword
+
+        Return the player's current sword, or None if he has no sword.
+        """
+        return self.inventory.get_item(SWORD)
+
     def acquire_item(self, item, key):
         """ p.acquire_item( Item, str ) -> None
 
@@ -751,12 +760,29 @@ class Player(Being):
         """
         self.inventory.add_item( item, key )
 
+    def open_inventory(self):
+        """ p.open_inventory( ) -> None
+
+        Open the inventory screen to view the player's items and make changes (such as setting lantern mode).
+        """
+        self.current_level.pause_game(self)
+        self.current_level.screen_manager.switch_to_inventory_screen(self)
+
+    def open_map(self):
+        """ p.open_map( ) -> None
+
+        The player opens up the map screen.
+        """
+        self.current_level.pause_game(self)
+        self.current_level.screen_manager.switch_to_map_screen(self)
+
     def pause_game(self):
         """ p.pause_game( ) -> None
 
         Pause the game and open the pause screen (which is currently the map screen).
         """
         self.current_level.pause_game(self)
+        self.current_level.screen_manager.switch_to_pause_screen(self)
 
     def unpause_game(self):
         """ p.unpause_game( ) -> None
