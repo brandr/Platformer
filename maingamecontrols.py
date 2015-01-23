@@ -73,6 +73,22 @@ class MainGameControls(Controls):
 		if toggle:
 			self.player.activate_lantern_ability()
 
+	def press_i(self, key, toggle):
+		""" mgc.press_i( str, bool ) -> None
+
+		i key action.
+		"""
+		if toggle:
+			self.player.open_inventory()
+
+	def press_m(self, key, toggle):
+		""" mgc.press_m( str, bool ) -> None
+
+		m key action.
+		"""
+		if toggle:
+			self.player.open_map()
+
 	def press_q(self, key, toggle):
 		""" mgc.press_q( str, bool ) -> None
 
@@ -121,6 +137,8 @@ move_space = MainGameControls.move_space
 move_control = MainGameControls.move_control
 
 press_c = MainGameControls.press_c
+press_i = MainGameControls.press_i
+press_m = MainGameControls.press_m
 press_q = MainGameControls.press_q
 press_w = MainGameControls.press_w
 press_x = MainGameControls.press_x
@@ -132,6 +150,8 @@ MAIN_GAME_CONTROL_MAP = {
 	K_UP:move_up, K_DOWN:move_down, K_LEFT: move_left, K_RIGHT:move_right,
 	K_SPACE:move_space, K_LCTRL:move_control,
 	K_c:press_c,
+	K_i:press_i,
+	K_m:press_m,
 	K_q:press_q,
 	K_w:press_w,
 	K_x:press_x,

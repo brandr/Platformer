@@ -26,12 +26,25 @@ class MainGameScreen(GameScreen):
 		self.draw_bg()
 		self.level_update()
 
+	def pause_update(self):
+		""" mgs.pause_update( ) -> None
+
+		Update the game in its paused state.
+		"""
+
 	def level_update(self):
 		""" mgs.level_update( ) -> None
 
 		Call the updates that will make objects in the level update physically and visually.
 		"""
 		self.player.current_level.update(False, False, False, False, False, False)
+
+	def pause_game(self):
+		""" mgs.pause_game( ) -> None
+
+		Pause the game.
+		"""
+		self.paused = True
 
 	def clear(self):
 		""" mgs.level_update( ) -> None

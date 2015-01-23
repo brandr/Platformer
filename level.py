@@ -179,7 +179,7 @@ class Level(object):
 
 		# TEMP METHOD. No docstring.
 	def setTilesOutdoors(self):
-		default_sky_tile = GameImage.load_image_file('./data/', 'test_sky_tile_1.bmp') #GameImage.loadImageFile('test_sky_tile_1.bmp') 
+		default_sky_tile = GameImage.load_image_file('./images/', 'test_sky_tile_1.bmp') #GameImage.loadImageFile('test_sky_tile_1.bmp') 
 		dimensions =  self.get_dimensions()
 		tiles = self.getTiles()
 		for y in xrange(dimensions[1]):
@@ -540,8 +540,7 @@ class Level(object):
 		Pauses the game and goes to the map screen.
 		This is subject to change as the pause screen gets fleshed out further.
 		"""
-		self.set_active(False)
-		self.screen_manager.switch_to_pause_screen(player)	
+		self.set_active(False)	
 
 	def unpause_game(self, player):
 		""" l.unpause_game( Player ) -> None
@@ -719,8 +718,7 @@ class Level(object):
 		After this, lighting is applied by blitting black squares of varying transparency over the tiles. 
 		Finally, visual effects like cutscene bars or dialog boxes are displayed.
 		"""
-		if(not self.active):
-			return
+		if(not self.active): return
 		if(self.current_event):
 			self.current_event.update(self)
 			if(self.current_event.is_complete()):

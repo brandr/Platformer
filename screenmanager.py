@@ -3,6 +3,10 @@
 
 from maingamescreen import *
 from pausescreen import *
+from mapscreen import MapScreen
+from mapcontrols import MapControls
+from inventoryscreen import InventoryScreen
+from inventorycontrols import InventoryControls
 
 class ScreenManager:
 	""" ScreenManager ( Surface, GameScreen, Player ) -> ScreenManager
@@ -54,6 +58,16 @@ class ScreenManager:
 		"""
 		self.current_screen.draw_screen(self.master_screen)
 
+	def switch_to_inventory_screen(self, player):
+		""" sm.switch_to_inventory_screen( Player ) -> None
+
+		Switch to the screen that shows the player's inventory.
+		"""
+		controls = InventoryControls(player)
+		control_manager = ControlManager(controls)
+		inventory_screen = InventoryScreen(control_manager, player)
+		self.set_current_screen(inventory_screen)
+
 	def switch_to_main_screen(self, player):
 		""" sm.switch_to_main_screen( Player ) -> None
 
@@ -69,9 +83,19 @@ class ScreenManager:
 	def switch_to_pause_screen(self, player):
 		""" sm.switch_to_pause_screen( Player ) -> None
 
-		Switch to the pause screen. Currently this only shows the map of the dungeon, but I may put more elements on the pause screen later.
+		Switch to the pause screen.
 		"""
 		controls = PauseControls(player)
 		control_manager = ControlManager(controls)
 		pause_screen = PauseScreen(control_manager, player)
 		self.set_current_screen(pause_screen)
+
+	def switch_to_map_screen(self, player):
+		""" sm.switch_to_map_screen( Player ) -> None
+
+		Switch to the map screen, which shows the map of the dungeon.
+		"""
+		controls = MapControls(player)	
+		control_manager = ControlManager(controls)
+		map_screen = MapScreen(control_manager, player)
+		self.set_current_screen(map_screen)

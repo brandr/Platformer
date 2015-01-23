@@ -4,7 +4,7 @@
 import sys
 import json
 
-def build_dungeon(filename):
+def build_dungeon(filename, dungeon_name):
 	""" build_dungeon( str ) -> Dungeon
 
 	Creates a DungeonData object from a file stored in the given file.
@@ -14,7 +14,7 @@ def build_dungeon(filename):
 	level_data_set = dungeon_data.level_data_set
 	room_data_set = dungeon_data.rooms
 	print "Setting up main level group..."
-	return Dungeon(level_data_set, room_data_set) #could also give the factory itself more of the work than this
+	return Dungeon(level_data_set, room_data_set, dungeon_name) #could also give the factory itself more of the work than this
 
 
 def dungeonDataFromFile(filename, filepath = "./"):

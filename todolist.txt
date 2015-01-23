@@ -1,3 +1,16 @@
+TODOs by person
+
+LILLY
+
+# make the miner closer to the player in size 
+# make miner portait(s)
+# create "bouncing" or "getting hit" animations for both the player and the miner
+# add in "getting hurt" animations, weapon-swinging animations, jumping animations, etc. for the player and miner.
+# design dialog boxes, map screen, inventory screen, etc.
+
+--------------------------------------------------------------------------
+
+ROBERT (everything below here)
 
     #KNOWN BUGS
 
@@ -105,30 +118,43 @@ OVERARCHING MAIN GOAL: Build a demo showing off combat, exploration, dialogs, cu
     - should also include a boss that feels good to fight
     - also some world stuff and exploration stuff
 
-IMMEDIATE STUFF: most immediate
+IMMEDIATE STUFF: most immediate (defined mainly as finishing incomplete systems or creating new ones that are interesting or that other TODOs depend on.)
 
-# instead of just saying "no additional data" or the additional data in the entitydatapane, give the name of the current selection (unless there is no selection)
-    - This will make level editing MUCH more convenient so don't forget
-# give the player a lantern mode that increases the radius, but drains oil faster.
-    - could do this in a general way by setting different "oil drain rates" for different lantern modes.
-        * maybe memory mode should drain oil slower than other modes?
-# fix the lag AGAIN
-# IDEA: consider making the lantern flash ability automatically set the flicker count to the higher radius before activating.
-    - ask people if this is a good idea. I think it might be annoying to have to time the flash for blocks at the edge of the radius, but it might also make exploring more engaging.
-# make it so some events (like the start of a boss fight) temporarily "lock" a room and unlock it when the boss is defeated (or based on some other event)
+# finish the inventory screen
+    - make a selector to go to different items and perform some action on them
+# allow the player to change the controls from the defaults.
+    - do this from pause menu -> options
+    - this will change the structure of maingamecontrols.py quite a bit.
+    - it might help to generate a config file that includes control settings.
+# make the pause pane look decent. Need a frame and a cursor to choose from "resume", "options", and "quit".
+    - also consider different colors and font
+    - not sure what will go in options but one possibility is the option to change control scheme
+# expand on pause screen using advice from humans
+    - focus on figuring out whether additional screens would be good or bad
+    - tab might be a good button to open up another pane
+    - IDEAS for layouts:
+        1. everything is a different button
+            * tab to change lantern mode
+            * E or I for inventory (currently just lantern, sword, and maybe some flavor items)
+            * enter for pause menu (resume, options, quit)
+            * M for map (arrow keys will pan around)
+        2. everything reachable through one button (enter) 
+            * need to expand on pause panes and make a way to switch between them
+        3. same as 1, but lantern mode can be selected from the inventory screen
+# draw the items on the inventory screen larger (maybe 64 x 64 px)
+# IDEA: make some objects on the inventory screen (such as the lantern) animated
 # make it possible to change the lantern setting while paused.
     - will need to expand on the pause screen and controls a good deal.
-# figure out more exploration stuff. maybe experiment with interesting areas based on the darkness mechanics.
-    - make tiles that are blitted over the player and appear to be solid (same sprites or similar sprites to existing blocks)
-    - goal: an interesting maze-type area
-    - breakable blocks? fake walls? hidden objects? 
-# IDEA: show the lantern attached to the player's belt area and center the light rings on it pixel-wise.
+# figure out an item system
+    - remember that the lantern and sword are both items but work very differently
+    - might just have checks to make them display on the inventory screen
+# show the lantern attached to the player's belt area and center the light rings on it pixel-wise.
     - could do this by making the lantern a subentity of the player that appears when the player is in the dark
     - in lit areas when the lantern is off, make it visibly clear that it is not lit, possibly by having the player put it away.
+# change the way the player looks in complete darkness.
 # might be able to draw the player towards some places in the darkness by blitting transparent white rings (or some other visual effect) over important spots
-# make an executable to ensure that the process still works. This will probably require tweaking the executable script a lot.
-# fix the issue where the player runs in place when ctrl is held.
-    - this is low priority since this might end up being what I want
+# generalize subentities/entityeffects so that they can apply to monsters and NPCs
+    - to test this, make a giant frog with an armored mask that deflects frontal attacks 
 # implement some kind of projectiles
     - this will help test the damage system, since currently subentities like weapons only damage the player or monsters
       based on checks from their superentities. Projectiles, spikes, etc. should cause damage without being called by superentities.
@@ -136,12 +162,17 @@ IMMEDIATE STUFF: most immediate
       the one who fired it dies)
 # figure out how monster spawining should be handled: i.e., when monsters defeated earlier should reappear.
     - it's possible this will relate to World data.
-# generalize subentities/entityeffects so that they can apply to monsters and NPCs
-    - to test this, make a giant frog with an armored mask that deflects frontal attacks 
+# add basic sounds (make them easy to disable for testing purposes)
 # make it easier to add simple NPCs with no actions or branching dialog trees, since most NPCs will work this way. Follow the same pattern as signs
   and make a "default NPC" that can have many different sprites. Note that such NPCs will not have dialog portraits.
-# fix the problem where the player bounces up and down on stairs.
     - this may be related to another issue where the player collides with doors wrong.
+
+--------------------------------------------------------------------------------
+
+SECOND MOST IMMEDIATE STUFF
+
+# fix the issue where the player runs in place when ctrl is held.
+    - this is low priority since this might end up being what I want
 # make the "hit spark" better (and possibly more well-adapted to the shape of the thing hit)
     - consider other ways to show that something is being damaged-- flashing red?
 # IDEA: Make the dungeon editor (not the level editor) more intuitive by allowing level selection via the grid and not just the scroll list.
@@ -155,25 +186,14 @@ IMMEDIATE STUFF: most immediate
     - later, use gun/bow as example
 # consider using multiprocessing instead of multithreading to make adjacent dungeons load
     - might want more tests first -- I'm not sure that I'll ever need to have the player start in a room adjacent to another dungeon.
-# figure out an item system
-    - remember that the lantern and sword are both items but work very differently
-    - might just have checks to make them display on the inventory screen
 # fully implement a cutscene system and ways to trigger cutscenes (besides the existing contact-based triggers)
-# Make the miner good. Steps:
-    1. May want to create "bouncing" or "getting hit" animations for both the player and the miner (can Lilly do this thing?)
-        - Maybe the miner doesn't bounce? This would make things much easier.
-        - consider making the miner's sprite flash red when hit. Not sure how to implement this in a general way, though.
-        - NOTE: pick animation offset is currently (33, -13)
-    2. The miner is supposed to be fast and aggressive, so experiment with different ways to achieve this.
-    3. Attack pattern idea: charge while swinging, turn around in an exaggerrated way (if the player is behind), charge while swinging again
-        - figure out how attack pattern will work, and make it interruptible (probably)
-    4. have the miner check for a clear path to the player before charging. If there is not a clear path, jump instead of charging.
-# For the sake of testing the boss fight, add in "getting hurt" animations, swinging animations, jumping animations, etc. for the player and boss to make movement more natural-looking.
-# make the miner closer to the player in size (Lilly pls)
-# make miner portait(s)
-    - maybe lilly can do this thing
-    - probably not though because it doesn't sound like she felt like it at all
-# add basic sounds
+# make it so some events (like the start of a boss fight) temporarily "lock" a room and unlock it when the boss is defeated (or based on some other event)
+# Make the miner good.
+    - NOTE: pick animation offset is currently (33, -13)
+    - The miner is supposed to be fast and aggressive, so experiment with different ways to achieve this.
+    - Attack pattern idea: charge while swinging, turn around in an exaggerrated way (if the player is behind), charge while swinging again
+        * figure out how attack pattern will work, and make it interruptible (probably)
+    - have the miner check for a clear path to the player before charging. If there is not a clear path, jump instead of charging.
 
 ----------------------------------------------------------------------
 
@@ -186,6 +206,15 @@ IMMEDIATE STUFF: Level Editor
 # give the dungeon editor grid more distinct colors for selected/deselected rooms
 
 -------------------------------------------------------------------
+
+IMMEDIATE STUFF: lantern
+
+# IDEA: consider making the lantern flash ability automatically set the flicker count to the higher radius before activating.
+    - ask people if this is a good idea. I think it might be annoying to have to time the flash for blocks at the edge of the radius, but it might also make exploring more engaging.
+# consider giving the player a lantern mode that increases the radius, but drains oil faster.
+
+----------------------------------------------------------------------
+
 
 IMMEDIATE STUFF: world
 
@@ -317,7 +346,8 @@ IMMEDIATE STUFF: cutscenes
 
     # LONG-TERM STUFF
 
-# allow the player to change the controls from the defaults.
+# to make running out of lantern oil more threatening, make some unkillable monster (explained in the story) who comes to kill you if you're in complete darkness.
+    - maybe you kill this monster during one of the possible endings?
 # figure out the long-term artstyle and change sprites to match
 # since being in the dark with no light could make it extremely tedious to get out, make a "suicide" option and ensure that death
     has siginficant pentalties and sends the player back to a save point where they are guaranteed to have access to light
