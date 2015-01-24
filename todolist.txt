@@ -8,6 +8,33 @@ LILLY
 # add in "getting hurt" animations, weapon-swinging animations, jumping animations, etc. for the player and miner.
 # design dialog boxes, map screen, inventory screen, etc.
 
+HOW TO ADD PLATFORM TYPES:
+
+# make a 32x32 image, or open a platform image that is simiar to the one you want to make
+# save it in the following places:
+    - Platformer/LevelEditor/images/blocks/platforms/default_platform (or sloping_platform if it is sloped)
+    - Platformer/LevelEditor/images/blocks/platforms/destructible_platform 
+    - Platformer/LevelEditor/images/blocks/platforms/passable_platform
+    - Platformer/images
+# the platform can now be added through the level editor.
+
+HOW TO CHANGE EXISTING IMAGES: (non-animated)
+
+# change the image in Platformer/images
+# optionally, find it in LevelEditor/images and change it there, too (though it should work either way)
+
+HOW TO CHANGE EXISTING IMAGES: (animated)
+
+# change the image in Platformer/animations
+# to add frames, expand the canvas width, adding multiples of the base image's width, and make altered versions of the base image.
+    - remember that for images that have "left" and "right" versions, if you change one, you should change the other
+
+HOW TO ADD BACKGROUNDS:
+
+# save a file in Platformer/backgrounds with the name axb_name.bmp, where a and b are the number of "rooms" wide and tall the background is and name is the name of the background.
+    - the image should be a*896 pixels wide by b*640 pixels tall.
+    - in general, it will probably be helpful to make varying sizes of backgrounds for varying rooms sizes, along with some "outdoor" backgrounds and some "cave" backgrounds 
+
 --------------------------------------------------------------------------
 
 ROBERT (everything below here)
