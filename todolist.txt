@@ -149,6 +149,10 @@ OVERARCHING MAIN GOAL: Build a demo showing off combat, exploration, dialogs, cu
 
 IMMEDIATE STUFF: most immediate (defined mainly as finishing incomplete systems or creating new ones that are interesting or that other TODOs depend on.)
 
+# Make the control screen work as a screen before worrying about the controls for it.
+    - need to make the structures that show the current key bindings.
+    - ideally these should be a single letter in a box.
+# conisder adding a "cancel" button for navigating the pause menu.
 # allow the player to change the controls from the defaults.
     - do this from pause menu -> options
     - this will change the structure of maingamecontrols.py quite a bit.
@@ -171,8 +175,7 @@ IMMEDIATE STUFF: most immediate (defined mainly as finishing incomplete systems 
 # draw the items on the inventory screen larger (maybe 64 x 64 px)
 # IDEA: make some objects on the inventory screen (such as the lantern) animated
 # make it possible to change the lantern setting while paused.
-    - will need to expand on the pause screen and controls a good deal.
-# figure out an item system
+# flesh out item system
     - remember that the lantern and sword are both items but work very differently
     - might just have checks to make them display on the inventory screen
 # show the lantern attached to the player's belt area and center the light rings on it pixel-wise.

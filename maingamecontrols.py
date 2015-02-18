@@ -70,40 +70,35 @@ class MainGameControls(Controls):
 
 		c key action.
 		"""
-		if toggle:
-			self.player.activate_lantern_ability()
+		if toggle: self.player.activate_lantern_ability()
 
 	def press_i(self, key, toggle):
 		""" mgc.press_i( str, bool ) -> None
 
 		i key action.
 		"""
-		if toggle:
-			self.player.open_inventory()
+		if toggle: self.player.open_inventory()
 
 	def press_m(self, key, toggle):
 		""" mgc.press_m( str, bool ) -> None
 
 		m key action.
 		"""
-		if toggle:
-			self.player.open_map()
+		if toggle: self.player.open_map()
 
 	def press_q(self, key, toggle):
 		""" mgc.press_q( str, bool ) -> None
 
 		q key action.
 		"""
-		if toggle:
-			self.player.toggle_lantern_mode(-1)
+		if toggle: self.player.toggle_lantern_mode(-1)
 
 	def press_w(self, key, toggle):
 		""" mgc.press_w( str, bool ) -> None
 
 		w key action.
 		"""
-		if toggle:
-			self.player.toggle_lantern_mode(1)
+		if toggle: self.player.toggle_lantern_mode(1)
 
 	def press_x(self, key, toggle):
 		""" mgc.press_x( str, bool ) -> None
@@ -117,16 +112,14 @@ class MainGameControls(Controls):
 
 		z key action.
 		"""
-		if toggle:
-			self.player.temp_z_method()	#consider making this work like every other button, or making the x key work like this.
+		if toggle: self.player.temp_z_method()	#consider making this work like every other button, or making the x key work like this.
 
 	def press_return(self, key, toggle):
 		""" mgc.press_return( str, bool ) -> None
 
 		Tell the player to pause the game.
 		"""
-		if(toggle):
-			self.player.pause_game()
+		if(toggle):	self.player.pause_game()
 
 move_up = MainGameControls.move_up
 move_down = MainGameControls.move_down

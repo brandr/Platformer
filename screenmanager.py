@@ -3,6 +3,10 @@
 
 from maingamescreen import *
 from pausescreen import *
+from selectcontrols import SelectControls
+from optionsscreen import OptionsScreen
+from optionscontrols import OptionsControls
+from controlsscreen import ControlsScreen
 from mapscreen import MapScreen
 from mapcontrols import MapControls
 from inventoryscreen import InventoryScreen
@@ -58,6 +62,8 @@ class ScreenManager:
 		"""
 		self.current_screen.draw_screen(self.master_screen)
 
+	# NOTE: if I make many more of these "switch" methods, make a more general method for them.
+
 	def switch_to_inventory_screen(self, player):
 		""" sm.switch_to_inventory_screen( Player ) -> None
 
@@ -80,15 +86,37 @@ class ScreenManager:
 		level = player.current_level
 		level.initialize_screen(self, main_screen)
 
-	def switch_to_pause_screen(self, player):
-		""" sm.switch_to_pause_screen( Player ) -> None
+	def switch_to_pause_screen(self, player, option_index = 0):
+		""" sm.switch_to_pause_screen( Player, int ) -> None
 
 		Switch to the pause screen.
 		"""
-		controls = PauseControls(player)
+		controls = SelectControls(player)
 		control_manager = ControlManager(controls)
 		pause_screen = PauseScreen(control_manager, player)
+		pause_screen.option_index = option_index
 		self.set_current_screen(pause_screen)
+
+	def switch_to_options_screen(self, player, option_index = 0):
+		""" sm.switch_to_options_screen( Player, int ) -> None
+
+		Switch to the options screen.
+		"""
+		controls = SelectControls(player)
+		control_manager = ControlManager(controls)
+		options_screen = OptionsScreen(control_manager, player)
+		options_screen.option_index = option_index
+		self.set_current_screen(options_screen)	
+
+	def switch_to_controls_screen(self, player):
+		""" sm.switch_to_controls_screen( Player ) -> None
+
+		Switch to the controls screen.
+		"""
+		controls = SelectControls(player) #it's possible these should be ControlsControls but I'm not sure
+		control_manager = ControlManager(controls)
+		controls_screen = ControlsScreen(control_manager, player)
+		self.set_current_screen(controls_screen)	
 
 	def switch_to_map_screen(self, player):
 		""" sm.switch_to_map_screen( Player ) -> None
