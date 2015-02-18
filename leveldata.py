@@ -42,19 +42,13 @@ class LevelData(object):
 		corner2 = self.corners[1]
 		width = len(rooms[0])
 		height = len(rooms)
-		if not ( 0 <= corner2[0] - corner1[0] < width and
-			0 <= corner2[1] - corner1[1] < height):
+		if not ( 0 <= corner2[0] - corner1[0] < width and 0 <= corner2[1] - corner1[1] < height):
 			print corner1, corner2, width, height
 			print "ERROR: attempting to load an invalid level."
 			raise(SystemExit)
 		for y in range(corner1[1], corner2[1] + 1):
 			for x in range(corner1[0], corner2[0] + 1):
-				#if x > width or y > height:
-				#	print "x, y: ", x, y
-				#	print "width, height: ", width, height
-				room_set.append(rooms[y][x]) # is this right? need to test
-
-				# TODO: error checking for out of range
+				room_set.append(rooms[y][x])
 		return room_set
 
 	def formatted_data(self): #used for saving to files

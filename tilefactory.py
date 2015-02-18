@@ -25,10 +25,8 @@ class TileFactory(object):
 		for y in range(dimensions[1]): #TODO: make it possible to move rect down for y > 1
 			self.tile_images.append([])
 			for x in range(dimensions[0]):
-				current_rect = Rect(x*32, y*32, 32, 32)
-				next_row = tile_sheet.load_strip(current_rect, dimensions[0])
-				for image in next_row:
-					self.tile_images[y].append(image)
+				current_rect.topleft = x*32, y*32
+				self.tile_images[y].append(tile_sheet_image.subsurface(current_rect))
 
 	def image_at(self, coords):
 		""" tf.image_at( ( int, int ) ) -> Surface

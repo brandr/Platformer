@@ -37,6 +37,8 @@ import math
 import thread
 from multiprocessing import Process
 
+from numpy import array
+
 BLACK = Color ("#000000")
 
 MAX_LIGHT_RINGS = 20
@@ -45,6 +47,10 @@ RING_OUTER = "ring_outer"
 
 LANTERN_BAR_MIN_WIDTH = 128
 LANTERN_BAR_MAX_WIDTH = 300
+
+DUNGEON_NAME_MAP = {
+	"Cave_test":"Caves of Mystery"
+}
 
 class Level(object):
 	""" Level( Dungeon, LevelData, ( int, int ), [ [ Room ] ] ) -> Level
@@ -98,6 +104,7 @@ class Level(object):
 	#it copies all objects from the rooms into itself, and processes these objects as the game is running.
 	#only the player's current level should be active at any given time
 	def __init__(self, dungeon, level_data, origin, rooms):
+		
 		self.screen = None
 		self.screen_manager = None
 		self.effect_layer = []
@@ -126,10 +133,11 @@ class Level(object):
 		if(not self.outdoors): self.concentric_circle_map = self.load_concentric_circles()
 
 		if(self.outdoors): self.setTilesOutdoors() #TEMP
-		
 		self.init_bg(level_data.bg_filename)
 		self.calibrateLighting()
 		self.init_explored()
+		self.tile_array = array(self.level_objects.tiles)
+
 
 	def initialize_screen(self, screen_manager, game_screen):
 		""" l.initialize_screen( ScreenManager, GameScreen ) -> None
@@ -179,12 +187,12 @@ class Level(object):
 
 		# TEMP METHOD. No docstring.
 	def setTilesOutdoors(self):
-		default_sky_tile = GameImage.load_image_file('./images/', 'test_sky_tile_1.bmp') #GameImage.loadImageFile('test_sky_tile_1.bmp') 
+		default_sky_tile = GameImage.load_image_file('./images', 'test_sky_tile_1.bmp') #GameImage.loadImageFile('test_sky_tile_1.bmp') 
 		dimensions =  self.get_dimensions()
 		tiles = self.getTiles()
 		for y in xrange(dimensions[1]):
 			for x in xrange(dimensions[0]):
-				tiles[y][x].changeImage(default_sky_tile) #Tile(default_sky_tile, x,y)
+				tiles[y][x].changeImage(default_sky_tile)
 		# TEMP METHOD
 
 		#level building methods (called in constructor)
@@ -222,8 +230,8 @@ class Level(object):
 		"""
 		if self.start_coords != None: return
 		if room.start_coords[0]:
-			self.start_coords = (room.start_coords[1], room.start_coords[2])
-			return
+			x_offset, y_offset = room.global_coords[0] - self.origin[0], room.global_coords[1] - self.origin[1]
+			self.start_coords = (room.start_coords[1] + x_offset*ROOM_WIDTH*32, room.start_coords[2] + y_offset*ROOM_HEIGHT*32)
 
 	#outdoor-related methods
 	def outdoors(self):
@@ -529,7 +537,10 @@ class Level(object):
 
 		Sets this level's adjacent dungeon, building it if necessary.
 		"""
-		adjacent_dungeon = build_dungeon(dungeon_directory + dungeon_name)
+		dungeon_display_name = dungeon_name
+		if dungeon_name in DUNGEON_NAME_MAP:
+			dungeon_display_name = DUNGEON_NAME_MAP[dungeon_name]
+		adjacent_dungeon = build_dungeon(dungeon_directory + dungeon_name, dungeon_display_name)
 		adjacent_dungeon.connect_to_level(self, self.dungeon)
 		self.adjacent_dungeon = adjacent_dungeon
 
@@ -725,13 +736,12 @@ class Level(object):
 				self.end_current_event()
 		dimensions = self.get_dimensions()
 		player = self.getPlayer()
-		all_tiles = self.getTiles()
-
-		start_x = max(0, self.level_camera.state.left/32)			#TODO: get rid of these 32s and replace with some constant.
-		end_x = min(self.level_camera.state.right/32, self.width)
-		start_y = max(0, self.level_camera.state.top/32)
-		end_y = min(self.level_camera.state.bottom/32, self.height)
-		tiles = all_tiles[start_y:end_y][start_x:end_x]
+		all_tiles = self.level_objects.tiles 
+		start_x = max(0, -1*self.level_camera.state.left/32 - 2)			#TODO: get rid of these 32s and replace with some constant.
+		end_x = min( self.width, start_x + WIN_WIDTH/32 + 4)
+		start_y = max(0, -1*self.level_camera.state.top/32 - 2)
+		end_y = min( self.height, start_y + WIN_HEIGHT/32 + 4 )	
+		tiles = self.tile_array[start_y:end_y, start_x:end_x]
 		light_map = self.empty_light_map()
 		if(player != None):
 			self.update_explored()
@@ -829,7 +839,8 @@ class Level(object):
 				width = len(tiles[0])
 				height = len(tiles)
 				player_x, player_y = player.rect.center
-				start_x, start_y = min( width, max( 0, player_x/32 - radius ) ), min( height, max ( 0, player_y/32 - radius ) )
+				camera_offset_x, camera_offset_y = self.level_camera.state.left/32, self.level_camera.state.top/32
+				start_x, start_y = min( width, max( 0, player_x/32 - radius + camera_offset_x ) ), min( height, max ( 0, player_y/32 - radius + camera_offset_y ) )
 				end_x, end_y = min( width, max( 0, player_x/32 + radius + 1 ) ), min( height, max ( 0, player_y/32 + radius + 1 ) )
 				for y in range(  start_y , end_y ):
 					for x in range ( start_x, end_x ):
@@ -839,7 +850,6 @@ class Level(object):
 			for row in tiles:
 				for t in row:
 					self.screen.blit(t.image, self.level_camera.apply(t))
-
 		# stationary update
 		# no need to blit all platforms, since this is already handled by tiles.
 		for dp in self.getDestructiblePlatforms():

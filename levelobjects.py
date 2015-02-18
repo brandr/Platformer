@@ -4,6 +4,8 @@
 from roomdata import *
 from chest import Chest #TEMP
 
+from numpy import array
+
 class LevelObjects(object):
 	""" LevelObjects( Level, [ [ Tile ] ], [ Entity ] ) -> LevelObjects
 
@@ -23,6 +25,7 @@ class LevelObjects(object):
 	def __init__(self, level, tiles = None, entities = None):
 		self.level = level
 		self.tiles = tiles
+		#self.tiles = array(tiles)
 		self.entities = entities
 		self.player = None
 

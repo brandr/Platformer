@@ -28,6 +28,7 @@ class GameScreen:
     
     def __init__(self, control_manager): #not sure what other args should be yet.
         self.control_manager = control_manager
+        control_manager.screen = self
         self.screen_image = Surface((WIN_WIDTH, WIN_HEIGHT))
         self.bg = Surface((32, 32))
 

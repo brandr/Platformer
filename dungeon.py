@@ -25,7 +25,7 @@ class Dungeon(object):
 	def __init__(self, level_data_set, room_data_set, dungeon_name): #Dungeon builds the dungeon from a single map along with some other data about the level.
 		factory = LevelFactory()
 		print "Building dungeon rooms..."
-		rooms = factory.dungeon_rooms(self, room_data_set) 
+		rooms = factory.dungeon_rooms(self, room_data_set, level_data_set) 
 		self.dungeon_levels = factory.dungeon_levels(self, rooms, level_data_set)
 		self.dungeon_name = dungeon_name
 		
@@ -36,8 +36,7 @@ class Dungeon(object):
 		travel between dungeons, save the game, etc.
 		"""
 		for L in self.dungeon_levels:
-			if(L.start_coords != None):
-				return L
+			if(L.start_coords != None): return L
 		return None
 
 		#TODO: error case where next_level is None.

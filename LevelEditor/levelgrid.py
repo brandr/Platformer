@@ -6,37 +6,49 @@ from ocempgui.draw import Image
 
 LEFT_MOUSE_BUTTON = 1      #NOTE: this variable is repeated in dungeongridcontainer.py. Not sure if this could become a problem.
 RIGHT_MOUSE_BUTTON = 3
-# IDEA: middle mouse button to "paint" tiles.
 
 TILE_WIDTH, TILE_HEIGHT = 32, 32
 WHITE = Color(("#FFFFFF"))
 BLACK = Color(("#000000"))
 RED = Color(("#FF0000"))
 
-#TODO: give this class the same fuctionality as before using the ImageLabel setup instead of table
-
 class LevelGrid(ImageLabel):	# maybe this should be a table instead? not sure
 	def __init__(self, level_editor):
 		print "Creating level grid..."
 		self.level_editor = level_editor
 		self.selected_tile, self.selected_row, self.selected_col = None, 0, 0
+		self.room_x, self.room_y = 0, 0
 		room_cols, room_rows = self.get_room_dimensions()
-		self.cols, self.rows = room_cols*ROOM_WIDTH, room_rows*ROOM_HEIGHT
-		self.grid_image = LevelGrid.empty_grid_image(self.cols, self.rows)
+		self.full_image = LevelGrid.empty_grid_image(room_cols*ROOM_WIDTH, room_rows*ROOM_HEIGHT)
+		self.bg_grid = self.build_bg_grid(room_cols, room_rows)	
+		self.cols, self.rows = ROOM_WIDTH, ROOM_HEIGHT
+		self.grid_image = Surface((ROOM_WIDTH*32, ROOM_HEIGHT*32))
 		ImageLabel.__init__(self, self.grid_image)
+		self.refresh_bg()
 		print "Level grid created."
 
 	def init_components(self, bg_filename):		
-		room_cells = self.level_cell().aligned_rooms()
-		room_cols, room_rows = self.get_room_dimensions()
 		self.set_bg(bg_filename)
+
+	def build_bg_grid(self, cols, rows):
+		grid = []
+		for y in xrange(rows):
+			grid.append([])
+			for x in xrange(cols):
+				grid[y].append(None)
+		grid[0][0] = self.build_room_image(0, 0)
+		return grid
+
+	def build_room_image(self, x, y):
+		image = Surface((ROOM_WIDTH*TILE_WIDTH, ROOM_HEIGHT*TILE_HEIGHT))
+		sub_image = self.full_image.subsurface(Rect(x*ROOM_WIDTH*TILE_WIDTH, y*ROOM_HEIGHT*TILE_HEIGHT, ROOM_WIDTH*TILE_WIDTH, ROOM_HEIGHT*TILE_HEIGHT))
+		image.blit(sub_image, (0, 0))
+		return image
 
 	def drawGridlines(self):
 		pixel_width, pixel_height = self.get_pixel_width(), self.get_pixel_height()
-		for x in range(0, self.cols):
-			pygame.draw.line(self.grid_image, BLACK, (x*TILE_WIDTH, 0), (x*TILE_HEIGHT, pixel_height))
-		for y in range (0, self.rows):
-			pygame.draw.line(self.grid_image, BLACK, (0, y*TILE_HEIGHT), (pixel_width, y*TILE_HEIGHT))
+		for x in range(0, self.cols): pygame.draw.line(self.grid_image, BLACK, (x*TILE_WIDTH, 0), (x*TILE_HEIGHT, pixel_height))
+		for y in range (0, self.rows): pygame.draw.line(self.grid_image, BLACK, (0, y*TILE_HEIGHT), (pixel_width, y*TILE_HEIGHT))
 
 	def get_pixel_width(self):
 		return self.cols*TILE_WIDTH
@@ -44,42 +56,51 @@ class LevelGrid(ImageLabel):	# maybe this should be a table instead? not sure
 	def get_pixel_height(self):
 		return self.rows*TILE_HEIGHT
 		
-	def init_cells(self, room_cells, rows, cols):
-		for i in xrange (rows):
-			rooms = self.level_cell().aligned_rooms()
-			for j in xrange (cols):
-				cell = room_cells[i][j]
-				self.add_room(i, j, cell)
+	def init_cells(self, room_cells): 
+		cell = room_cells[self.room_y][self.room_x]
+		self.add_room(cell)
 
 	def set_bg(self, filename):
-		if filename:
-			self.grid_image = LevelGrid.bg_grid_image(filename)
+		if filename: self.full_image = LevelGrid.bg_grid_image(filename)
 		else:
-			self.grid_image = LevelGrid.empty_grid_image(self.cols, self.rows)
-		room_cells = self.level_cell().aligned_rooms()
+			room_cols, room_rows = self.get_room_dimensions() 
+			self.full_image = LevelGrid.empty_grid_image(self.cols*room_cols, self.rows*room_rows)
 		room_cols, room_rows = self.get_room_dimensions()
-		self.init_cells(room_cells, room_rows, room_cols)
+		self.bg_grid = self.build_bg_grid(room_cols, room_rows)
+		self.refresh_bg()
+
+	def refresh_bg(self):
+		current_room_bg = self.bg_grid[self.room_y][self.room_x]
+		if not current_room_bg: 
+			self.bg_grid[self.room_y][self.room_x] = self.build_room_image(self.room_x, self.room_y)
+			current_room_bg = self.bg_grid[self.room_y][self.room_x]
+		self.grid_image.blit( current_room_bg, ( 0, 0) )
+		room_cells = self.level_cell().aligned_rooms()
+		self.init_cells(room_cells)
 		self.drawGridlines()
 		self.set_picture(self.grid_image)
 
-	def add_room(self, row, col, room_cell):
+	def add_room(self, room_cell):
 		if room_cell.room_data == None:
 			room_cell.init_room_data(ROOM_WIDTH, ROOM_HEIGHT)
 			return
 		room_data = room_cell.room_data
-		origin_x, origin_y = col*ROOM_WIDTH,row*ROOM_HEIGHT
-		for y in range (origin_y, origin_y + ROOM_HEIGHT):
-			for x in range(origin_x, origin_x + ROOM_WIDTH):
-				tile_data = room_data.tile_at(x - origin_x, y - origin_y)
+		for y in xrange (ROOM_HEIGHT):
+			for x in xrange(ROOM_WIDTH):
+				tile_data = room_data.tile_at(x, y)
 				if tile_data == None: continue
 				self.add_tile_cell(tile_data, x, y)
+
+	def select_room(self, x, y):
+		self.room_x, self.room_y = x, y
+		self.refresh_bg()
+		#TODO: redraw the room with correct bg subsurface etc. 
 
 	def add_tile_cell(self, tile_data, x, y):
 		if(tile_data == None or isinstance(tile_data, BlockedTileData)): return
 		self.updateTileImage(tile_data.get_image(), x, y)
 
-	def updateTileImage(self, image, x, y):
-		tile_image = image
+	def updateTileImage(self, tile_image, x, y):
 		pygame.draw.line(tile_image, BLACK, (0, 0), (0, TILE_HEIGHT))
 		pygame.draw.line(tile_image, BLACK, (0, 0), (TILE_WIDTH, 0))
 		self.grid_image.blit(tile_image, (x*TILE_WIDTH, y*TILE_HEIGHT))
@@ -116,19 +137,17 @@ class LevelGrid(ImageLabel):	# maybe this should be a table instead? not sure
 		if not self.valid_coords(coordinate_pos):return
 		if event.button == LEFT_MOUSE_BUTTON:
 			self.leftClick(coordinate_pos[1], coordinate_pos[0])
-		elif event.button == RIGHT_MOUSE_BUTTON:
-			self.rightClick(coordinate_pos[1], coordinate_pos[0], bg_filename)
-		else:
-			self.leftClick(coordinate_pos[1], coordinate_pos[0]) # middle mouse case
-			#print event
+		elif event.button == RIGHT_MOUSE_BUTTON: self.rightClick(coordinate_pos[1], coordinate_pos[0], bg_filename)
+		else: self.leftClick(coordinate_pos[1], coordinate_pos[0]) # middle mouse case
 			#TODO: other click types
 
 	def leftClick(self, row, col):
+		global_row, global_col = row + self.room_y*self.rows, col + self.room_x*self.cols
 		self.deselect()
-		existing_tile = self.tile_at(row, col)
+		existing_tile = self.tile_at(global_row, global_col)
 		if existing_tile != None: 
 			if isinstance(existing_tile, BlockedTileData):
-				row, col = existing_tile.origin_y, existing_tile.origin_x
+				row, col = existing_tile.origin_y%self.rows, existing_tile.origin_x%self.cols
 				existing_tile = existing_tile.origin_tile
 			self.select_cell(row, col)
 			return
@@ -140,14 +159,13 @@ class LevelGrid(ImageLabel):	# maybe this should be a table instead? not sure
 		self.addEntity(tile, row, col)
 
 	def select_cell(self, row, col):
-		tile_data = self.tile_at(row, col)
+		global_row, global_col = row + self.room_y*self.rows, col + self.room_x*self.cols
+		tile_data = self.tile_at(global_row, global_col)
 		if tile_data == None: return
 		if isinstance(tile_data, BlockedTileData):
-			row, col = tile_data.origin_y, tile_data.origin_x
+			row, col = tile_data.origin_y%self.rows, tile_data.origin_x%self.cols
 			tile_data = tile_data.origin_tile
-		# TODO: make sure different objects can have data set differently this way.
-			# maybe make a "save data" button in EntityDataPane?
-		# TODO: implement and test for a one-pane sign before expanding to anything else
+			global_row, global_col = row + self.room_y*self.rows, col + self.room_x*self.cols
 		self.selected_tile, self.selected_row, self.selected_col = tile_data, row, col
 		self.level_editor.select_tile(tile_data)
 		self.outline_selection(row, col, tile_data) #NOTE: this part will not work for sprites over 1X1
@@ -178,23 +196,27 @@ class LevelGrid(ImageLabel):	# maybe this should be a table instead? not sure
 		pygame.draw.line(self.grid_image, RED, p4, p3, 2)
 
 	def addEntity(self, template, row, col):
+		#TODO: test that this is right
+		global_row, global_col = row + self.room_y*self.rows, col + self.room_x*self.cols
 		self.deselect()
 		tile = template.create_copy()
 		width, height = tile.width, tile.height
-		self.level_cell().add_entity(tile, col, row) 	# this will be important to setting data differently for different signs
-		for x in range(col + 1, col + width):
-			next_block = BlockedTileData(tile, col, row)
-			self.level_cell().add_entity(next_block, x, row)
-		for y in range(row + 1,  row + height):
-			for x in range(col, col + width):
-				next_block = BlockedTileData(tile, col, row)
+		self.level_cell().add_entity(tile, global_col, global_row) 	# this will be important to setting data differently for different signs
+		for x in range(global_col + 1, global_col + width):
+			next_block = BlockedTileData(tile, global_col, global_row)
+			self.level_cell().add_entity(next_block, x, global_row)
+		for y in range(global_row + 1,  global_row + height):
+			for x in range(global_row, global_col + width):
+				next_block = BlockedTileData(tile, global_col, global_row)
 				self.level_cell().add_entity(next_block, x, y)
 		tile_image = tile.get_image() 						# this part only needs to be done once
 		self.drawGridlines()
 		self.updateTileImage(tile_image, col, row)
 
 	def rightClick(self, row, col, bg_filename):
-		tile = self.tile_at(row, col)
+		#TODO: test
+		global_row, global_col = row + self.room_y*self.rows, col + self.room_x*self.cols
+		tile = self.tile_at(global_row, global_col)
 		if tile == None: return
 		if(isinstance(tile, BlockedTileData)):
 			origin_tile = tile.origin_tile
@@ -203,18 +225,16 @@ class LevelGrid(ImageLabel):	# maybe this should be a table instead? not sure
 		self.removeEntity(row, col, tile.width, tile.height)
 
 	def removeEntity(self, row, col, width, height):
-		tile = self.tile_at(row, col)
-		if tile == self.selected_tile:
-			self.deselect()
-		for y in range(row, row + height):
-			for x in range(col, col + width):
+		global_row, global_col = row + self.room_y*self.rows, col + self.room_x*self.cols
+		tile = self.tile_at(global_row, global_col)
+		if tile == self.selected_tile: self.deselect()
+		for y in range(global_row, global_row + height):
+			for x in range(global_col, global_col + width):
 				self.level_cell().add_entity(None, x, y) 
 				tile_image = LevelGrid.empty_tile_image()
-				bg_filename = self.level_editor.current_bg
-				if bg_filename:
-					bg_image = Image.load_image("./backgrounds/" + bg_filename)
-					tile_image = bg_image.subsurface(Rect(x*32, y*32, 32, 32))
-				self.updateTileImage(tile_image, x, y)
+				bg = self.bg_grid[self.room_y][self.room_x]
+				if bg: tile_image.blit( bg.subsurface( Rect((x%self.cols)*32, (y%self.rows)*32, 32, 32) ), (0, 0) ) 
+				self.updateTileImage(tile_image, x%self.cols, y%self.rows)
 
 	def room_for_tile(self, tile, row, col): #make sure any tile larger that 1x1 will fit in the room.
 		end_x = col + tile.width - 1

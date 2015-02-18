@@ -49,7 +49,7 @@ class DungeonGridContainer(Box):
 		if(event.button != LEFT_MOUSE_BUTTON or self.level_select_container.selected_level_cell == None): return #IDEA: consider allowing the use of differnt buttons for different actions
 		coords = event.pos
 		screen_offset = (self.left + self.dungeon_window.left,self.top + self.dungeon_window.top)
-		relative_coords = (coords[0]-screen_offset[0], coords[1]-screen_offset[1])
+		relative_coords = (coords[0] - screen_offset[0], coords[1] - screen_offset[1])
 		if relative_coords[0] > self.dungeon_window.vscrollbar.left or relative_coords[1] > self.dungeon_window.hscrollbar.top: return
 		x_scroll_offset = self.dungeon_window.hscrollbar.value
 		y_scroll_offset = self.dungeon_window.vscrollbar.value

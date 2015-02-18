@@ -1,3 +1,4 @@
+# NOTE: not sure this is actually used by leveleditor clalsses.
 #NOTE: this class might need to be accessed by classes outside the leveleditor.
 
 # TODO: implemeent dungeon travel data

@@ -19,26 +19,36 @@ class PauseControls(Controls):
 		self.initialize_control_map(PAUSE_CONTROL_MAP)
 		self.player = player
 
-	def unpause(self, key, toggle):
-		""" pc.unpause( str, bool ) -> None
+	def select(self, key, toggle):
+		""" pc.select( str, bool ) -> None
 
-		When the player presses enter, resume the game.
+		Select the current pause option.
 		"""
-		if toggle:
-			self.player.unpause_game()
+		if toggle: self.control_manager.screen.select()
 
 	def move_cursor(self, key, toggle):
 		""" pc.move_cursor( str, bool ) -> None
 
 		Move the pause cursor from its current position.
 		"""
-		if toggle: pass #TODO
+		if toggle: 
+			direction = PAUSE_DIRECTION_MAP[key]
+			self.control_manager.screen.move_cursor(direction)
 
-unpause = PauseControls.unpause
+select = PauseControls.select
 move_cursor = PauseControls.move_cursor
 
 PAUSE_CONTROL_MAP = {
-	K_RETURN:unpause,
+	K_RETURN:select,
 	K_LEFT:move_cursor,
-	K_RIGHT:move_cursor
+	K_RIGHT:move_cursor,
+	K_UP:move_cursor,
+	K_DOWN:move_cursor
+}
+
+PAUSE_DIRECTION_MAP = {
+	K_LEFT:-1,
+	K_RIGHT:1,
+	K_UP:-1,
+	K_DOWN:1
 }

@@ -34,13 +34,15 @@ HOW TO ADD BACKGROUNDS:
 # save a file in Platformer/backgrounds with the name axb_name.bmp, where a and b are the number of "rooms" wide and tall the background is and name is the name of the background.
     - the image should be a*896 pixels wide by b*640 pixels tall.
     - in general, it will probably be helpful to make varying sizes of backgrounds for varying rooms sizes, along with some "outdoor" backgrounds and some "cave" backgrounds 
-
+    
 --------------------------------------------------------------------------
 
 ROBERT (everything below here)
 
     #KNOWN BUGS
 
+# the player "bounces back" a lot when traveling between dungeons.
+# it is possible for the computer running the game to freeze up given very large level backgrounds. No idea why.
 # The "add a level" button in the dungeon editor sometimes doesn't work after saving a level. not sure why.
 # the game will appear to freeze (but not really freeze) if the player somehow starts a new event too soon after finishing an old one.
     - can avoid this by not placing chests or signs near places where the player ends a cutscene.
@@ -147,8 +149,6 @@ OVERARCHING MAIN GOAL: Build a demo showing off combat, exploration, dialogs, cu
 
 IMMEDIATE STUFF: most immediate (defined mainly as finishing incomplete systems or creating new ones that are interesting or that other TODOs depend on.)
 
-# finish the inventory screen
-    - make a selector to go to different items and perform some action on them
 # allow the player to change the controls from the defaults.
     - do this from pause menu -> options
     - this will change the structure of maingamecontrols.py quite a bit.
@@ -192,12 +192,15 @@ IMMEDIATE STUFF: most immediate (defined mainly as finishing incomplete systems 
 # add basic sounds (make them easy to disable for testing purposes)
 # make it easier to add simple NPCs with no actions or branching dialog trees, since most NPCs will work this way. Follow the same pattern as signs
   and make a "default NPC" that can have many different sprites. Note that such NPCs will not have dialog portraits.
-    - this may be related to another issue where the player collides with doors wrong.
 
 --------------------------------------------------------------------------------
 
 SECOND MOST IMMEDIATE STUFF
 
+# finish the inventory screen
+    - connect the item selector to the data pane.
+    - allow a button to "select" an item, allowing additional actions via the data pane.
+    - consider making it so that the inventory selection is persistent when the inventory screen is opened and closed
 # fix the issue where the player runs in place when ctrl is held.
     - this is low priority since this might end up being what I want
 # make the "hit spark" better (and possibly more well-adapted to the shape of the thing hit)
@@ -262,9 +265,6 @@ IMMEDIATE STUFF: screens and menus
 # make the map screen more sophisticated. (get feedback)
     - consider how it should be centered (and how to scroll if there is not room for the entire explored area)
     - consider making parts of the map fade with time 
-# make more panes to go with the map screen. (these should also be accessible via the pause menu)
-    - one possible pane is inventory-- for this, make it possible to get the lantern as an upgrade, and have it contain oil which can be collected to increase light radius.
-        * note that this will require some planning (should probably sketch the screen before making it)
 
 ----------------------------------------------------------------------
 

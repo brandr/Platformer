@@ -6,6 +6,9 @@ from dungeontravelpane import DungeonTravelPane
 from ocempgui.draw import Image
 import os.path
 
+ROOM_CELL_WIDTH = 18
+ROOM_CELL_HEIGHT = 18
+
 class LevelEditorContainer(Box):
 	def __init__(self, window, level_cell, dimensions):
 		Box.__init__(self, dimensions[0], dimensions[1])
@@ -18,10 +21,10 @@ class LevelEditorContainer(Box):
 		self.level_grid_window = self.level_grid_window(self.current_bg)
 		print "Level grid windows built."
 		self.entity_select_container = self.entity_select_container(self.left + 8, level_name_label.bottom + 8, 360, 240)
-		#TODO
-		self.travel_pane = self.dungeon_travel_pane(self.entity_select_container.right + 16, level_name_label.bottom + 8, 
-			(self.level_grid_window.left - 16 - self.entity_select_container.right), 240)
-		#TODO
+		self.travel_pane = self.dungeon_travel_pane(self.entity_select_container.right + 16, level_name_label.bottom + 8, (self.level_grid_window.left - 16 - self.entity_select_container.right), 200)
+		self.room_select_grid_window = self.room_select_grid_window(self.travel_pane.left, self.travel_pane.bottom + 4, self.travel_pane.width - 16, 120)
+		self.room_select_grid = self.build_room_select_grid()
+		self.room_select_grid_window.set_child(self.room_select_grid)
 		self.additional_entity_data_pane = self.additional_entity_data_pane(self.level_grid_window.left, self.level_grid_window.bottom + 8, self.level_grid_window.width, 160)
 		self.background_select_label = self.background_select_label(self.entity_select_container.left, self.entity_select_container.bottom + 64)
 		self.background_select_list = self.build_background_select_list(self.background_select_label.left, self.background_select_label.bottom + 16, self.level_grid_window.left - 16, 120)
@@ -33,11 +36,13 @@ class LevelEditorContainer(Box):
 		self.sunlit_button.connect_signal(SIG_TOGGLED, self.toggleSunlit)
 		self.sunlit_button.topleft = (close_editor_button.right + 16, close_editor_button.top)
 		self.setSunlit(level_cell.sunlit)
+		self.select_room(self.room_select_grid.grid[(0, 0)], 0 , 0)
 
 		self.add_child(level_name_label) # should be self if it can be altered, I think.
 		self.add_child(self.level_grid_window)
 		self.add_child(self.entity_select_container)
 		self.add_child(self.travel_pane)
+		self.add_child(self.room_select_grid_window)
 		self.add_child(self.additional_entity_data_pane)
 		self.add_child(self.background_select_label)
 		self.add_child(self.background_select_list)
@@ -58,6 +63,33 @@ class LevelEditorContainer(Box):
 		travel_pane.initialize_travel_data(self.level_cell.travel_data)
 		return travel_pane
 
+	def room_select_grid_window(self, x, y, width, height):
+		window = ScrolledWindow(width, height)
+		window.topleft = x, y
+		window.connect_signal(SIG_MOUSEDOWN, self.click_room_cell)
+				
+		# TODO: fill the table with imagebuttons that will connect to the levelgrid, changing its bg image to a different subsurface of the full background
+		# and displaying entities with a different offset.
+		#window.set_child(room_select_grid)
+		return window
+
+	def build_room_select_grid(self):
+		room_width, room_height = self.level_grid_window.level_grid.get_room_dimensions()
+		room_select_grid = Table(room_height, room_width)
+		for i in xrange (room_height):
+			for j in xrange (room_width):
+				cell = self.room_select_cell(i, j)
+				room_select_grid.add_child (i, j, cell)
+		
+		return room_select_grid
+
+	def room_select_cell(self, row, col):
+		cell = ImageButton("")
+		blank_image = Surface((ROOM_CELL_WIDTH, ROOM_CELL_HEIGHT))
+		blank_image.fill(WHITE)
+		cell.set_picture(blank_image)
+		return cell
+
 	def background_select_label(self, x, y):
 		bg_name = "None"
 		if self.current_bg: bg_name = self.current_bg
@@ -70,6 +102,38 @@ class LevelEditorContainer(Box):
 		background_list.topleft = x, y
 		background_list.connect_signal(SIG_SELECTCHANGED, self.select_bg, background_list)
 		return background_list
+	
+	def click_room_cell(self, event):
+		if(event.button != LEFT_MOUSE_BUTTON): return
+		coords = event.pos
+		screen_offset = (self.room_select_grid_window.left + self.left + self.master_window.left, self.room_select_grid_window.top + self.top + self.master_window.top)
+		relative_coords = (coords[0] - screen_offset[0], coords[1] - screen_offset[1])
+		if relative_coords[0] > self.room_select_grid_window.vscrollbar.left or relative_coords[1] > self.room_select_grid_window.hscrollbar.top: return
+		x_scroll_offset = self.room_select_grid_window.hscrollbar.value
+		y_scroll_offset = self.room_select_grid_window.vscrollbar.value
+		adjusted_coords = (relative_coords[0] + x_scroll_offset, relative_coords[1] + y_scroll_offset) 
+		row = int(adjusted_coords[1]/30)
+		col = int(adjusted_coords[0]/30)
+		if (row, col) not in self.room_select_grid.grid: return None
+		cell = self.room_select_grid.grid[(row, col)]
+		self.select_room(cell, col, row) #.leftClickDungeonCell(selected_dungeon_cell)
+
+	def select_room(self, room_cell, x, y):
+		self.deselect_room_cell()
+		cell_image = Surface((ROOM_CELL_WIDTH, ROOM_CELL_HEIGHT))
+		cell_image.fill(RED)
+		room_cell.set_picture(cell_image)
+		self.level_grid_window.level_grid.select_room(x, y)
+		#TODO: select the room, altering:
+		# 1. the level grid's background image
+		# 2. the entities blitted onto the level grid
+		# 3. where entities added to the level should be placed.
+
+	def deselect_room_cell(self):
+		x, y = self.level_grid_window.level_grid.room_x, self.level_grid_window.level_grid.room_y
+		cell_image = Surface((ROOM_CELL_WIDTH, ROOM_CELL_HEIGHT))
+		cell_image.fill(WHITE)
+		self.room_select_grid.grid[y, x].set_picture(cell_image)
 
 	def select_bg(self, file_list):
 		if self.background_select_list.get_selected() == None:
@@ -83,8 +147,7 @@ class LevelEditorContainer(Box):
 		if level_dimensions == bg_dimensions:
 			self.cancel_invalid_bg()
 			self.set_bg(bg_filename)
-		else:
-			self.display_invalid_bg()
+		else: self.display_invalid_bg()
 
 	def set_bg(self, filename):
 		self.current_bg = filename

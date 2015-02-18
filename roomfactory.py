@@ -28,22 +28,20 @@ NON_DEFAULT_ENTITY_MAP = {
 class RoomFactory(object):
 
 	@staticmethod
-	def dungeon_rooms(dungeon, room_data_set):
-		""" dungeon_rooms( Dungeon, [ [ RoomData ] ] ) -> [ [ Room ] ]
+	def dungeon_rooms(dungeon, room_data_set, level_data_set):
+		""" dungeon_rooms( Dungeon, [ [ RoomData ] ], [ LevelData ] ) -> [ [ Room ] ]
 
-		Generate a double list of rooms from a double list of roomdatas.
+		Generate a double list of rooms from a double list of roomdatas along with some leveldatas..
 		"""
 		# TODO: probably sort out level backgrounds starting here
 		rooms = []
-		x1, y1 = RoomFactory.origin(room_data_set)
-		x2, y2 = RoomFactory.lower_right(room_data_set)
-		print "Setting up rooms..."
+		x1, y1 = RoomFactory.origin(level_data_set)
+		x2, y2 = RoomFactory.lower_right(level_data_set)
 		for y in range(0, y2 + 1):	
 			rooms.append([])
 			for x in range(0, x2 + 1):
 				rooms[y].append(None)
 		for y in range(y1, y2 + 1):	
-			#rooms.append([])
 			for x in range(x1, x2 + 1):
 				next_data = room_data_set[y][x]
 				next_room = RoomFactory.build_room(dungeon, next_data, x, y)
@@ -53,33 +51,35 @@ class RoomFactory(object):
 		return rooms
 
 	@staticmethod
-	def origin(room_data_set):
-		""" origin( [ [ RoomData ] ] ) -> int, int
+	def origin(level_data_set):
+		""" origin( [ LevelData ] ) -> int, int
 
-		Go through the set of all rooms in the dungeon and find the upper-left corner
-		(i.e., where the empty room slots stop and actual rooms begin).
-		It would work just as well to use (0, 0) for this but this might save time if the dungeon
-		is built starting from the middle.
+		Go through the set of all levels in the dungeon and finds the coordinates of the upper-left room.
+		"""
+		origin = level_data_set[0].corners[0]
+		for data in level_data_set:
+			corner = data.corners[0]
+			origin = ( min(origin[0], corner[0]), min(origin[1], corner[1]) )
+		return origin
 		"""
 		for y in xrange(len(room_data_set)):
 			for x in xrange(len(room_data_set[y])):
 				next_data = room_data_set[y][x]
 				if(room_data_set[y][x] != None): return x, y
 		return None
+		"""
 
 	@staticmethod
-	def lower_right(room_data_set):
-		""" lower_right( [ [ RoomData ] ] ) -> int, int 
+	def lower_right(level_data_set):
+		""" lower_right( [ LevelData ] ) -> int, int 
 
-		Go through the set of all rooms in the dungeon and find the lower-right corner
-		(i.e., where the actual rooms stop and empty room slots begin).
-		We can expect this to save a lot of time.
+		Go through the set of all levels in the dungeon and finds the coordinates of the lower-right room.
 		"""
-		for y in range(len(room_data_set) - 1, -1, -1):
-			for x in range(len(room_data_set[y]) - 1, -1, -1):
-				next_data = room_data_set[y][x]
-				if(room_data_set[y][x] != None): return x, y
-		return None
+		lower_right = level_data_set[0].corners[1]
+		for data in level_data_set:
+			corner = data.corners[1]
+			lower_right = ( max(lower_right[0], corner[0]), max(lower_right[1], corner[1]) )
+		return lower_right
 
 	@staticmethod
 	def build_room(dungeon, room_data, global_x, global_y): #might be able to get global x and global y through roomdata's coords instead
@@ -156,6 +156,7 @@ class RoomFactory(object):
 			
 		room_objects = LevelObjects(None, tiles, entities)
 		created_room = Room(room_objects, dungeon, (global_x, global_y), start_coords)
+		#print "MADE ROOM AT: " + str((global_x, global_y))
 		return created_room
 
 	@staticmethod

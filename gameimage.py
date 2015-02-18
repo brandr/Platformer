@@ -240,7 +240,6 @@ class GameImage(pygame.sprite.Sprite):
         
         Load an animation given two parts of a filepath and some other data.
         """
-        #animation_strip = GameImage.load_image_file("./animations", filename)  
         animation_strip = GameImage.load_image_file(filepath, filename)  
         count = animation_strip.get_width()/rect.width                          # assume that the animation strip is wide only, not long
         return SpriteStripAnimator(animation_strip, rect, count, colorkey, loop, frames)
@@ -257,8 +256,7 @@ class GameImage(pygame.sprite.Sprite):
             animation_strip.blit(images[i], ( rect.width*i, 0 ) )
         animation = SpriteStripAnimator(animation_strip, rect, count, colorkey, loop, frames)
         return animation
-        #return SpriteStripAnimator(animation_strip, rect, count, colorkey, loop, frames)
-
+    
     @staticmethod
     def load_image_file(path, name, colorkey = None):
         """ load_image_file( str, str, str ) -> Surface

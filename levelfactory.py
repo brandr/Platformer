@@ -18,12 +18,12 @@ class LevelFactory(object):
 		self.global_y = 0
 
 	#maybe this should go in roomfactory instead? Not sure
-	def dungeon_rooms(self, dungeon, room_data_set):
-		""" lf.dungeon_rooms( Dungeon, [ [ RoomData ] ] ) -> [ [ Room ] ]
+	def dungeon_rooms(self, dungeon, room_data_set, level_data_set):
+		""" lf.dungeon_rooms( Dungeon, [ [ RoomData ] ], [ LevelData ] ) -> [ [ Room ] ]
 
 		Calls the RoomFactory method to convert RoomDatas into a grid of Rooms.
 		"""
-		return RoomFactory.dungeon_rooms(dungeon, room_data_set)
+		return RoomFactory.dungeon_rooms(dungeon, room_data_set, level_data_set)
 
 	def dungeon_levels(self, dungeon, rooms, level_data_set):
 		""" lf.dungeon_levels( Dungeon, [ [ Room ] ], [ LevelData ] ) -> [ Level ]

@@ -1,9 +1,6 @@
 """ A manager which controls the flow of gameplay, including switching between screens and controls.
 """
 
-DUNGEON_NAME_MAP = {
-	"Cave_test":"Caves of Mystery"
-}
 
 from screenmanager import *
 from dungeonfactory import build_dungeon
@@ -11,6 +8,7 @@ from cutscene import *
 from world import World
 from player import Player
 from gameaction import GameAction
+from level import DUNGEON_NAME_MAP
 
 from os import listdir
 from os.path import isfile, join
@@ -39,7 +37,6 @@ class GameManager:
 		#factory = DungeonFactory() #might need args like filename, filepath, etc later
 		start_dungeon, dungeon_name, master_screen = self.build_dungeon_and_screen() 
 		world = World(start_dungeon) # TODO: implement world (contains all dungeons, along with other global data-- how to do this?)
-		
 		pygame.display.set_caption(dungeon_name)
 		timer = pygame.time.Clock()
 
@@ -74,11 +71,8 @@ class GameManager:
 			pygame.display.update()
 
 	def build_dungeon_and_screen(self):
-		#use the commented out section for developers only
+		#use this block for developers only vvvvv
 		dungeon_path = "./dungeon_map_files/"
-		"""
-		print "Select a starting dungeon by number: "
-		
 		print "Select a starting dungeon by number: "
 		dungeon_path = "./dungeon_map_files/"
 		dungeon_files = [ f for f in listdir(dungeon_path) if isfile(join(dungeon_path, f)) ]
@@ -90,15 +84,16 @@ class GameManager:
 		if not dungeon_input.isdigit():
 			print "Invalid dungeon input. Try again.", "\n"
 			return self.build_dungeon_and_screen()
-		dungeon_index = int(dungeon_input) #TODO: make this step a bit easier.
+		dungeon_index = int(dungeon_input) 
 		if not 0 < dungeon_index <= len(dungeon_files):
 			print "Invalid dungeon number. Try again.", "\n"
 			return self.build_dungeon_and_screen()
 		dungeon_name = dungeon_files[dungeon_index - 1]
-		"""
-		dungeon_name = "Cave_test"
+		# ^^^^^^^^
+		
+		#dungeon_name = "Cave_test"
 		print "Building dungeon..."
-		dungeon_display_name = "???"
+		dungeon_display_name = dungeon_name
 		if dungeon_name in DUNGEON_NAME_MAP:
 			dungeon_display_name = DUNGEON_NAME_MAP[dungeon_name]
 		master_screen = pygame.display.set_mode(DISPLAY, FLAGS, DEPTH)

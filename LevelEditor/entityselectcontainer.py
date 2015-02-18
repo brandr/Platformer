@@ -49,12 +49,11 @@ class EntitySelectContainer(Box):
 
 	def build_tile_data(self, tile_key, filepath):
 		if tile_key in ENTITY_CONSTRUCTOR_MAP:
-			print tile_key
 			constructor = ENTITY_CONSTRUCTOR_MAP[tile_key]
 			return constructor(tile_key, filepath)
 		return TileData(tile_key, filepath) 
 
-	def entity_select_window(self, width, height, x, y): #TODO
+	def entity_select_window(self, width, height, x, y):
 		file_list = FileList (width, height, "./images")
 		file_list.topleft = x, y
 		file_list.connect_signal(SIG_SELECTCHANGED, self.change_selection, file_list)

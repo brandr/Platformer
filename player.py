@@ -193,7 +193,6 @@ class Player(Being):
         Make the player unable to move, as for a cutscene.
         """
         self.refresh_animation_set()
-        #self.get_lantern().deactivate()
         self.active = False
         for button in self.button_press_map:
             self.button_press_map[button] = False
@@ -204,7 +203,6 @@ class Player(Being):
         Makes the player active, such as after a cutscene is over.
         """
         self.active = True
-        #self.get_lantern.activate()
 
     def update(self, tiles, light_map):
         """ p.update( [ [ Tile ] ], [ [ double ] ]) -> None
@@ -224,7 +222,6 @@ class Player(Being):
         for e in player_interactables:
             e.update(self)
         self.updateView(tiles, light_map)
-
 
     def default_move_update(self):  #consider separating midair update into its own method if this gets too complex.
         """ p.default_move_update( ) -> None
@@ -427,8 +424,6 @@ class Player(Being):
 
         Mark tiles adjacent to the player as explored so that they will appear in memory mode.
         """
-        #print len(tiles)
-        #print len(tiles[0])
         center_x, center_y = (self.rect.left + 1)/32, (self.rect.top + 1)/32
         width, height = len(tiles[0]), len(tiles) 
         x1, y1 = center_x - 2, center_y - 2
