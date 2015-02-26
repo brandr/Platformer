@@ -4,7 +4,9 @@
 from gamescreen import GameScreen
 from dialog import WHITE, BLACK
 import pygame
-from pygame import Surface, font
+from pygame import Surface, Color, font
+
+SELECTION_BAR_COLOR = Color("#00FFFF")
 
 class SelectScreen(GameScreen):
 	""" SelectScreen( ControlManager, Player) -> SelectScreen
@@ -33,6 +35,9 @@ class SelectScreen(GameScreen):
 		self.select_option_methods = select_option_methods
 		self.option_index = 0
 		self.option_font_size = 28
+		dimensions = self.get_dimensions()
+		self.select_bar = Surface((dimensions[0] - 18, self.option_font_size + 6))
+		self.select_bar.fill(SELECTION_BAR_COLOR)
 
 	def update(self):
 		""" ss.update( ) -> None
@@ -64,7 +69,7 @@ class SelectScreen(GameScreen):
 		return pane
 
 	def draw_select_options_pane(self):
-		""" ss.draw_select_options_pane( ) -> Surface
+		""" ss.draw_select_options_pane( Surface ) -> Surface
 
 		Draw an image representing the pane that shows the options available.
 		"""
@@ -78,11 +83,12 @@ class SelectScreen(GameScreen):
 		pygame.draw.lines(pane, BLACK, True, points, 2)
 		text_font = font.Font("./fonts/FreeSansBold.ttf", self.option_font_size)	
 		space = self.option_font_size + 8
+		pane.blit(self.select_bar, ( 2,  self.option_index*space + 2))
 		for i in xrange(len(self.select_options)):
 			text_image = text_font.render(self.select_options[i], 1, BLACK)
 			pane.blit(text_image, ( space, 8 + i*space))
-		select_cursor = Surface((14, 14)) 							# might want to replace this with a better-looking cursor
-		pane.blit( select_cursor, ( 6, 14 + self.option_index*space))
+		#select_cursor = Surface((14, 14)) 							# might want to replace this with a better-looking cursor
+		#pane.blit( select_cursor, ( 6, 14 + self.option_index*space))
 		return pane
 
 	def move_cursor(self, direction):
@@ -91,6 +97,13 @@ class SelectScreen(GameScreen):
 		Move the cursor to select a different option.
 		"""
 		self.option_index = (self.option_index + direction)%len(self.select_options)
+
+	def get_dimensions(self):
+		""" ss.get_dimensions( ) -> (int, int)
+
+		Get the dimensions in pixels of this selectscreen.
+		"""
+		return SCREEN_DATA_MAP[self.screen_key][DIMENSIONS]
 
 # select screen types
 PAUSE, OPTIONS, CONTROLS = "pause", "options", "controls"

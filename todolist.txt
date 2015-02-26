@@ -150,6 +150,8 @@ OVERARCHING MAIN GOAL: Build a demo showing off combat, exploration, dialogs, cu
 IMMEDIATE STUFF: most immediate (defined mainly as finishing incomplete systems or creating new ones that are interesting or that other TODOs depend on.)
 
 # Make the control screen work as a screen before worrying about the controls for it.
+    - create a highlight effect that makes it easier to show which key is selected.
+        * consider using different highlight colors to show if a key is being changed, etc.
     - need to make the structures that show the current key bindings.
     - ideally these should be a single letter in a box.
 # conisder adding a "cancel" button for navigating the pause menu.

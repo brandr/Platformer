@@ -4,7 +4,9 @@
 from selectscreen import SelectScreen, CONTROLS, SCREEN_DATA_MAP, OPTIONS_COORDS
 from dialog import WHITE, BLACK
 import pygame
-from pygame import Surface, font 
+from pygame import Surface, font
+import ConfigParser
+
 
 class ControlsScreen(SelectScreen):
 	""" ControlsScreen( ControlManager, Player) -> ControlsScreen
@@ -19,8 +21,25 @@ class ControlsScreen(SelectScreen):
 	def __init__(self, control_manager, player):
 		level_image = player.current_level.screen
 		SelectScreen.__init__(self, control_manager, player, level_image, CONTROLS, CONTROLS_OPTIONS, CONTROLS_OPTION_METHODS ) 
-		self.title = "Options"
+		self.title = "Controls"
 		self.option_font_size = 18
+		self.control_map = self.load_control_map()
+
+	def load_control_map(self):
+		""" os.load_control_map( ) -> { str:str }
+		
+		Returns a dict mapping actions to key inputs.
+		"""
+		control_map = {}
+		config = ConfigParser.ConfigParser()
+		config.read("./config.ini")
+		controls = config.options("controls")
+		for c in controls:
+			try: control_map[c] = config.get("controls", c)
+			except:
+				print "ERROR: missing control settings. Check config.ini."
+				raise(SystemExit)
+		return control_map
 
 	def draw_select_pane(self):
 		""" os.draw_select_pane( ) -> Surface
@@ -32,10 +51,29 @@ class ControlsScreen(SelectScreen):
 		text_image = text_font.render(self.title, 1, BLACK)
 		pane.blit(text_image, ( 100, 20 ))
 		coords = SCREEN_DATA_MAP[CONTROLS][OPTIONS_COORDS]
-		pane.blit(self.draw_select_options_pane(), (coords[0], coords[1]))	
-		# TODO: display current control settings and allow changes
-		# will need a lot of error cases
+		pane.blit(self.draw_select_options_pane(), (coords[0], coords[1]))
 		return pane
+
+	def draw_select_options_pane(self):
+		""" os.draw_select_options_pane( ) -> Surface
+
+		Draws a pane for control selection.
+		"""
+		pane = SelectScreen.draw_select_options_pane(self)
+		self.display_controls(pane)
+		return pane
+
+	def display_controls(self, pane):
+		""" os.display_controls( Surface ) -> None
+
+		Show the current control settings.
+		"""
+		text_font = font.Font("./fonts/FreeSansBold.ttf", self.option_font_size)
+		i = 0
+		for c in self.control_map:
+			text_image = text_font.render(self.control_map[c], 1, BLACK)
+			pane.blit(text_image, ( 300, 8 + 26*i ))
+			i += 1
 
 	# Controls methods
 
@@ -60,7 +98,8 @@ class ControlsScreen(SelectScreen):
 
 		Confirm changes to controls and return to the options menu.
 		"""
-		self.player.current_level.screen_manager.switch_to_options_screen(self.player, 1)
+		#TODO: write the current control scheme to config.ini
+		self.player.current_level.screen_manager.switch_to_options_screen(self.player)
 
 
 # control constants
