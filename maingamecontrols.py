@@ -2,6 +2,7 @@
 """
 
 from controls import *
+import ConfigParser
 
 LEFT, RIGHT, DOWN, UP, SPACE, CONTROL, X = "left", "right", "down", "up", "space", "control", "x"
 
@@ -21,7 +22,28 @@ class MainGameControls(Controls):
 	def __init__(self, player):
 		Controls.__init__(self)
 		self.player = player
-		self.initialize_control_map(MAIN_GAME_CONTROL_MAP)
+		self.load_controls()
+		#self.initialize_control_map(MAIN_GAME_CONTROL_MAP)
+
+	def load_controls(self):
+		""" mgc.load_controls( ) -> None
+
+		Load the game's controls from config.ini.
+		"""
+		self.control_map = {}
+		config = ConfigParser.ConfigParser()
+		config.read("./config.ini")
+		controls = config.options("controls")
+		for c in controls:
+			try: 
+				key_value = KEY_VALUE_MAP[config.get("controls", c)]
+				key_action = ACTION_MAP[c]
+				self.control_map[key_value] = key_action
+			except:
+				print "ERROR: something is wrong with the saved control settings. Check config.ini."
+				raise(SystemExit)
+
+		#TODO make it so these controls load values from config.ini rather than using defaults.
 
 	def move_up(self, key, toggle):
 		""" mgc.move_up( str, bool ) -> None
@@ -121,6 +143,8 @@ class MainGameControls(Controls):
 		"""
 		if(toggle):	self.player.pause_game()
 
+
+
 move_up = MainGameControls.move_up
 move_down = MainGameControls.move_down
 move_left = MainGameControls.move_left
@@ -150,4 +174,18 @@ MAIN_GAME_CONTROL_MAP = {
 	K_x:press_x,
 	K_z:press_z,
 	K_RETURN:press_return
+}
+
+KEY_VALUE_MAP = {
+	"up":K_UP, "down":K_DOWN, "left":K_LEFT, "right":K_RIGHT,
+	"space":K_SPACE, "control":K_LCTRL, "return":K_RETURN,
+	"a":K_a, "b":K_b, "c":K_c, "d":K_d, "e":K_e, "f":K_f, "g":K_g, "h":K_h, "i":K_i, "j":K_j, "l":K_l, "m":K_m, 
+	"n":K_n, "o":K_o, "p":K_p, "q":K_q,	"r":K_r, "s":K_s, "t":K_t, "u":K_u, "v":K_v, "w":K_w, "x":K_x, "z":K_z	
+}
+
+ACTION_MAP = {
+	"move left":move_left, "move right":move_right, "move up": move_up, "move down":move_down,
+	"jump":move_space, "sprint":move_control,
+	"attack":press_z, "interact":press_x, "pause":press_return, "inventory":press_i, "map":press_m,
+	"toggle lantern left":press_q, "toggle lantern right":press_w, "lantern ability":press_c
 }

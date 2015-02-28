@@ -41,6 +41,13 @@ class ScreenManager:
 		self.current_screen = screen
 		screen.screen_manager = self
 
+	def set_controls(self, controls):
+		""" sm.set_controls( Controls ) -> None
+
+		Set a control scheme while leaving the current screen the same.
+		"""
+		self.current_screen.control_manager.switch_controls(controls)
+
 	def process_event(self, event):
 		""" sm.process_event( Event ) -> None
 

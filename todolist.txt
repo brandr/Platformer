@@ -149,31 +149,7 @@ OVERARCHING MAIN GOAL: Build a demo showing off combat, exploration, dialogs, cu
 
 IMMEDIATE STUFF: most immediate (defined mainly as finishing incomplete systems or creating new ones that are interesting or that other TODOs depend on.)
 
-# Make the control screen work as a screen before worrying about the controls for it.
-    - create a highlight effect that makes it easier to show which key is selected.
-        * consider using different highlight colors to show if a key is being changed, etc.
-    - need to make the structures that show the current key bindings.
-    - ideally these should be a single letter in a box.
-# conisder adding a "cancel" button for navigating the pause menu.
-# allow the player to change the controls from the defaults.
-    - do this from pause menu -> options
-    - this will change the structure of maingamecontrols.py quite a bit.
-    - it might help to generate a config file that includes control settings.
-# make the pause pane look decent. Need a frame and a cursor to choose from "resume", "options", and "quit".
-    - also consider different colors and font
-    - not sure what will go in options but one possibility is the option to change control scheme
-# expand on pause screen using advice from humans
-    - focus on figuring out whether additional screens would be good or bad
-    - tab might be a good button to open up another pane
-    - IDEAS for layouts:
-        1. everything is a different button
-            * tab to change lantern mode
-            * E or I for inventory (currently just lantern, sword, and maybe some flavor items)
-            * enter for pause menu (resume, options, quit)
-            * M for map (arrow keys will pan around)
-        2. everything reachable through one button (enter) 
-            * need to expand on pause panes and make a way to switch between them
-        3. same as 1, but lantern mode can be selected from the inventory screen
+# conisder adding a "cancel" button for navigating the controls menu.
 # draw the items on the inventory screen larger (maybe 64 x 64 px)
 # IDEA: make some objects on the inventory screen (such as the lantern) animated
 # make it possible to change the lantern setting while paused.

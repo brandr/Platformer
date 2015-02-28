@@ -36,7 +36,7 @@ class SelectScreen(GameScreen):
 		self.option_index = 0
 		self.option_font_size = 28
 		dimensions = self.get_dimensions()
-		self.select_bar = Surface((dimensions[0] - 18, self.option_font_size + 6))
+		self.select_bar = Surface((dimensions[0] - 24, self.option_font_size + 6))
 		self.select_bar.fill(SELECTION_BAR_COLOR)
 
 	def update(self):
@@ -50,7 +50,6 @@ class SelectScreen(GameScreen):
 		self.screen_image.blit(self.draw_select_pane(), ( pane_coords[0], pane_coords[1]) )
 
 	def select(self):
-
 		""" ss.select( ) -> None
 
 		Select the current option, executing its associated action.
@@ -87,8 +86,6 @@ class SelectScreen(GameScreen):
 		for i in xrange(len(self.select_options)):
 			text_image = text_font.render(self.select_options[i], 1, BLACK)
 			pane.blit(text_image, ( space, 8 + i*space))
-		#select_cursor = Surface((14, 14)) 							# might want to replace this with a better-looking cursor
-		#pane.blit( select_cursor, ( 6, 14 + self.option_index*space))
 		return pane
 
 	def move_cursor(self, direction):
