@@ -27,8 +27,9 @@ class SubEntity(Being): #NOTE: should lanterns be a subentity?
 		self.active = False
 		self.active_count = 0
 		self.follow_offset = (0, 0)
+		self.permanent = False
 
-	def activate(self):
+	def activate(self, permanent = False):
 		""" se.activate( ) -> None
 
 		Make the subentity appear onscreen and start doing whatever it does.
@@ -37,13 +38,15 @@ class SubEntity(Being): #NOTE: should lanterns be a subentity?
 		if self.active: return
 		self.active = True
 		self.superentity.add_subentity(self)
-		self.active_count = 20
+		self.active_count = 20 #TEMP
+		if permanent: self.permanent = True
 
 	def deactivate(self):
 		""" se.deactivate( ) -> None
 
 		Remove the subentity from the screen and make it stop doing things.
 		"""
+		#print "DEACTIVATING"
 		self.active = False
 		self.superentity.remove_subentity(self)
 
@@ -78,9 +81,9 @@ class SubEntity(Being): #NOTE: should lanterns be a subentity?
 
 		Update the subentity assuming that its duration is based on a timer rather than completing its animation.
 		"""
-		if self.active:
+		if self.active and not self.permanent:
 			self.active_count -= 1
-			if self.active_count <= 0:
+			if self.active_count == 0:
 				self.deactivate()
 
 	def follow_update(self):

@@ -3,6 +3,7 @@
 
 from being import *
 from weaponfactory import build_weapon, PICK
+from armorfactory import build_armor, FROG_MASK
 
 from random import randint
 
@@ -68,7 +69,7 @@ class Monster(Being):
                 if key in monster_map:
                     self.init_attribute(key, monster_map[key])
                 else:
-                    self.init_attribute(key, default_map)
+                    self.init_attribute(key, default_map[key])
         else:
             for key in default_map:
                 self.init_attribute(key, default_map[key])
@@ -93,7 +94,19 @@ class Monster(Being):
 
         Set this monster's weapon to the given weapon.
         """
-        self.weapon = weapon(self)
+        if weapon: self.weapon = weapon(self)
+
+    def init_armor_set(self, armor_set):
+        """ m.init_armor_set( [ method ] ) -> None
+
+        Build each piece of the monster's armor and add it to the set.
+        """
+        
+        if armor_set:
+            for armor_build in armor_set:
+                armor = armor_build(self)
+                self.armor_set.append(armor)
+                armor.activate()
 
     def init_bounce(self, bounce):
         """ m.init_bounce( bool ) -> None
@@ -108,8 +121,6 @@ class Monster(Being):
         """
         self.max_speed = speed
 
-    #TODO: make this general in the long run, so that monsters can interact with each other as well as with the player.
-    #  in particular, consider having monsters "collide" with each other (they probably shouldn't bounce but I'm not sure.)
     def update(self, player):
         """ m.update( Player ) -> None
 
@@ -119,10 +130,13 @@ class Monster(Being):
         self.updateAnimation()
         #TODO: check if the monster can see the player. (using sightdist)
         #TODO: check if the monster is hostile the player.
-        #TODO: figure out a better way to assosciate the monster with its udpate action (probably a dict, though name alone might not be sophisticated enoough.)
+        #TODO: figure out a better way to assosciate the monster with its udpate action 
+        #       (probably a dict, though name alone might not be sophisticated enoough.)
         if not self.active: return
         self.ai_update(player)
         Being.updatePosition(self)
+        if self.armor_set: 
+            for a in self.armor_set: a.activate(True)
 
     def set_active(self, active):
         """ m.set_active( bool ) -> None
@@ -150,6 +164,19 @@ class Monster(Being):
         update_method = MONSTER_AI_MAP[(self.name, self.ai_state)]
         update_method(self, player)
 
+    def default_update_idle(self, player, gravity = True):
+        """ m.default_update_idle( Player, bool ) -> None
+
+        An update that simply applies gravity and ensures that the monster is facing the correct direction.
+        Will probably be used for many monsters.
+        """
+        if gravity: self.gravityUpdate()
+        if self.bounce_count > 0:   
+            self.bounce()
+        if self.onGround:
+            self.changeAnimation('idle', self.direction_id)
+            self.xvel = 0   
+
     def bat_update(self, player):
         """ m.bat_update( Player ) -> None 
 
@@ -167,20 +194,17 @@ class Monster(Being):
 
         In-progress method handling a giant frog's behavior.
         """
-        self.gravityUpdate()
-        if self.bounce_count > 0:   #TEMP
-            self.bounce()
-            return
-        self.faceTowards(player.current_tile())
-        if self.onGround:
+        self.default_update_idle(player)
+        #if self.onGround: 
+        # TODO: make the frog try to land on the player.
+        # figure out the frog's distance from the player, and calculate the necessary xvel.
+        # jump with min(self.max_speed/2, target_speed)
+        if self.onGround and self.ai_counter <= 0: #TODO: change the way this works
+            self.faceTowards(player.current_tile())
             self.changeAnimation('idle', self.direction_id)
-            self.xvel = 0
-            #TODO: make the frog try to land on the player.
-                # figure out the frog's distance from the player, and calculate the necessary xvel.
-                # jump with min(self.max_speed/2, target_speed)
-            if self.ai_counter <= 0: #TODO: change the way this works
-                self.jump(self.direction_val*self.max_speed/2, self.max_speed)
-            self.wait()
+            self.jump(self.direction_val*self.max_speed/2, self.max_speed)
+            self.ai_counter = 110
+        self.wait()
 
     #TEMP
 
@@ -189,12 +213,7 @@ class Monster(Being):
 
         The miner does nothing. Gravity is applied here.
         """
-        self.gravityUpdate()
-        if self.bounce_count > 0:   
-            self.bounce()
-        if self.onGround:
-            self.changeAnimation('idle', self.direction_id)
-            self.xvel = 0
+        self.default_update_idle(player)
         if self.ai_counter <= 0:
             self.faceTowards(player)
             next_actions = [Monster.miner_begin_charging, Monster.miner_begin_jumping] #TODO: make a more general way to select a "next action" from a set of possibilities
@@ -258,12 +277,23 @@ class Monster(Being):
             self.weapon.activate(31, -13, self.direction_id)
         self.weapon.animation.synch_animation_frame(self.animation)
 
+# weapons
+
     def miner_pick(self):
         """ m.miner_pick( ) -> MeleeWeapon
 
         A pick used by the miner boss. May want to load this sort of data more neatly once there are a lot of weapons.
         """
         return build_weapon(PICK, self)
+
+# armor
+
+    def frog_mask(self):
+        """ m.frog_mask( ) -> Armor
+
+        Generates the mask that armored frogs use to defend their faces.
+        """
+        return build_armor(FROG_MASK, self)
 
     def collide(self, xvel, yvel):
         """ m.collide( int, int ) -> None 
@@ -393,10 +423,12 @@ DIRECTION_MAP = {'left': -1, 'right': 1}
 DEFAULT = "default"
 BAT = "bat"
 GIANT_FROG = "giant_frog"
+ARMORED_FROG = "armored_frog"
 MINER = "miner"
 
 HIT_POINTS = "hit_points"
 WEAPON = "weapon"
+ARMOR_SET = "armor_set"     # NOTE: might want to think of this more generally as subentity set
 BOUNCE = "bounce"
 MAX_SPEED = "max_speed"
 
@@ -405,12 +437,21 @@ MONSTER_DATA_MAP = {
         {
         HIT_POINTS:1,
         WEAPON:None,
+        ARMOR_SET:[],
         BOUNCE:True,
         MAX_SPEED:6
         },
     GIANT_FROG:
         {
         HIT_POINTS:3
+        },
+    ARMORED_FROG:
+        {
+        HIT_POINTS:3,
+        ARMOR_SET:
+            [
+            Monster.frog_mask
+            ]
         },
     MINER:
         {
@@ -424,6 +465,7 @@ MONSTER_DATA_MAP = {
 MONSTER_INIT_MAP = {
     HIT_POINTS:Monster.init_hit_points,
     WEAPON:Monster.init_weapon,
+    ARMOR_SET:Monster.init_armor_set,
     BOUNCE:Monster.init_bounce,
     MAX_SPEED:Monster.init_max_speed
 }
@@ -434,10 +476,14 @@ AI_IDLE = "idle"
 AI_CHARGING = "charging"
 AI_JUMPING = "jumping"
 
+# TODO: make some default updates idle that apply to any monster
+# TODO: check creature platformer's monster.py for ideas
 MONSTER_AI_MAP = {
     (BAT, AI_IDLE):Monster.bat_update,
 
-    (GIANT_FROG, AI_IDLE):Monster.frog_update, #TEMP: frog should also have jump method
+    (GIANT_FROG, AI_IDLE):Monster.frog_update, #TEMP: frog should also have jumping method
+
+    (ARMORED_FROG, AI_IDLE):Monster.frog_update,
 
     (MINER, AI_IDLE):Monster.miner_update_idle,
     (MINER, AI_CHARGING):Monster.miner_update_charging,

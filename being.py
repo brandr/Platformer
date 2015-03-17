@@ -52,6 +52,7 @@ class Being(Entity):
         self.bounce_count = 0 # might want a more general counter system, like a dict of counters
         self.invincibility_frames = 0
         self.hit_points = None
+        self.armor_set = []
         #TODO: if methods/data from monster/player are universal, move them to this class.
 
     def update(self, player):

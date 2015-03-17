@@ -1,6 +1,8 @@
 ﻿Platformer
 ==========
 
+Lead programmer/designer: Robert Brandenburg
+
 A currently unnamed platformer which will be sort of like super metroid and based around exploration.
 We need more programmers, sprite artists, and pretty much every type of game making person (even idea guys).
 

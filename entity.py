@@ -192,6 +192,14 @@ class Entity(GameImage):
         """
         return 0
 
+    def hittable_targets(self):
+        """ e.hittable_targets( ) -> [ Entity ]
+
+        A method to be overridden by player and monster.
+        Includes all opponents they are allowed to attack.
+        """
+        return []
+
     #might not end up using this method. If so, delete it.
     def castShadow(self):
         tiles = self.current_level.getTiles()

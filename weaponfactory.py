@@ -7,7 +7,6 @@ from gameimage import GameImage
 from animationset import AnimationSet
 from meleeweapon import MeleeWeapon
 
-
 def weapon_animation_set(animation_data):
 	""" weapon_animation_set( ( Rect, [ ( str, str, str ) ] ) ) -> AnimationSet
 

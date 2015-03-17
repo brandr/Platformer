@@ -134,9 +134,6 @@ LONG-TERM GOALS: (short summaries, does not include all TODOs)
 # exploration/hidden objects
     - Make interesting mazes/hidden areas
     - Keep in mind how the map will work
-# items/inventory
-    - Barely implemented and don't have many ideas.
-    - There should probably be an inventory screen.
 # screens/menus
     - Make it more clear what each screen is supposed to be and plan out the pause screens/menus after other systems have been implemented.
 
@@ -149,20 +146,10 @@ OVERARCHING MAIN GOAL: Build a demo showing off combat, exploration, dialogs, cu
 
 IMMEDIATE STUFF: most immediate (defined mainly as finishing incomplete systems or creating new ones that are interesting or that other TODOs depend on.)
 
-# conisder adding a "cancel" button for navigating the controls menu.
-# draw the items on the inventory screen larger (maybe 64 x 64 px)
-# IDEA: make some objects on the inventory screen (such as the lantern) animated
-# make it possible to change the lantern setting while paused.
-# flesh out item system
-    - remember that the lantern and sword are both items but work very differently
-    - might just have checks to make them display on the inventory screen
-# show the lantern attached to the player's belt area and center the light rings on it pixel-wise.
-    - could do this by making the lantern a subentity of the player that appears when the player is in the dark
-    - in lit areas when the lantern is off, make it visibly clear that it is not lit, possibly by having the player put it away.
-# change the way the player looks in complete darkness.
-# might be able to draw the player towards some places in the darkness by blitting transparent white rings (or some other visual effect) over important spots
+# fix the bug in the LevelEditor where the wrong tiles are blocked by large entities.
+# improve cell selection for the room selector in the level editor.
 # generalize subentities/entityeffects so that they can apply to monsters and NPCs
-    - to test this, make a giant frog with an armored mask that deflects frontal attacks 
+    - I may have already done this
 # implement some kind of projectiles
     - this will help test the damage system, since currently subentities like weapons only damage the player or monsters
       based on checks from their superentities. Projectiles, spikes, etc. should cause damage without being called by superentities.
@@ -173,6 +160,13 @@ IMMEDIATE STUFF: most immediate (defined mainly as finishing incomplete systems 
 # add basic sounds (make them easy to disable for testing purposes)
 # make it easier to add simple NPCs with no actions or branching dialog trees, since most NPCs will work this way. Follow the same pattern as signs
   and make a "default NPC" that can have many different sprites. Note that such NPCs will not have dialog portraits.
+# change the way the player looks in complete darkness.
+# show the lantern attached to the player's belt area and center the light rings on it pixel-wise.
+    - could do this by making the lantern a subentity of the player that appears when the player is in the dark
+    - in lit areas when the lantern is off, make it visibly clear that it is not lit, possibly by having the player put it away.
+# might be able to draw the player towards some places in the darkness by blitting transparent white rings (or some other visual effect) over important spots
+# IDEA: make the miner more reactive by making his charge bring him to the player, then stop, and creating a more animated swing animation for when he is in front of the player.
+
 
 --------------------------------------------------------------------------------
 
@@ -182,6 +176,12 @@ SECOND MOST IMMEDIATE STUFF
     - connect the item selector to the data pane.
     - allow a button to "select" an item, allowing additional actions via the data pane.
     - consider making it so that the inventory selection is persistent when the inventory screen is opened and closed
+# draw the items on the inventory screen larger (maybe 64 x 64 px)
+# IDEA: make some objects on the inventory screen (such as the lantern) animated
+# make it possible to change the lantern setting while paused. (might not actually do this)
+# flesh out item system
+    - remember that the lantern and sword are both items but work very differently
+    - might just have checks to make them display on the inventory screen
 # fix the issue where the player runs in place when ctrl is held.
     - this is low priority since this might end up being what I want
 # make the "hit spark" better (and possibly more well-adapted to the shape of the thing hit)

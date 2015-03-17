@@ -30,6 +30,7 @@ ENTITY_CONSTRUCTOR_MAP = { #TODO: try to figure out why signs aren't in here
 	
 	BAT:Monster,
 	GIANT_FROG:Monster,
+	ARMORED_FROG:Monster,
 
 	MINER:NonPlayerCharacter,
 
@@ -98,6 +99,7 @@ ENTITY_BUILD_MAP = {
 	SLOPING_PLATFORM:EntityFactory.initSlopingPlatform,
 	BAT:EntityFactory.initMonster,
 	GIANT_FROG:EntityFactory.initMonster,
+	ARMORED_FROG:EntityFactory.initMonster,
 	KENSTAR:EntityFactory.initNPC,
 	MINER:EntityFactory.initNPC,
 	DEFAULT_SIGN:EntityFactory.initSign
