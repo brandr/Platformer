@@ -34,6 +34,12 @@ HOW TO ADD BACKGROUNDS:
 # save a file in Platformer/backgrounds with the name axb_name.bmp, where a and b are the number of "rooms" wide and tall the background is and name is the name of the background.
     - the image should be a*896 pixels wide by b*640 pixels tall.
     - in general, it will probably be helpful to make varying sizes of backgrounds for varying rooms sizes, along with some "outdoor" backgrounds and some "cave" backgrounds 
+
+HOW TO ENABLE MUSIC:
+
+# go to the line in gamemanager that says:
+pygame.mixer.music.set_volume(0)
+and comment it out.
     
 --------------------------------------------------------------------------
 
@@ -89,7 +95,7 @@ INSTRUCTIONS FOR ADDING NEW OBJECT TYPES:
 8. Create a factory for the object (ex: chestfactory.py). 
     - This will define how the object's additional data is added by its data class.
 9. Import this new factory in roomfactory.py and add it to NON_DEFAULT_ENTITY_MAP.
-10. Change entityselectpane.py to import the proper data class (along with its constant from tiledata) and add it to ENTITY_CONSTRUCTOR_MAP.
+10. Change entityselectcontainer.py to import the proper data class (along with its constant from tiledata) and add it to ENTITY_CONSTRUCTOR_MAP.
 11. Make it possible to add the necessary additional data for the object in the level editor by changing entitydatapane.py.
     - the type of pane may very, but all panes should update and they should save if there is data that will not immediately be saved to the
       associtaed TileData-inheriting object, current_selection.
@@ -146,32 +152,42 @@ OVERARCHING MAIN GOAL: Build a demo showing off combat, exploration, dialogs, cu
 
 IMMEDIATE STUFF: most immediate (defined mainly as finishing incomplete systems or creating new ones that are interesting or that other TODOs depend on.)
 
-# fix the bug in the LevelEditor where the wrong tiles are blocked by large entities.
-# improve cell selection for the room selector in the level editor.
-# generalize subentities/entityeffects so that they can apply to monsters and NPCs
-    - I may have already done this
-# implement some kind of projectiles
-    - this will help test the damage system, since currently subentities like weapons only damage the player or monsters
-      based on checks from their superentities. Projectiles, spikes, etc. should cause damage without being called by superentities.
-    - Have to decide how things like projectiles respond when their superentities are killed (i.e., what tells an arrow to keep flying if
-      the one who fired it dies)
+# might be able to draw the player towards some places in the darkness by blitting transparent white rings (or some other visual effect) over important spots
+    - fix the bugs where the red outline remains and where the level effect doesn't appear but it can still be selected
+    - need to change leveleditor in the following ways:
+        * need to make it possible to blit effects without the pink background
+        * make it possible to select effects by left-clicking on them
+        * make it possible to remove effects (and only effects) by right-clicking on them
+            # a second click removes the entity underneath
+        * copy the changes in LevelEditor/roomdata to roomdata
+    - files and methods to change:
+        * need to make leveleffect.py (and possibly leveleffectdata.py)
+        * LevelEditor/levelselectcell.py: add_level_effect()
+        * LevelEditor/levelgrid.py: add_level_effect()
+        * Figure out how to make the level editor load effects properly. (same as loading entities)
+        * make sure the level can display effects properly
+        * TODO
+    - IDEA: simply create a new leveleffects folder in LevelEditor/images and check current_selection when left-clicking.
+        * in doing so, prevent placed effects from snapping to grid
+    - Change addLevelObjects in levelobjects.py and look for a LevelObjects constructor in roomfactory.py. Change these so they include level effects, and backtrack to where the level effects are created
+        * Don't want to set up LevelEffects using RoomData's tileat because we should make it possible to use any offset
+        * use a separate loop from the main one in roomfactory's build_room
+    - could also use slight glimmers
+    - note that these purely visual effects may do well with a separate generation system from the entities made in the level editor.
+    - might even use a completely separate editor. Not sure, though
+# make the miner more reactive by making his charge bring him to the player, then stop, and creating a more animated swing animation for when he is in front of the player.
 # figure out how monster spawining should be handled: i.e., when monsters defeated earlier should reappear.
     - it's possible this will relate to World data.
-# add basic sounds (make them easy to disable for testing purposes)
-# make it easier to add simple NPCs with no actions or branching dialog trees, since most NPCs will work this way. Follow the same pattern as signs
-  and make a "default NPC" that can have many different sprites. Note that such NPCs will not have dialog portraits.
-# change the way the player looks in complete darkness.
-# show the lantern attached to the player's belt area and center the light rings on it pixel-wise.
-    - could do this by making the lantern a subentity of the player that appears when the player is in the dark
-    - in lit areas when the lantern is off, make it visibly clear that it is not lit, possibly by having the player put it away.
-# might be able to draw the player towards some places in the darkness by blitting transparent white rings (or some other visual effect) over important spots
-# IDEA: make the miner more reactive by making his charge bring him to the player, then stop, and creating a more animated swing animation for when he is in front of the player.
+    - also consider what will happen to things like destructible blocks
+    - IDEA: when levels are created, give them a 2D grid of TileData that will store everything that should respawn when the level is reloaded.
+        * to permanently remove something from the level, just remove its associated data object.
 
 
 --------------------------------------------------------------------------------
 
 SECOND MOST IMMEDIATE STUFF
 
+# change the way the player looks in complete darkness.
 # finish the inventory screen
     - connect the item selector to the data pane.
     - allow a button to "select" an item, allowing additional actions via the data pane.
@@ -306,6 +322,10 @@ IMMEDIATE STUFF: cutscenes
 # Make a windowed launcher that makes it possible to select which dungeon to load from the saved list.
 # consider removing level_ID, but first try to think of possible uses for it.
     - it is likely to come in handy when "world data" is implemented.
+# flesh out projectiles
+    - might need a more general way to create projectiles
+    - make variables that determine how projectiles move, whether they harm their owner, whether they penetrate armor, whether they penetrate blocks, etc.
+    - Have to ensure things like projectiles respond when their superentities are killed (i.e., what tells an arrow to keep flying if the one who fired it dies)
 
     # USER SUGGESTIONS
 

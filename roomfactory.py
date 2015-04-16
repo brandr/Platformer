@@ -1,6 +1,7 @@
 from tilefactory import TileFactory
 from entityfactory import EntityFactory
 from platformfactory import PlatformFactory
+from npcfactory import NPCFactory
 from signfactory import SignFactory
 from chestfactory import ChestFactory
 from doorfactory import DoorFactory
@@ -11,13 +12,14 @@ from room import Room
 from block import Block
 from tile import Tile
 from gameimage import GameImage
-from tiledata import TileData, BlockedTileData, DEFAULT_TILE_SIZE, DEFAULT_CUTSCENE_TRIGGER, PLAYER_START, DESTRUCTIBLE_PLATFORM, DEFAULT_SIGN, DEFAULT_DOOR, DEFAULT_CHEST, OIL_PICKUP
+from tiledata import TileData, BlockedTileData, DEFAULT_TILE_SIZE, DEFAULT_CUTSCENE_TRIGGER, PLAYER_START, DESTRUCTIBLE_PLATFORM, DEFAULT_SIGN, DEFAULT_NPC, DEFAULT_DOOR, DEFAULT_CHEST, OIL_PICKUP
 from roomdata import ROOM_WIDTH, ROOM_HEIGHT
 
 from pygame import Rect
 
 NON_DEFAULT_ENTITY_MAP = {
 	DESTRUCTIBLE_PLATFORM:PlatformFactory,
+	DEFAULT_NPC:NPCFactory,
 	DEFAULT_SIGN:SignFactory,	
 	DEFAULT_DOOR:DoorFactory,
 	DEFAULT_CHEST:ChestFactory,
@@ -59,15 +61,8 @@ class RoomFactory(object):
 		origin = level_data_set[0].corners[0]
 		for data in level_data_set:
 			corner = data.corners[0]
-			origin = ( min(origin[0], corner[0]), min(origin[1], corner[1]) )
+			if corner: origin = ( min(origin[0], corner[0]), min(origin[1], corner[1]) )
 		return origin
-		"""
-		for y in xrange(len(room_data_set)):
-			for x in xrange(len(room_data_set[y])):
-				next_data = room_data_set[y][x]
-				if(room_data_set[y][x] != None): return x, y
-		return None
-		"""
 
 	@staticmethod
 	def lower_right(level_data_set):
@@ -78,7 +73,7 @@ class RoomFactory(object):
 		lower_right = level_data_set[0].corners[1]
 		for data in level_data_set:
 			corner = data.corners[1]
-			lower_right = ( max(lower_right[0], corner[0]), max(lower_right[1], corner[1]) )
+			if corner: lower_right = ( max(lower_right[0], corner[0]), max(lower_right[1], corner[1]) )
 		return lower_right
 
 	@staticmethod
@@ -99,7 +94,8 @@ class RoomFactory(object):
 		"""
 		if(room_data == None): return RoomFactory.empty_room(dungeon, global_x, global_y) 
 		tiles = []
-		entities = [] #TODO: figure out why the example platformer used Group
+		entities = [] 
+		level_effects = []
 
 		start_coords = (False, 0, 0)
 		x = y = 0
@@ -123,8 +119,6 @@ class RoomFactory(object):
 					if next_tile_data.entity_key == PLAYER_START:
 						start_coords = (True, x, y)
 					else:
-
-						#TODO: remember that this part may need some checks if the object created is larger than 32*32.
 						raw_entity_image = next_tile_data.get_image("./LevelEditor/")
 						entity_width, entity_height = next_tile_data.width, next_tile_data.height
 						entity_rect = Rect(0, 0, entity_width*DEFAULT_TILE_SIZE, entity_height*DEFAULT_TILE_SIZE)
@@ -153,10 +147,9 @@ class RoomFactory(object):
 				x += DEFAULT_TILE_SIZE 
 			y += DEFAULT_TILE_SIZE
 			x = 0
-			
-		room_objects = LevelObjects(None, tiles, entities)
+		# TODO: fill in level effects
+		room_objects = LevelObjects(None, tiles, entities, level_effects)
 		created_room = Room(room_objects, dungeon, (global_x, global_y), start_coords)
-		#print "MADE ROOM AT: " + str((global_x, global_y))
 		return created_room
 
 	@staticmethod

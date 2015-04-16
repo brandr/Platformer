@@ -1,4 +1,3 @@
-#TODO: copy the finished one from Platfomer/chestdata.py.
 """ A special kind of tiledata specific to chests"""
 
 from tiledata import *
@@ -10,7 +9,7 @@ class ChestData(TileData):
 
 	Attrbitues:
 
-	TODO: contained item
+	contents_key: Used to figure out what item is in the chest.
 	"""
 
 	def __init__(self, key, filepath, filepath_start = "./"):

@@ -46,11 +46,17 @@ ARMORED_FROG = "armored_frog"
 
 #NPCS
 NPCS = "NPCs"
+DEFAULT_NPC = "default_npc"
 MINER = "miner"
 
 #Triggers
 TRIGGERS = "triggers"
 DEFAULT_CUTSCENE_TRIGGER = "default_cutscene_trigger"
+
+#Level effects
+LEVEL_EFFECTS = "level_effects"
+DEFAULT_LEVEL_EFFECT = "default_level_effect"
+
 #---------TEMPORARY------------------
 
 KENSTAR = "kenstar"
@@ -68,8 +74,9 @@ ENTITY_CATEGORY_MAP = {
 	DEFAULT_CHEST:CHESTS,
 	OIL_PICKUP:PICKUPS,
 	BAT:MONSTERS, GIANT_FROG:MONSTERS, ARMORED_FROG:MONSTERS,
-	MINER:NPCS,
+	DEFAULT_NPC:NPCS, MINER:NPCS,
 	DEFAULT_CUTSCENE_TRIGGER:TRIGGERS,
+	DEFAULT_LEVEL_EFFECT:LEVEL_EFFECTS,
 	#TEMP
 	KENSTAR:NPCS
 }

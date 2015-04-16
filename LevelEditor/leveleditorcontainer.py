@@ -50,8 +50,6 @@ class LevelEditorContainer(Box):
 		self.add_child(close_editor_button)
 		self.add_child(self.sunlit_button)
 
-		#TODO: add something that will allow linkage to another dungeon
-
 	def entity_select_container(self, x, y, width, height):
 		container = EntitySelectContainer(width, height) # may need "self" arg
 		container.topleft = x, y
@@ -67,10 +65,6 @@ class LevelEditorContainer(Box):
 		window = ScrolledWindow(width, height)
 		window.topleft = x, y
 		window.connect_signal(SIG_MOUSEDOWN, self.click_room_cell)
-				
-		# TODO: fill the table with imagebuttons that will connect to the levelgrid, changing its bg image to a different subsurface of the full background
-		# and displaying entities with a different offset.
-		#window.set_child(room_select_grid)
 		return window
 
 	def build_room_select_grid(self):
@@ -80,7 +74,6 @@ class LevelEditorContainer(Box):
 			for j in xrange (room_width):
 				cell = self.room_select_cell(i, j)
 				room_select_grid.add_child (i, j, cell)
-		
 		return room_select_grid
 
 	def room_select_cell(self, row, col):
@@ -108,7 +101,11 @@ class LevelEditorContainer(Box):
 		coords = event.pos
 		screen_offset = (self.room_select_grid_window.left + self.left + self.master_window.left, self.room_select_grid_window.top + self.top + self.master_window.top)
 		relative_coords = (coords[0] - screen_offset[0], coords[1] - screen_offset[1])
-		if relative_coords[0] > self.room_select_grid_window.vscrollbar.left or relative_coords[1] > self.room_select_grid_window.hscrollbar.top: return
+		# TODO: if there is no vertical scrollbar, do not perform the first check. If there is no horizontal scrollbar, do not perform the second check.
+		# there is no vertical scrollbar if width >= 8. There is no horizontal scrollbar if height >= 4.
+		width, height = self.room_select_grid.columns, self.room_select_grid.rows
+		if width >= 8 and relative_coords[0] > self.room_select_grid_window.vscrollbar.left: return
+		if height >= 4 and relative_coords[1] > self.room_select_grid_window.hscrollbar.top: return
 		x_scroll_offset = self.room_select_grid_window.hscrollbar.value
 		y_scroll_offset = self.room_select_grid_window.vscrollbar.value
 		adjusted_coords = (relative_coords[0] + x_scroll_offset, relative_coords[1] + y_scroll_offset) 

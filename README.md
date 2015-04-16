@@ -19,7 +19,7 @@ NOTE: These steps are currently Windows-only. I will add instructions for other 
 
 4. Install numpy:(not yet sure if this works)
 	a. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy. 
-	b. If you have a 64-bit machine, click the link that says “numpy‑MKL‑1.9.0.win-amd64‑py2.7.exe”. If you have a 32-bit machine, click 	the link that says “numpy‑MKL‑1.9.0.win32‑py2.7.exe”
+	b. If you have a 64-bit machine, click the link that says “numpy‑MKL‑1.9.0.win-amd64‑py2.7.exe”. If you have a 32-bit machine, click the link that says “numpy‑MKL‑1.9.0.win32‑py2.7.exe”
 	b. Run this exe to install numpy.
 
 5. Install git bash: http://git-scm.com/downloads

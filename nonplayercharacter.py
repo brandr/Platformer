@@ -3,6 +3,7 @@
 
 from being import Being
 from gameevent import GameEvent
+from gameaction import GameAction
 from dialog import Dialog
 from dialogchoice import DialogChoice
 from monster import Monster

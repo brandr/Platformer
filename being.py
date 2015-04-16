@@ -53,6 +53,7 @@ class Being(Entity):
         self.invincibility_frames = 0
         self.hit_points = None
         self.armor_set = []
+        self.active_projectiles = []
         #TODO: if methods/data from monster/player are universal, move them to this class.
 
     def update(self, player):
@@ -109,7 +110,6 @@ class Being(Entity):
         Collide with all solid platforms using the collideWith method also found in Being.
         Collisions with non-platform objects are handled by other methods.
         """
-
         level = self.current_level
         platforms = level.get_impassables()
         slopes = []

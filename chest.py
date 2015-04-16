@@ -27,7 +27,6 @@ class Chest(Block):
 
 	# methods for building the chest
 
-
 	def generate_contents(self, key):
 		""" c.generate_contents( str ) -> None
 
@@ -39,7 +38,6 @@ class Chest(Block):
 		item_key = item_data[ITEM_KEY]
 		display_name = item_data[DISPLAY_NAME]
 		dialog_data = item_data[RECEIVE_DIALOG_DATA]
-		#TODO: set self.contents to item
 		self.contents_data = { ITEM_CLASS:constructor, ITEM_KEY:item_key, DISPLAY_NAME:display_name }
 		self.set_text_set(dialog_data)
 
@@ -80,12 +78,12 @@ class Chest(Block):
 		self.default_image = self.open_chest_image #TODO: set open chest image
 		self.image = self.open_chest_image
 		if not self.contents_data: return # case for empty chest
-		item = self.build_item()
+		item = self.build_chest_item()
 		key = self.contents_data[ ITEM_KEY ]
 		player.acquire_item( item, key )
 
-	def build_item(self):
-		""" c.build_item( ) -> ?
+	def build_chest_item(self):
+		""" c.build_chest_item( ) -> Item
 
 		Use this chest's item data to build its contained item.
 		"""

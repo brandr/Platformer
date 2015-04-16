@@ -183,7 +183,8 @@ MOVE_UP = "Move up"
 MOVE_DOWN = "Move down"
 JUMP = "Jump"
 SPRINT = "Sprint"
-ATTACK = "Attack"
+MELEE_ATTACK = "Melee Attack"
+RANGED_ATTACK = "Ranged Attack"
 INTERACT = "Interact"
 PAUSE = "Pause"
 INVENTORY = "Inventory"
@@ -197,7 +198,7 @@ CONFIRM = "Confirm"
 
 CONTROLS_OPTIONS = [
 	MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN,
-	JUMP, SPRINT, ATTACK, INTERACT,
+	JUMP, SPRINT, MELEE_ATTACK, RANGED_ATTACK, INTERACT,
 	PAUSE, INVENTORY, MAP,
 	TOGGLE_LANTERN_LEFT, TOGGLE_LANTERN_RIGHT, LANTERN_ABILITY,
 	RESTORE_DEFAULTS, CONFIRM
@@ -205,9 +206,10 @@ CONTROLS_OPTIONS = [
 
 begin_set_key = ControlsScreen.begin_set_key
 
+# might be easier to do this by dictating that all but the last 2 are begin_set_key
 CONTROLS_OPTION_METHODS = [
 	begin_set_key, begin_set_key, begin_set_key, begin_set_key,
-	begin_set_key, begin_set_key, begin_set_key, begin_set_key,
+	begin_set_key, begin_set_key, begin_set_key, begin_set_key, begin_set_key,
 	begin_set_key, begin_set_key, begin_set_key,
 	begin_set_key, begin_set_key, begin_set_key,
 	ControlsScreen.restore_defaults, ControlsScreen.confirm
@@ -240,7 +242,6 @@ class ControlSettingControls(Controls):
 		"""
 		if toggle:
 			key_string = VALID_KEYS[key]
-			# TODO: actually set the key to the inputted value, if valid
 			self.screen.set_key(key_string)
 			controls = SelectControls(self.screen.player)
 			self.screen.player.current_level.screen_manager.set_controls(controls)

@@ -25,7 +25,5 @@ class ChestFactory:
 		chest_anim_set = GameImage.still_animation_set(closed_chest_image, chest_rect)
 		chest = Chest(chest_anim_set, x, y)
 		chest.open_chest_image = open_chest_image
-		#use chest_data.contents_key
 		chest.generate_contents(chest_data.contents_key)
-		#TODO: actually add the chests item.
 		return chest

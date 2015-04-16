@@ -12,7 +12,7 @@ from pygame.draw import polygon
 from cutscenescripts import MASTER_CUTSCENE_MAP
 from chestcontents import MASTER_CHEST_CONTENTS_MAP
 from platformdata import MASTER_CATALYST_MAP
-from tiledata import DEFAULT_CUTSCENE_TRIGGER, DESTRUCTIBLE_PLATFORM, DEFAULT_SIGN, DEFAULT_DOOR, DEFAULT_CHEST
+from tiledata import DEFAULT_CUTSCENE_TRIGGER, DESTRUCTIBLE_PLATFORM, DEFAULT_SIGN, DEFAULT_NPC, DEFAULT_DOOR, DEFAULT_CHEST
 
 WHITE = Color("#FFFFFF")
 BLACK = Color("#000000")
@@ -137,7 +137,7 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 			next_entry = self.sign_entry_set[j]
 			next_text = next_entry.text	
 			self.sign_text_panes[i][j] = next_text
-		self.current_selection.set_sign_text(self.sign_text_panes)
+		self.current_selection.set_dialog_text(self.sign_text_panes)
 
 	def add_sign_pane_button(self, x, y):
 		button = Button("Add pane")
@@ -221,6 +221,49 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 		polygon(next_image, color, [(0, 0), (0, 24), (24, 12)])
 		return next_image
 
+	# NPC
+
+	def update_npc(self):
+		self.pane_index = 0
+		npc_data = self.current_selection
+		sign_label = Label("NPC Dialogue:")
+		self.sign_text_panes = npc_data.text_panes
+		sign_text_entries = []
+		sign_text_lines = self.sign_text_panes[0]
+		y_offset = 16
+		for s in sign_text_lines:
+			next_entry = Entry(s)
+			next_entry.set_minimum_size(self.width, 12)
+			next_entry.padding = 4
+			next_entry.top += y_offset
+			y_offset += 24
+			sign_text_entries.append(next_entry)
+
+		self.set_children([sign_label])	
+		self.sign_entry_set = sign_text_entries
+		for s in self.sign_entry_set:
+			self.add_child(s)
+
+		bottom_entry = self.sign_entry_set[-1]
+		self.prev_pane_button = self.build_prev_pane_button(bottom_entry.left, bottom_entry.bottom + 8, False)
+		self.next_pane_button = self.build_next_pane_button(self.prev_pane_button.right + 8, self.prev_pane_button.top, len(self.sign_text_panes) > 1)
+		add_sign_pane_button = self.add_sign_pane_button(self.next_pane_button.right + 8, self.next_pane_button.top)
+		remove_sign_pane_button = self.remove_sign_pane_button(add_sign_pane_button.right + 8, add_sign_pane_button.top)
+		self.sign_pane_index_label = self.build_sign_pane_index_label(remove_sign_pane_button.right + 8, remove_sign_pane_button.top)
+		self.add_child(self.prev_pane_button)
+		self.add_child(self.next_pane_button)
+		self.add_child(add_sign_pane_button)
+		self.add_child(remove_sign_pane_button)
+		self.add_child(self.sign_pane_index_label)
+
+	def save_npc_data(self):
+		i = self.pane_index
+		for j in range(0, 4):
+			next_entry = self.sign_entry_set[j]
+			next_text = next_entry.text	
+			self.sign_text_panes[i][j] = next_text
+		self.current_selection.set_dialog_text(self.sign_text_panes)
+
 	# CHEST
 	def update_chest(self):
 		chest_data = self.current_selection
@@ -292,6 +335,12 @@ ENTITY_DATA_MAP = {
 			UPDATE: EntityDataPane.update_sign,
 			SAVE: EntityDataPane.save_sign_data
 		},
+		DEFAULT_NPC:
+		{
+			UPDATE: EntityDataPane.update_npc,
+			SAVE: EntityDataPane.save_npc_data
+		},
+
 		DEFAULT_CHEST:
 		{
 			UPDATE: EntityDataPane.update_chest

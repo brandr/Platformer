@@ -342,8 +342,7 @@ class Monster(Being):
         Bounce against another being, starting the bounce counter so that this monster cannot
         take other actions until the counter runs out.
         """
-        if self.can_bounce:
-            Being.bounceAgainst(self, other)
+        if self.can_bounce: Being.bounceAgainst(self, other)
         # TODO: separate bouncing frames from invincibility frames, and think of some structure that can hold both.
 
     def wait(self):

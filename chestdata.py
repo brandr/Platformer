@@ -31,4 +31,4 @@ class ChestData(TileData):
 
 		Format this chestdata into primitive types so that it can be saved to a file.
 		"""
-		return (self.entity_key, self.image_filepath, self.width, self.height, self.contents_key) #TODO: add contained item 
+		return (self.entity_key, self.image_filepath, self.width, self.height, self.contents_key)

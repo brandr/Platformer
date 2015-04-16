@@ -1,9 +1,10 @@
 
 from signdata import SignData
+from npcdata import NPCData
 from cutscenetriggerdata import CutsceneTriggerData
 from chestdata import ChestData
 from platformdata import PlatformData, DestructiblePlatformData
-from tiledata import TileData, BlockedTileData, DEFAULT_SIGN, DEFAULT_CHEST, DEFAULT_CUTSCENE_TRIGGER, DESTRUCTIBLE_PLATFORM
+from tiledata import TileData, BlockedTileData, DEFAULT_SIGN, DEFAULT_NPC, DEFAULT_CHEST, DEFAULT_CUTSCENE_TRIGGER, DESTRUCTIBLE_PLATFORM
 
 ROOM_WIDTH = 28
 ROOM_HEIGHT = 20
@@ -13,6 +14,7 @@ class RoomData(object):
 	def __init__(self, width, height, x, y):
 		self.global_x, self.global_y = x, y
 		self.tiles = RoomData.empty_tile_set(width, height)
+		self.effects = RoomData.empty_effect_set(width, height)
 	
 	def empty(self):
 		for row in self.tiles:
@@ -20,8 +22,11 @@ class RoomData(object):
 				if t != None: return False #NOTE: because of this, if we make it possible to clear tiles, doing so should set those tiles to None.
 		return True
 
-	def tile_at(self,x,y):
+	def tile_at(self, x, y):
 		return self.tiles[y][x]
+
+	def effect_at(self, x, y):
+		return self.effects[y][x]
 
 	def setAllTiles(self, tile_set):
 		rows, cols = len(tile_set), len(tile_set[0])
@@ -31,6 +36,9 @@ class RoomData(object):
 	
 	def set_tile(self,tile_data,col,row):
 		self.tiles[row][col] = tile_data #might benefit from a special setter if tiledata becomes more complex.
+
+	def set_effect(self, effect_data, col, row):
+		self.effects[row][col] = effect_data
 
 	def formatted_data(self):
 		return ( self.global_x, self.global_y, self.formatted_tile_set() ) #might need to format tiles
@@ -113,6 +121,16 @@ class RoomData(object):
 		sign_data.text_panes = formatted_data[4]
 		return sign_data
 
+	@staticmethod
+	def deformatted_npc(formatted_data, filepath):	# this will need to change as this class's constructor does.
+		""" deformatted_npc( ? ) -> NPCData
+
+		Take a tuplet of primitive data loaded from a file and turn it into a usable NPCData object.
+		"""
+		npc_data = NPCData(formatted_data[0], formatted_data[1], filepath)
+		npc_data.text_panes = formatted_data[4]
+		return npc_data
+
 	#TODO: make sure this copies Platformer/chestdata.py
 	@staticmethod
 	def deformatted_chest(formatted_data, filepath):	# this will need to change as this class's constructor does.
@@ -149,8 +167,18 @@ class RoomData(object):
 				tiles[y].append(None)
 		return tiles
 
+	@staticmethod
+	def empty_effect_set(width,height):
+		effects = []
+		for y in xrange(height):
+			effects.append([])
+			for x in xrange(width):
+				effects[y].append(None)
+		return effects
+
 TILE_INIT_MAP = {
 	DEFAULT_SIGN:RoomData.deformatted_sign,
+	DEFAULT_NPC:RoomData.deformatted_npc,
 	DEFAULT_CHEST:RoomData.deformatted_chest,
 	DEFAULT_CUTSCENE_TRIGGER:RoomData.deformatted_cutscene_trigger,
 	DESTRUCTIBLE_PLATFORM:RoomData.deformatted_destructible_platform

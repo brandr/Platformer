@@ -54,11 +54,24 @@ class GameImage(pygame.sprite.Sprite):
         self.direction_id = 'default'
         self.animation_id = ('default', 'default')
 
+        self.changeDirection('default')
+
         self.default_image = copy.copy(self.animation.images[0]) #this might be an inefficient/awkward place to use copy in the long run.
         self.image = self.default_image
         self.image.convert()
         self.rect = self.image.get_bounding_rect()
         self.mask = pygame.mask.from_surface(self.image)
+
+    def refresh_rect_and_mask(self):
+        """ gi.refresh_rect_and_mask( ) -> None
+
+        Refresh pygame rect and mask values based on this gameimage's current image.
+        """
+        self.animate()
+        x, y = self.rect.left, self.rect.top
+        self.rect = self.image.get_bounding_rect()
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect.left, self.rect.top = x, y
 
     def coordinates(self):
         """ gi.coordinates -> ( int, int )
@@ -250,6 +263,7 @@ class GameImage(pygame.sprite.Sprite):
         
         Load an animation given a set of images and some other data.
         """
+        if colorkey == None: colorkey = DEFAULT_COLORKEY
         count = len(images)
         animation_strip = Surface( ( rect.width*count, rect.height ) )
         for i in xrange(count):

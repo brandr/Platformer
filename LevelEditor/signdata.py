@@ -19,7 +19,7 @@ class SignData(TileData):
 				copy_sign.text_panes[i].append(line)
 		return copy_sign
 
-	def set_sign_text(self, text_panes):
+	def set_dialog_text(self, text_panes):
 		self.text_panes = text_panes
 
 	def formatted_data(self):

@@ -34,6 +34,8 @@ ENTITY_CONSTRUCTOR_MAP = { #TODO: try to figure out why signs aren't in here
 
 	MINER:NonPlayerCharacter,
 
+	DEFAULT_NPC:NonPlayerCharacter,
+
 	DEFAULT_CUTSCENE_TRIGGER:CutsceneTrigger,	#this might not be necessary, but I'm not sure.
 	#TEMP
 	KENSTAR:NonPlayerCharacter
@@ -102,5 +104,6 @@ ENTITY_BUILD_MAP = {
 	ARMORED_FROG:EntityFactory.initMonster,
 	KENSTAR:EntityFactory.initNPC,
 	MINER:EntityFactory.initNPC,
+	DEFAULT_NPC:EntityFactory.initNPC,
 	DEFAULT_SIGN:EntityFactory.initSign
 }

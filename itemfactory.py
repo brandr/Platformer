@@ -38,15 +38,20 @@ def build_item( constructor, key, x, y ):
 	return item
 
 DEFAULT = "default"
+IDLE = "idle"
+LEFT = "left"
+RIGHT = "right"
 
 LANTERN = "lantern"
 
 ITEM_ANIMATION_DATA_MAP = {
 	LANTERN:
 		(
-			Rect(0, 0, 32, 32),
+			Rect(0, 0, 32, 64),
 			[
-				( "default_lantern_default.bmp", DEFAULT, DEFAULT )
+				( "lantern_idle_left.bmp", DEFAULT, DEFAULT ),
+				( "lantern_idle_left.bmp", LEFT, IDLE ),
+				( "lantern_idle_right.bmp", RIGHT, IDLE ),
 			]	
 		)
 }

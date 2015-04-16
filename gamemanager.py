@@ -61,6 +61,14 @@ class GameManager:
 		test_cutscene = Cutscene(actions)
 		player.current_level.begin_cutscene(test_cutscene)
 
+		#TEMP
+		pygame.mixer.init()
+		pygame.mixer.music.load('./music/test_song.mp3')
+		pygame.mixer.music.play(-1)
+
+		pygame.mixer.music.set_volume(0) # comment out this line to enable music.
+		#TEMP
+
 		while 1:
 			timer.tick(120) # make this value lower to make the game run slowly for testing. (use about 40-50 I think)
 
@@ -90,7 +98,7 @@ class GameManager:
 			return self.build_dungeon_and_screen()
 		dungeon_name = dungeon_files[dungeon_index - 1]
 		# ^^^^^^^^
-		
+		# change for exes
 		#dungeon_name = "Cave_test"
 		print "Building dungeon..."
 		dungeon_display_name = dungeon_name

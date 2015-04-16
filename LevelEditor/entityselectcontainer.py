@@ -1,8 +1,10 @@
-from tiledata import TileData, DESTRUCTIBLE_PLATFORM, DEFAULT_SIGN, DEFAULT_CHEST, DEFAULT_CUTSCENE_TRIGGER
+from tiledata import TileData, DESTRUCTIBLE_PLATFORM, DEFAULT_SIGN, DEFAULT_NPC, DEFAULT_CHEST, DEFAULT_CUTSCENE_TRIGGER, DEFAULT_LEVEL_EFFECT
 from platformdata import PlatformData, DestructiblePlatformData
 from signdata import SignData
+from npcdata import NPCData
 from chestdata import ChestData
 from cutscenetriggerdata import CutsceneTriggerData
+from leveleffectdata import LevelEffectData
 #import other children of tiledata separately
 
 from ocempgui.widgets import Bin, Box, FileList, Label, ImageLabel, Label, Entry
@@ -21,8 +23,10 @@ BMP_FILETYPE = 33204 #not sure if this will work cross-platform. (Then again, a 
 ENTITY_CONSTRUCTOR_MAP = {
 		DESTRUCTIBLE_PLATFORM:DestructiblePlatformData,
 		DEFAULT_SIGN:SignData,
+		DEFAULT_NPC:NPCData,
 		DEFAULT_CHEST:ChestData,
-		DEFAULT_CUTSCENE_TRIGGER:CutsceneTriggerData
+		DEFAULT_CUTSCENE_TRIGGER:CutsceneTriggerData,
+		DEFAULT_LEVEL_EFFECT:LevelEffectData
 }
 
 class EntitySelectContainer(Box):

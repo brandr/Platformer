@@ -23,7 +23,6 @@ class MainGameControls(Controls):
 		Controls.__init__(self)
 		self.player = player
 		self.load_controls()
-		#self.initialize_control_map(MAIN_GAME_CONTROL_MAP)
 
 	def load_controls(self):
 		""" mgc.load_controls( ) -> None
@@ -73,19 +72,61 @@ class MainGameControls(Controls):
 		"""
 		self.player.button_press_map[RIGHT] = toggle
 
-	def move_space(self, key, toggle):
-		""" mgc.move_space( str, bool ) -> None
+	def move_jump(self, key, toggle):
+		""" mgc.move_jump( str, bool ) -> None
 
-		Space key action.
+		Jump key action.
 		"""
 		self.player.button_press_map[SPACE] = toggle
 
-	def move_control(self, key, toggle):
-		""" mgc.move_control( str, bool ) -> None
+	def move_sprint(self, key, toggle):
+		""" mgc.move_sprint( str, bool ) -> None
 
-		Control key action.
+		Sprint key action.
 		"""
 		self.player.button_press_map[CONTROL] = toggle
+
+	def interact(self, key, toggle):
+		""" mgc.interact( str, bool ) -> None
+
+		Player interact action.
+		"""
+		self.player.button_press_map[X] = toggle
+		
+	def melee_attack(self, key, toggle):
+		""" mgc.melee_attack( str, bool ) -> None
+
+		Melee attack action.
+		"""
+		if toggle: self.player.temp_z_method()	#consider making this work like every other button, or making the x key work like this.
+
+	def ranged_attack(self, key, toggle):
+		""" mgc.ranged_attack( str, bool ) -> None
+
+		Ranged attack action.
+		"""
+		if toggle: self.player.shoot() 
+
+	def press_return(self, key, toggle):
+		""" mgc.press_return( str, bool ) -> None
+
+		Tell the player to pause the game.
+		"""
+		if(toggle):	self.player.pause_game()
+
+	def open_inventory(self, key, toggle):
+		""" mgc.open_inventory( str, bool ) -> None
+
+		Opens the player's inventory.
+		"""
+		if toggle: self.player.open_inventory()
+
+	def open_map(self, key, toggle):
+		""" mgc.open_map( str, bool ) -> None
+
+		Open the player's map.
+		"""
+		if toggle: self.player.open_map()
 
 	def press_c(self, key, toggle):
 		""" mgc.press_c( str, bool ) -> None
@@ -93,20 +134,6 @@ class MainGameControls(Controls):
 		c key action.
 		"""
 		if toggle: self.player.activate_lantern_ability()
-
-	def press_i(self, key, toggle):
-		""" mgc.press_i( str, bool ) -> None
-
-		i key action.
-		"""
-		if toggle: self.player.open_inventory()
-
-	def press_m(self, key, toggle):
-		""" mgc.press_m( str, bool ) -> None
-
-		m key action.
-		"""
-		if toggle: self.player.open_map()
 
 	def press_q(self, key, toggle):
 		""" mgc.press_q( str, bool ) -> None
@@ -122,59 +149,26 @@ class MainGameControls(Controls):
 		"""
 		if toggle: self.player.toggle_lantern_mode(1)
 
-	def press_x(self, key, toggle):
-		""" mgc.press_x( str, bool ) -> None
-
-		x key action.
-		"""
-		self.player.button_press_map[X] = toggle
-		
-	def press_z(self, key, toggle):
-		""" mgc.press_z( str, bool ) -> None
-
-		z key action.
-		"""
-		if toggle: self.player.temp_z_method()	#consider making this work like every other button, or making the x key work like this.
-
-	def press_return(self, key, toggle):
-		""" mgc.press_return( str, bool ) -> None
-
-		Tell the player to pause the game.
-		"""
-		if(toggle):	self.player.pause_game()
-
-
-
 move_up = MainGameControls.move_up
 move_down = MainGameControls.move_down
 move_left = MainGameControls.move_left
 move_right = MainGameControls.move_right
 
-move_space = MainGameControls.move_space
-move_control = MainGameControls.move_control
+move_jump = MainGameControls.move_jump
+move_sprint = MainGameControls.move_sprint
+
+interact = MainGameControls.interact
+melee_attack = MainGameControls.melee_attack
+ranged_attack = MainGameControls.ranged_attack
+
+open_inventory = MainGameControls.open_inventory
+open_map = MainGameControls.open_map
 
 press_c = MainGameControls.press_c
-press_i = MainGameControls.press_i
-press_m = MainGameControls.press_m
 press_q = MainGameControls.press_q
 press_w = MainGameControls.press_w
-press_x = MainGameControls.press_x
-press_z = MainGameControls.press_z
 
 press_return = MainGameControls.press_return
-
-MAIN_GAME_CONTROL_MAP = { 
-	K_UP:move_up, K_DOWN:move_down, K_LEFT: move_left, K_RIGHT:move_right,
-	K_SPACE:move_space, K_LCTRL:move_control,
-	K_c:press_c,
-	K_i:press_i,
-	K_m:press_m,
-	K_q:press_q,
-	K_w:press_w,
-	K_x:press_x,
-	K_z:press_z,
-	K_RETURN:press_return
-}
 
 KEY_VALUE_MAP = {
 	"up":K_UP, "down":K_DOWN, "left":K_LEFT, "right":K_RIGHT,
@@ -185,7 +179,7 @@ KEY_VALUE_MAP = {
 
 ACTION_MAP = {
 	"move left":move_left, "move right":move_right, "move up": move_up, "move down":move_down,
-	"jump":move_space, "sprint":move_control,
-	"attack":press_z, "interact":press_x, "pause":press_return, "inventory":press_i, "map":press_m,
+	"jump":move_jump, "sprint":move_sprint,
+	"melee attack":melee_attack, "ranged attack":ranged_attack, "interact":interact, "pause":press_return, "inventory":open_inventory, "map":open_map,
 	"toggle lantern left":press_q, "toggle lantern right":press_w, "lantern ability":press_c
 }

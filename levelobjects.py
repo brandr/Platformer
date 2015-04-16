@@ -22,11 +22,11 @@ class LevelObjects(object):
 
 	player: the player currently on the level. There can only be one.
 	"""
-	def __init__(self, level, tiles = None, entities = None):
+	def __init__(self, level, tiles = None, entities = None, level_effects = None):
 		self.level = level
 		self.tiles = tiles
-		#self.tiles = array(tiles)
 		self.entities = entities
+		self.level_effects = level_effects
 		self.player = None
 
 	def get_entities(self, entity_type):
@@ -85,10 +85,9 @@ class LevelObjects(object):
 		This is generally done if there is a saved set of level objects to be placed into
 		a level when it's generated.
 		"""
-		if self.tiles == None:
-			self.tiles = []
-		if self.entities == None:
-			self.entities = []
+		if self.tiles == None: self.tiles = []
+		if self.entities == None: self.entities = []
+		if self.level_effects == None: self.level_effects = []
 		level = self.level
 		x_offset = room_coords[0] - level.origin[0]	#this didn't work. need to test new version before deleting, though.
 		y_offset = room_coords[1] - level.origin[1]
@@ -99,6 +98,13 @@ class LevelObjects(object):
 			if(entity_x_offset != 0 or entity_y_offset != 0):
 				e.moveRect(entity_x_offset*32, entity_y_offset*32)
 			e.current_level = level
+		for le in level_objects.level_effects:
+			self.level_effects.append(le)
+			entity_x_offset = ROOM_WIDTH*x_offset
+			entity_y_offset = ROOM_HEIGHT*y_offset
+			if(entity_x_offset != 0 or entity_y_offset != 0):
+				le.moveRect(entity_x_offset*32, entity_y_offset*32)
+			le.current_level = level
 		for row in level_objects.tiles:
 			for t in row:
 				self.addTile(t, x_offset, y_offset)

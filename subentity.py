@@ -29,13 +29,14 @@ class SubEntity(Being): #NOTE: should lanterns be a subentity?
 		self.follow_offset = (0, 0)
 		self.permanent = False
 
-	def activate(self, permanent = False):
+	def activate(self, permanent = False, new_superentity = None):
 		""" se.activate( ) -> None
 
 		Make the subentity appear onscreen and start doing whatever it does.
 		(That means this is an abstract class, not that I'm too lazy to describe it.)
 		"""
 		if self.active: return
+		if new_superentity: self.superentity = new_superentity
 		self.active = True
 		self.superentity.add_subentity(self)
 		self.active_count = 20 #TEMP
@@ -46,7 +47,6 @@ class SubEntity(Being): #NOTE: should lanterns be a subentity?
 
 		Remove the subentity from the screen and make it stop doing things.
 		"""
-		#print "DEACTIVATING"
 		self.active = False
 		self.superentity.remove_subentity(self)
 

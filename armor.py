@@ -46,6 +46,7 @@ class Armor(SubEntity):
 		Note that it does not perform the "single animation update",
 		because armor does not vanish after completing an animation.
 		"""
+		if self.superentity.direction_id != self.direction_id: self.refresh_rect_and_mask()
 		self.changeAnimation('idle', self.superentity.direction_id)
 		SubEntity.update(self)
 		SubEntity.follow_update(self)

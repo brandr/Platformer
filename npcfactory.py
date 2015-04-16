@@ -2,12 +2,44 @@
 """
 
 from nonplayercharacter import *
+from tiledata import DEFAULT_NPC
+from gameimage import GameImage
+from animationset import AnimationSet
 #NOTE: in the future, this may require saving/loading data
 #about NPCs that appear in more than one area.
 
 class NPCFactory:
-	""" No constructor.
-	"""
+	#TODO: make a bulid_entity method for default npcs and delete the corresponding code in init_NPC.
+
+	@staticmethod
+	def build_entity(raw_npc_image, npc_rect, npc_data, x, y):	#not sure if I can use sign_key-- might need a different structure to figure out the proper text
+		""" build_entity( Surface, Rect, NPCData, int, int ) -> NonPlayerCharacter
+
+		Take an npc image and rect to create the npc object that will appear on the level, and use the npc data 
+		to build the text for the npc's dialogue.
+
+		Note that the raw_npc_image is always the right-facing version, which will be algorithmically flipped to create the left-facing image.
+		"""
+		filepath = './animations/'
+		file_key = npc_data.file_key
+		npc_idle_left = GameImage.load_animation(filepath,  file_key + '_idle_left.bmp', npc_rect, -1)
+		npc_idle_right = GameImage.load_animation(filepath,  file_key + '_idle_right.bmp', npc_rect, -1)
+		animations = AnimationSet(npc_idle_left)
+		animations.insertAnimation(npc_idle_left, 'left', 'idle')
+		animations.insertAnimation(npc_idle_right, 'right', 'idle')
+		npc = NonPlayerCharacter(animations, x, y)
+		text_panes = npc_data.text_panes
+		dialog_set = [] 		
+		for t in text_panes: 
+			text = ""
+			for line in t:
+				text += line
+			dialog_set.append( ( text, None ) )
+		npc.dialog_tree = ( dialog_set, None )
+		npc.dialog_tree_map = { START: npc.dialog_tree }
+		#sign.set_text_set(sign_text_panes)		# TODO: need to build a dialog tree instead of using set_text_set.
+		return npc
+
 	@staticmethod
 	def init_NPC(npc, name):
 		""" init_NPC( NonPlayerCharacter, str ) -> None
@@ -19,15 +51,20 @@ class NPCFactory:
 		npc.name = name
 
 		#TEMP FOR TESTING
-		temp_dialog_tree_map = MASTER_NPC_DIALOG_MAP[name] 
+		if name in MASTER_NPC_DIALOG_MAP[COMPLEX]:
+			temp_dialog_tree_map = MASTER_NPC_DIALOG_MAP[COMPLEX][name] 
 		# TODO: need to make dialog more extensible later on
 		# IDEA: map each NPC by name to a dict of possible dialogs, whose key (or value?) can in turn be changed somehow.
 		#TEMP FOR TESTING
-
-		npc.dialog_tree = temp_dialog_tree_map[START] # later on, it might be useful to change START to some value that can change as the game progresses.
-		npc.dialog_tree_map = temp_dialog_tree_map
+			npc.dialog_tree = temp_dialog_tree_map[START] # later on, it might be useful to change START to some value that can change as the game progresses.
+			npc.dialog_tree_map = temp_dialog_tree_map
+		elif name == DEFAULT_NPC:
+			print "SIMPLE HUMAN"
+			#TODO: treat the NPC's dialogue exactly like a sign's
 
 START = "start"
+COMPLEX = "complex"
+SIMPLE = "simple"
 TEST_KENSTAR_TIRED = "test_kenstar_tired"
 
 # for now, test dialog trees go here.
@@ -119,6 +156,8 @@ TEST_MINER_DIALOG_TREE_MAP = {
 }
 
 MASTER_NPC_DIALOG_MAP = {
-	KENSTAR:TEST_KENSTAR_DIALOG_TREE_MAP,
-	MINER:TEST_MINER_DIALOG_TREE_MAP
+	COMPLEX:{
+		KENSTAR:TEST_KENSTAR_DIALOG_TREE_MAP,
+		MINER:TEST_MINER_DIALOG_TREE_MAP
+	}
 }

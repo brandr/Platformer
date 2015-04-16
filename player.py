@@ -9,6 +9,7 @@ from platform import Platform, DestructiblePlatform
 from platformdata import DESTROY_STEP_ON
 from animationset import AnimationSet
 from lightflash import LightFlash
+from projectile import Projectile
 
 from weaponfactory import build_weapon, SWORD
 from inventory import Inventory, LANTERN
@@ -16,8 +17,12 @@ from level import DISPLAY_MEMORY
 from maingamecontrols import LEFT, RIGHT, DOWN, UP, SPACE, CONTROL, X
 from lantern import DEFAULT_MODE, MEMORY_MODE
 
+import thread
+
 MAX_LIGHT_FLASH_RADIUS = 10 #might move this somewhere else
 LIGHT_FLASH_ALPHA = 100
+
+DEFAULT_MUSIC_FADE_MS = 1100
 
 STARTING_BUTTON_PRESS_MAP = {
     LEFT:False, RIGHT:False, DOWN:False, UP:False,
@@ -93,15 +98,7 @@ class Player(Being):
         #TEMP
         sword = build_weapon(SWORD, self)
         self.acquire_item(sword, SWORD)
-        #self.sword = build_weapon(SWORD, self)
         self.hit_points = [10, 10]
-        #TEMP
-
-    def temp_z_method(self):    
-        #TEMP (no docstring)
-        #TODO: find some way to pass this directional check into the sword itself.
-        self.get_sword().activate(32, 0, self.direction_id) 
-        #TODO: make a sword-swinging animation for the player, and set it so that the player cannot face the other way if moving left while swinging right (i.e., he just walks backwards)
         #TEMP
 
     @staticmethod
@@ -216,12 +213,12 @@ class Player(Being):
         update_method = MOVEMENT_STATE_MAP[self.movement_state]
         update_method(self)
         self.invincibility_update()
-        self.lantern_update()
         Being.updatePosition(self)
         player_interactables = self.current_level.player_interactables()
         for e in player_interactables:
             e.update(self)
         self.updateView(tiles, light_map)
+        self.lantern_update()
 
     def default_move_update(self):  #consider separating midair update into its own method if this gets too complex.
         """ p.default_move_update( ) -> None
@@ -325,8 +322,50 @@ class Player(Being):
         Update the player's lantern (draining oil) if the player is underground and holding a lantern.
         """
         lantern = self.get_lantern()
-        if lantern and not self.current_level.outdoors:
-            lantern.active_update(self.active)
+        if lantern: 
+            if not self.current_level.outdoors:
+                if not lantern in self.active_subentities: lantern.activate(True, self)
+                lantern.active_update(self.active, self.direction_id)
+            else: 
+                lantern.superentity = self
+                lantern.deactivate()
+
+    def temp_z_method(self):    
+        #TEMP (no docstring)
+        #TODO: find some way to pass this directional check into the sword itself.
+        self.get_sword().activate(32, 0, self.direction_id) 
+        #TODO: make a sword-swinging animation for the player, and set it so that the player cannot face the other way if moving left while swinging right (i.e., he just walks backwards)
+        #TEMP
+
+    def shoot(self):
+        """ p.shoot() -> None
+
+        Not sure what this will do in final version.
+        """
+        # Create a temporary way to produce simple projectiles.
+        projectile = self.temp_create_projectile()
+        self.current_level.level_objects.addEntity(projectile)
+        self.active_projectiles.append(projectile)
+
+    def temp_create_projectile(self):
+        animations = self.temp_load_projectile_animation_set()
+        coords = self.rect_coords()
+        x, y = coords[0], coords[1]
+        direction = -1
+        if self.direction_id == 'right': direction = 1
+        xvel, yvel = direction*6, 0
+        return Projectile(self, animations, x, y, xvel, yvel)
+
+    def temp_load_projectile_animation_set(self):
+        rect = Rect(0, 0, 32, 32)
+        filepath = './animations/'
+        default_animation = GameImage.load_animation(filepath, 'temp_projectile_default.bmp', rect, -1, True, 6)
+        plink_animation = GameImage.load_animation(filepath, 'temp_projectile_plink.bmp', rect, -1, True, 6)
+        hit_animation = GameImage.load_animation(filepath, 'temp_projectile_hit.bmp', rect, -1, True, 6)
+        animation_set = AnimationSet(default_animation)
+        animation_set.insertAnimation(plink_animation, 'default', 'plink')
+        animation_set.insertAnimation(hit_animation, 'default', 'hit')
+        return animation_set
 
     def refresh_animation_set(self):
         """ p.refresh_animation_set( ) -> None
@@ -339,6 +378,21 @@ class Player(Being):
         else:
             animations = Player.load_player_animation_set()
         self.change_animation_set(animations)
+
+    def music_update(self, level):
+        """ p.music_update( Level ) -> None
+
+        If the music on this level is different from the music in the previous level, switching to the new music.
+        """
+        if level.music_key == self.current_level.music_key: return
+        music_fade_ms = DEFAULT_MUSIC_FADE_MS
+        thread.start_new_thread( Player.switch_music, ( self, music_fade_ms, self.current_level.music_key  ) )
+        
+
+    def switch_music(self, fade_ms, music_key):
+        pygame.mixer.music.fadeout(fade_ms)
+        pygame.mixer.music.load("./music/" + self.current_level.music_key + ".mp3")
+        pygame.mixer.music.play( -1)
 
     def activate_lantern_ability(self):
         """ p.activate_lantern_ability( ) -> None
@@ -415,9 +469,6 @@ class Player(Being):
         """
         GameImage.updateAnimation(self, 256)  
         self.explore_adjacent_tiles(all_tiles)       
-        #if(self.current_level.outdoors):
-        #    return
-        #self.emit_light(self.sight_dist(), all_tiles, light_map)
 
     def explore_adjacent_tiles(self, tiles):
         """ p.explore_adjacent_tiles( [ [ Tile ] ] ) -> None

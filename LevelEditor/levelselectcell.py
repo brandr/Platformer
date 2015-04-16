@@ -72,6 +72,17 @@ class LevelSelectCell(Table):
 		relative_row = row%ROOM_HEIGHT
 		self.room_cells[adjusted_room_row][adjusted_room_col].add_entity(tile_data, relative_col, relative_row)
 
+	def add_effect(self, effect_data, col, row):
+		room_offset = self.origin()
+		room_col = col/ROOM_WIDTH	#make sure we have access to these
+		room_row = row/ROOM_HEIGHT
+		adjusted_room_col = room_col + room_offset[0]
+		adjusted_room_row = room_row + room_offset[1]
+		relative_col = col%ROOM_WIDTH
+		relative_row = row%ROOM_HEIGHT
+		self.room_cells[adjusted_room_row][adjusted_room_col].add_effect(effect_data, relative_col, relative_row)
+
+	#TODO
 	#could probabaly shorten tile_at and add_entity with an accessory method
 	def tile_at(self, col, row):
 		room_offset = self.origin()
@@ -82,6 +93,16 @@ class LevelSelectCell(Table):
 		relative_col = col%ROOM_WIDTH
 		relative_row = row%ROOM_HEIGHT
 		return self.room_cells[adjusted_room_row][adjusted_room_col].tile_at(relative_col, relative_row)
+
+	def effect_at(self, col, row):
+		room_offset = self.origin()
+		room_col = col/ROOM_WIDTH	#make sure we have access to these
+		room_row = row/ROOM_HEIGHT
+		adjusted_room_col = room_col + room_offset[0]
+		adjusted_room_row = room_row + room_offset[1]
+		relative_col = col%ROOM_WIDTH
+		relative_row = row%ROOM_HEIGHT
+		return self.room_cells[adjusted_room_row][adjusted_room_col].effect_at(relative_col, relative_row)		
 
 	def updateSunlit(self, sunlit):
 		self.sunlit = sunlit

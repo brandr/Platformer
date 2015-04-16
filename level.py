@@ -12,6 +12,7 @@ from levelobjects import LevelObjects
 from entity import Entity
 from cutscenetrigger import CutsceneTrigger
 from pickup import Pickup
+from projectile import Projectile
 from platform import Platform, DestructiblePlatform, PassablePlatform
 from ladder import Ladder
 from sign import Sign
@@ -96,8 +97,6 @@ class Level(object):
 
 	outdoors: flags whether sunlight fills the level.
 
-	current_light_map: a 2D list of floating point values from 0-256 representing the light level of each tile.
-
 	explored: a 2D list of booleans representing the room-sized areas in this level that the player has been to so far.
 	"""
 	#a level is built from a rectangular set of rooms.
@@ -107,7 +106,8 @@ class Level(object):
 		
 		self.screen = None
 		self.screen_manager = None
-		self.effect_layer = []
+		
+		self.cutscene_effect_layer = []
 		self.has_effects = False
 		self.current_event = None
 		self.active = True
@@ -119,7 +119,7 @@ class Level(object):
 		self.level_objects = LevelObjects(self) # all objects in the level (tiles and entities)
 		self.start_coords = None 				# coords where the player appears upon entering the level (set by addRooms)
 		self.dungeon_travel_data = level_data.travel_data
-		self.adjacent_dungeon = None #not sure if I'll use this yet
+		self.adjacent_dungeon = None 
 		self.addRooms(rooms)
 
 		tiles = self.getTiles()
@@ -131,6 +131,11 @@ class Level(object):
 		self.outdoors = level_data.sunlit
 		self.concentric_circle_map = None
 		if(not self.outdoors): self.concentric_circle_map = self.load_concentric_circles()
+
+		#TEMP
+		self.music_key = "test_song"
+		if not self.outdoors: self.music_key = "test_song_2"
+		#TEMP
 
 		if(self.outdoors): self.setTilesOutdoors() #TEMP
 		self.init_bg(level_data.bg_filename)
@@ -486,6 +491,7 @@ class Level(object):
 				player.rect.left += direction[0]
 				player.rect.top += direction[1]
 		player.current_level.update_explored()
+		player.music_update(self)
 
 	def move_player_dungeon(self, coords):
 		""" l.move_player_dungeon( ( int, int ) ) -> None
@@ -662,7 +668,7 @@ class Level(object):
 		Add a visual effect (such as cutscene bars) that is rendered on the topmost layer, even above 
 		entity effects and subentities.
 		"""
-		self.effect_layer.append(effect)
+		self.cutscene_effect_layer.append(effect)
 		self.has_effects = True
 
 	def remove_effect(self, effect):
@@ -670,9 +676,9 @@ class Level(object):
 
 		Remove a visual effect from the screen.
 		"""
-		if effect in self.effect_layer:
-			self.effect_layer.remove(effect)
-			if not self.effect_layer:
+		if effect in self.cutscene_effect_layer:
+			self.cutscene_effect_layer.remove(effect)
+			if not self.cutscene_effect_layer:
 				self.has_effects = False
 
 	def end_effects(self):
@@ -681,7 +687,7 @@ class Level(object):
 		Clear all visual effects from the screen. This must be done in reverse order,
 		or else the iteration process will be interrupted by the removals.
 		"""
-		for e in reversed(self.effect_layer):
+		for e in reversed(self.cutscene_effect_layer):
 			e.end(self)
 
 	def clear_effects(self):
@@ -689,7 +695,7 @@ class Level(object):
 
 		Empty the effect layer. This will probably be called at the same time as end_effects().
 		"""
-		self.effect_layer = []
+		self.cutscene_effect_layer = []
 		self.has_effects = False
 
 	def display_dialog(self, dialog):
@@ -748,11 +754,8 @@ class Level(object):
 			self.level_camera.update( player )						# try calling this at the end of this method if there are weird visual effects.
 			player.update(all_tiles, light_map)
 			player_subs = player.active_subentities
-			if player_subs:
-				for s in player_subs: s.update()
-			destructible_platforms = self.getDestructiblePlatforms()
-			for dp in destructible_platforms:
-				dp.update(player)
+			for s in player_subs: s.update()
+			for p in self.getProjectiles(): p.update()
 			display_mode = self.display_mode( player )
 			display_method = DISPLAY_MODE_MAP[display_mode]
 			display_method( self, tiles, player )
@@ -766,6 +769,7 @@ class Level(object):
 		self.draw_level_contents(tiles, player)
 		if (player.invincibility_frames % 2) == 0: self.screen.blit(player.image, self.level_camera.apply(player))
 		self.display_passable_blocks()
+		self.display_player_subentities(player)
 		if not self.current_event:
 			self.update_player_hud(player) 
 		if(self.has_effects): 
@@ -780,6 +784,7 @@ class Level(object):
 		light_map = self.empty_light_map( )
 		if (player.invincibility_frames % 2) == 0: self.screen.blit(player.image, self.level_camera.apply(player))
 		self.display_passable_blocks()
+		self.display_player_subentities(player)
 		if light_map: self.update_light(light_map)	
 		if not self.current_event:
 			self.update_player_hud(player) 
@@ -793,6 +798,7 @@ class Level(object):
 		except that nothing is drawn but the player.
 		"""
 		if (player.invincibility_frames % 2) == 0: self.screen.blit(player.image, self.level_camera.apply(player))
+		self.display_player_subentities(player)
 		if not self.current_event:
 			self.update_player_hud(player) 
 		if(self.has_effects): 
@@ -889,17 +895,21 @@ class Level(object):
 					self.screen.blit(e.image, self.level_camera.apply(e))	
 			# ...and ending here
 
+		for p in self.getProjectiles():
+			self.screen.blit(p.image, self.level_camera.apply(p))
+
+		"""
 		player_subs = player.active_subentities
 		if player_subs:
 			for s in player_subs:
 				if s.active:
-					self.screen.blit(s.image, self.level_camera.apply(s))	
+					self.screen.blit(s.image, self.level_camera.apply(s))
 		player_effects = player.entity_effects
 		if player_effects:
 			for e in player_effects:
 				e.update()
 				self.screen.blit(e.image, self.level_camera.apply(e))		
-
+		"""
 	def update_light(self, light_map):
 		""" l.update_light( [ [ double ] ] ) -> None 
 
@@ -937,6 +947,23 @@ class Level(object):
 		for p in self.getPassablePlatforms():
 			self.screen.blit(p.image, self.level_camera.apply(p))	
 
+	def display_player_subentities(self, player):
+		""" l.display_player_subentities( Player ) -> None
+
+		Display all of the player's subentites and effects.
+		This should be done after blitting the player.
+		"""
+		player_subs = player.active_subentities
+		if player_subs:
+			for s in player_subs:
+				if s.active:
+					self.screen.blit(s.image, self.level_camera.apply(s))
+		player_effects = player.entity_effects
+		if player_effects:
+			for e in player_effects:
+				e.update()
+				self.screen.blit(e.image, self.level_camera.apply(e))	
+
 	def display_mode(self, player):
 		""" l.display_mode( Player ) -> str
 
@@ -969,7 +996,7 @@ class Level(object):
 		Display visual effects like cutscene bars and dialog boxes.
 		These are usually on the topmost layer.
 		"""
-		for e in self.effect_layer:
+		for e in self.cutscene_effect_layer:
 			next_effect, offset = e.draw_image(self)
 			self.screen.blit(next_effect, (e.offset[0] + offset[0], e.offset[1] + offset[1]))
 
@@ -1065,6 +1092,8 @@ class Level(object):
 			interactables.append(n)
 		for t in self.getTriggers():
 			interactables.append(t)
+		for dp in self.getDestructiblePlatforms():
+			interactables.append(dp)
 		return interactables
 		#TODO: other objects that should update based on the player
 
@@ -1170,7 +1199,14 @@ class Level(object):
 		Returns all pickups in the level.
 		"""
 		return self.level_objects.get_entities(Pickup)
-		
+
+	def getProjectiles(self):
+		""" l.getProjectiles( ) -> [ Projectile ]
+
+		Returns all projectiles in the level.
+		"""
+		return self.level_objects.get_entities(Projectile)
+
 	def getPlatforms(self):
 		""" l.getPlatforms( ) -> [ Platform ]
 

@@ -1,13 +1,16 @@
 """ An item the player can acquire to light the area around him.
 """
 
-from entity import *
+#from entity import *
+from subentity import SubEntity
+from animationset import AnimationSet
 import math
+from pygame import Rect
 
 FLICKER_CONSTANT = 120
 
-class Lantern(Entity):	#lantern which can help the player see
-    """ Lantern( AnimationSet, int, int ) -> Lantern
+class Lantern(SubEntity):	#lantern which can help the player see
+    """ Lantern( AnimationSet, int, int, Player ) -> Lantern
 
     A lantern exists either on the ground or in the player's inventory. I may change this in the future,
     and make it so lanterns can't just sit on the ground.
@@ -21,8 +24,9 @@ class Lantern(Entity):	#lantern which can help the player see
 
     light_multiplier: A value applied to the current oil ratio. Effectively represents the maximum light radius.
     """
-    def __init__(self, animations, x, y):
-        Entity.__init__(self, animations)
+    def __init__(self, animations, x, y, player = None):
+        SubEntity.__init__(self, player, animations, x, y)
+        #self.load_animation_set()
         self.rect.centerx += x
         self.rect.centery += y
         self.animated = True
@@ -33,40 +37,40 @@ class Lantern(Entity):	#lantern which can help the player see
         self.oil_meter = [9999, 9999]
         self.light_multiplier = 5           # Note that light multiplier is technically meant to determine light radius, but sometimes there is an off-by-one or off-by-two error of some sort.
 
-    def update(self, player):
-        """ l.update( Player ) -> None
+    def update(self):
+        """ l.update( ) -> None
 
-        Calls the flicker update, which may temporarily change the light radius.
-        This method should only be called when the lantern is sitting on the ground.
-        Other methods are called separately if the player is holding the lantern.
-
-        NOTE: this method may end up being unused.
+        Update the lantern (as an active subentity)
         """
-        self.flicker_update()
-        self.updateAnimation()
+        pass
 
-    def active_update(self, player_active):
+    def active_update(self, player_active, direction_id):
         """ l.active_update( bool ) -> None
 
         If the lantern is held by the player and is currently being used, update it proprely.
         player_active will be false if the player is in an event. It will keep the lantern's oil from draining
         and also turn off non-default lantern modes.
         """
+        SubEntity.update(self)
+        self.follow_update()
         if not player_active: self.mode = DEFAULT_MODE
         update_method = UPDATE_MODE_MAP[self.mode]
-        update_method(self, player_active)
+        update_method(self, player_active, direction_id)
         cost = OIL_COST_MAP[self.mode]
         self.oil_update(cost)
 
-    def default_update(self, player_active):
+    def default_update(self, player_active, direction_id):
         """ l.default_update( bool ) -> None
 
         Basic update for when the lantern is in its default mode.
         """
         self.flicker_update()
+        self.direction_id = direction_id
+        self.changeAnimation('idle', self.direction_id)
+        #self.updateAnimation()
         #if player_active: self.oil_update(1)
 
-    def memory_update(self, player_active):
+    def memory_update(self, player_active, direction_id):
         """ l.memory_update( ) -> None
 
         Update for when the lantern is in memory mode.

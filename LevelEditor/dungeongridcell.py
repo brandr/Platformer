@@ -81,8 +81,14 @@ class DungeonGridCell(ImageButton):
 	def add_entity(self, tile_data, col, row):
 		self.room_data.set_tile(tile_data, col, row)
 
+	def add_effect(self, effect_data, col, row):
+		self.room_data.set_effect(effect_data, col, row)	
+
 	def tile_at(self, x, y):
 		return self.room_data.tile_at(x, y)
+
+	def effect_at(self, x, y):
+		return self.room_data.effect_at(x, y)
 
 	#NOTE: could put these tiles (or just the color codes) in a dict as constants
 	@staticmethod

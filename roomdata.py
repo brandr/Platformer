@@ -2,10 +2,11 @@
 """
 
 from signdata import SignData
+from npcdata import NPCData
 from cutscenetriggerdata import CutsceneTriggerData
 from chestdata import ChestData
 from platformdata import PlatformData, DestructiblePlatformData
-from tiledata import TileData, BlockedTileData, DEFAULT_SIGN, DEFAULT_CHEST, DEFAULT_CUTSCENE_TRIGGER, DESTRUCTIBLE_PLATFORM
+from tiledata import TileData, BlockedTileData, DEFAULT_SIGN, DEFAULT_NPC, DEFAULT_CHEST, DEFAULT_CUTSCENE_TRIGGER, DESTRUCTIBLE_PLATFORM
 
 ROOM_WIDTH = 28
 ROOM_HEIGHT = 20
@@ -177,6 +178,16 @@ class RoomData(object):
 		return sign_data
 
 	@staticmethod
+	def deformatted_npc(formatted_data, filepath):	# this will need to change as this class's constructor does.
+		""" deformatted_npc( ? ) -> NPCData
+
+		Take a tuplet of primitive data loaded from a file and turn it into a usable NPCData object.
+		"""
+		npc_data = NPCData(formatted_data[0], formatted_data[1], filepath)
+		npc_data.text_panes = formatted_data[4]
+		return npc_data
+
+	@staticmethod
 	def deformatted_chest(formatted_data, filepath):	# this will need to change as this class's constructor does.
 		""" deformatted_chest( ? ) -> ChestData
 
@@ -222,6 +233,7 @@ class RoomData(object):
 
 TILE_INIT_MAP = {
 	DEFAULT_SIGN:RoomData.deformatted_sign,
+	DEFAULT_NPC:RoomData.deformatted_npc,
 	DEFAULT_CHEST:RoomData.deformatted_chest,
 	DEFAULT_CUTSCENE_TRIGGER:RoomData.deformatted_cutscene_trigger,
 	DESTRUCTIBLE_PLATFORM:RoomData.deformatted_destructible_platform
