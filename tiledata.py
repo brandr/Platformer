@@ -1,8 +1,10 @@
 """ A data object used to build a tile (and the entity in it, if there is one).
 """
 
-from pygame import image
+from pygame import image, Rect
 import pygame, pygame.locals
+from gameimage import GameImage, DEFAULT_COLORKEY
+from animationset import AnimationSet
 
 DEFAULT_TILE_SIZE = 32
 
@@ -143,6 +145,10 @@ DEFAULT_NPC_ANIMATION_KEYS = [
 	(IDLE_RIGHT, IDLE, D_RIGHT)
 ]
 
+DEFAULT_EFFECT_ANIMATION_KEYS = [
+	(DEFAULT, DEFAULT, D_DEFAULT)
+]
+
 # Note that not every monster needs an animation key set.
 # We can use default(s) for monsters whose animation key sets
 # are not shown here, based on their type if necessary.
@@ -157,11 +163,13 @@ ANIMATION_KEY_MAP = {
 	DEFAULT_LANTERN:DEFAULT_LANTERN_ANIMATION_KEYS,
 	BAT:BAT_ANIMATION_KEYS,
 	MINER:MINER_ANIMATION_KEYS
+	#DEFAULT_LEVEL_EFFECT:DEFAULT_EFFECT_ANIMATION_KEY
 }
 
 CATEGORY_ANIMATION_KEY_MAP = {
 	MONSTERS:DEFAULT_MONSTER_ANIMATION_KEYS, 
-	NPCS:DEFAULT_NPC_ANIMATION_KEYS
+	NPCS:DEFAULT_NPC_ANIMATION_KEYS,
+	LEVEL_EFFECTS:DEFAULT_EFFECT_ANIMATION_KEYS
 }
 
 class TileData(object):
@@ -202,6 +210,29 @@ class TileData(object):
 		filename = "./images/" + self.image_filepath.split("/")[-1]
 		return TileData.load_image(filename)
 	
+	def get_animation_set(self, tile_size, filepath_start = "./"):
+		key = self.image_filepath.split("/")[-1]
+		key = key.split(".bmp")[0]
+		animation_keys = self.animation_keys()
+		image_rect = Rect(0, 0, tile_size*self.width, tile_size*self.height)
+		animation_filepath = "./animations"
+		default_key = animation_keys[0][0]
+		default_animation_filename = key + "_" + default_key + ".bmp"
+		default_animation = GameImage.load_animation("./animations", default_animation_filename, image_rect, DEFAULT_COLORKEY)
+		animation_set = AnimationSet(default_animation)
+		
+		for n in xrange(1, len(animation_keys)):
+			anim_file_key = animation_keys[n][0]
+			anim_key = animation_keys[n][1]
+			anim_direction = animation_keys[n][2] 
+			anim_frames = 10
+			if len(animation_keys[n]) > 3:
+				anim_frames = animation_keys[n][3]
+			animation_filename = key + "_" + anim_file_key + ".bmp"
+			next_animation = GameImage.load_animation(animation_filepath, animation_filename, image_rect, colorkey, True, anim_frames)
+			animation_set.insertAnimation(next_animation, anim_direction, anim_key)
+		return animation_set
+
 	@staticmethod
 	def load_image (filename, alpha = False, colorkey = None):
 		""" td.load_image( str, bool, str ) -> Surface

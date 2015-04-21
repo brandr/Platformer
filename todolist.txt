@@ -153,28 +153,9 @@ OVERARCHING MAIN GOAL: Build a demo showing off combat, exploration, dialogs, cu
 IMMEDIATE STUFF: most immediate (defined mainly as finishing incomplete systems or creating new ones that are interesting or that other TODOs depend on.)
 
 # might be able to draw the player towards some places in the darkness by blitting transparent white rings (or some other visual effect) over important spots
-    - fix the bugs where the red outline remains and where the level effect doesn't appear but it can still be selected
-    - need to change leveleditor in the following ways:
-        * need to make it possible to blit effects without the pink background
-        * make it possible to select effects by left-clicking on them
-        * make it possible to remove effects (and only effects) by right-clicking on them
-            # a second click removes the entity underneath
-        * copy the changes in LevelEditor/roomdata to roomdata
-    - files and methods to change:
-        * need to make leveleffect.py (and possibly leveleffectdata.py)
-        * LevelEditor/levelselectcell.py: add_level_effect()
-        * LevelEditor/levelgrid.py: add_level_effect()
-        * Figure out how to make the level editor load effects properly. (same as loading entities)
-        * make sure the level can display effects properly
-        * TODO
-    - IDEA: simply create a new leveleffects folder in LevelEditor/images and check current_selection when left-clicking.
-        * in doing so, prevent placed effects from snapping to grid
-    - Change addLevelObjects in levelobjects.py and look for a LevelObjects constructor in roomfactory.py. Change these so they include level effects, and backtrack to where the level effects are created
-        * Don't want to set up LevelEffects using RoomData's tileat because we should make it possible to use any offset
-        * use a separate loop from the main one in roomfactory's build_room
-    - could also use slight glimmers
-    - note that these purely visual effects may do well with a separate generation system from the entities made in the level editor.
-    - might even use a completely separate editor. Not sure, though
+    - it works, but make it possible to add additional data to level effects, starting with transparency.
+    - could also make a flag that removes some effects when they are exposed to light.
+    - experiment with effects that are larger than 32x32. (may need to change the constructor where the rect is created)
 # make the miner more reactive by making his charge bring him to the player, then stop, and creating a more animated swing animation for when he is in front of the player.
 # figure out how monster spawining should be handled: i.e., when monsters defeated earlier should reappear.
     - it's possible this will relate to World data.

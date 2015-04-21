@@ -7,6 +7,7 @@ from chestfactory import ChestFactory
 from doorfactory import DoorFactory
 from pickupfactory import PickupFactory
 from cutscenetriggerfactory import CutsceneTriggerFactory
+from leveleffectfactory import LevelEffectFactory
 from levelobjects import LevelObjects
 from room import Room
 from block import Block
@@ -114,6 +115,7 @@ class RoomFactory(object):
 			tiles.append([])
 			for col in xrange(end_x):
 				next_tile_data = room_data.tile_at(col, row)
+				next_effect_data = room_data.effect_at(col, row)	
 				t = Tile(default_tile, x, y)
 				if next_tile_data != None and not isinstance(next_tile_data, BlockedTileData):
 					if next_tile_data.entity_key == PLAYER_START:
@@ -132,7 +134,7 @@ class RoomFactory(object):
 								t.block = entity
 						
 						elif next_tile_data.is_animated():
-							entity_animation_set = GameImage.load_animation_set(next_tile_data, DEFAULT_TILE_SIZE)	#TODO: allow this to incorporate frames
+							entity_animation_set = GameImage.load_animation_set(next_tile_data, DEFAULT_TILE_SIZE)
 							e = EntityFactory.build_entity(entity_animation_set, key, x, y)
 							entities.append(e)
 		
@@ -142,12 +144,16 @@ class RoomFactory(object):
 							entities.append(e)
 							if isinstance(e, Block): 
 								t.block = e
+				if next_effect_data != None:
+					effect_animation_set = next_effect_data.get_animation_set(DEFAULT_TILE_SIZE) 
+					width, height = next_effect_data.width, next_effect_data.height
+					e = LevelEffectFactory.build_entity(effect_animation_set, next_effect_data, x, y)
+					level_effects.append(e)
 		
 				tiles[y/DEFAULT_TILE_SIZE].append(t)
 				x += DEFAULT_TILE_SIZE 
 			y += DEFAULT_TILE_SIZE
 			x = 0
-		# TODO: fill in level effects
 		room_objects = LevelObjects(None, tiles, entities, level_effects)
 		created_room = Room(room_objects, dungeon, (global_x, global_y), start_coords)
 		return created_room

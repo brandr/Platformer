@@ -7,6 +7,7 @@ from cutscenetriggerdata import CutsceneTriggerData
 from chestdata import ChestData
 from platformdata import PlatformData, DestructiblePlatformData
 from tiledata import TileData, BlockedTileData, DEFAULT_SIGN, DEFAULT_NPC, DEFAULT_CHEST, DEFAULT_CUTSCENE_TRIGGER, DESTRUCTIBLE_PLATFORM
+from leveleffectdata import LevelEffectData
 
 ROOM_WIDTH = 28
 ROOM_HEIGHT = 20
@@ -26,6 +27,7 @@ class RoomData(object):
 	def __init__(self, width, height, x, y):
 		self.global_x, self.global_y = x, y
 		self.tiles = RoomData.empty_tile_set(width, height)
+		self.effects = RoomData.empty_effect_set(width, height)
 	
 	def empty(self):
 		""" rd.empty( ) -> bool
@@ -44,6 +46,13 @@ class RoomData(object):
 		"""
 		return self.tiles[y][x]
 
+	def effect_at(self, x, y):
+		""" rd.effect_at( int, int ) -> LevelEffectData
+
+		Returns the effectdata at the given coordinates.
+		"""
+		return self.effects[y][x]
+
 	def setAllTiles(self, tile_set):
 		""" rd.setAllTiles( [ [ TileData ] ] ) -> None
 
@@ -53,6 +62,16 @@ class RoomData(object):
 		for y in xrange(rows):
 			for x in xrange(cols):
 				self.tiles[y][x] = tile_set[y][x]
+
+	def setAllEffects(self, effect_set):
+		""" rd.setAllEffects( [ [ LevelEffectData ] ] ) -> None
+
+		Take a 2D list of effectdatas and set the effectdatas in this roomdata's list to the ones given.
+		"""
+		rows, cols = len(effect_set), len(effect_set[0])
+		for y in xrange(rows):
+			for x in xrange(cols):
+				self.effects[y][x] = effect_set[y][x]
 	
 	def set_tile(self, tile_data, col, row):
 		""" rd.set_tile( TileData, int, int ) -> None
@@ -61,12 +80,19 @@ class RoomData(object):
 		"""
 		self.tiles[row][col] = tile_data #might benefit from a special setter if tiledata becomes more complex.
 
+	def set_effect(self, effect_data, col, row):
+		""" rd.set_effect( LevelEffectData, int, int ) -> None
+
+		Set the effect at the given coordinates to the given effectdata.
+		"""
+		self.effects[row][col] = effect_data
+
 	def formatted_data(self):
-		""" rd.formatted_data( ) -> ( int, int, [ [ ( str, str, int, int ) ] ] ) 
+		""" rd.formatted_data( ) -> ( int, int, [ [ ( str, str, int, int ) ] ], [ [ ( str, str, int, int ) ] ] ) 
 
 		Converts this RoomData into primitive types for the purpose of saving to a file.
 		"""
-		return (self.global_x, self.global_y, self.formatted_tile_set()) #might need to format tiles
+		return (self.global_x, self.global_y, self.formatted_tile_set(), self.formatted_effect_set() ) #might need to format tiles
 
 	def formatted_tile_set(self):
 		""" rd.formatted_tile_set( ) -> [ [ ( str, str, int, int )  ] ]
@@ -83,6 +109,21 @@ class RoomData(object):
 					next_data = next_tile.formatted_data()
 				tiles[y].append(next_data)
 		return tiles
+
+	def formatted_effect_set(self):
+		""" rd.formatted_effect_set( ) -> [ [ ( str, str, int, int )  ] ]
+
+		Converts the effectdatas into primitive types for the purpose of saving to a file.
+		"""
+		effects = []
+		for y in xrange (len(self.effects)):
+			effects.append([])
+			for x in xrange(len(self.effects[y])):
+				next_data = None
+				next_effect = self.effects[y][x]
+				if next_effect != None: next_data = next_effect.formatted_data()
+				effects[y].append(next_data)
+		return effects
 
 	@staticmethod
 	def deformatted_room_set(formatted_data, filepath = "./"):	
@@ -110,9 +151,11 @@ class RoomData(object):
 		"""
 		x, y = formatted_data[0], formatted_data[1]
 		tile_set = RoomData.deformatted_tile_set(formatted_data[2], filepath) #have to deformat tiles before returning the room_data.
+		effect_set = RoomData.deformatted_effect_set(formatted_data[3], filepath)
 		width, height = len(tile_set[0]), len(tile_set) #might need a None exeception handler
 		room_data = RoomData(width, height, x, y)
 		room_data.setAllTiles(tile_set)
+		room_data.setAllEffects(effect_set)
 		return room_data
 
 	@staticmethod
@@ -133,6 +176,24 @@ class RoomData(object):
 				if next_tile != None:
 					RoomData.addTiles(tiles, next_tile, x, y, filepath)
 		return tiles
+
+	@staticmethod
+	def deformatted_effect_set(formatted_data, filepath = "./"):
+		""" deformatted_effect_set( [ [ ( str, str, int, int ) ] ] , str ) -> [ [ LevelEffectData ] ]
+
+		Builds a grid of effectdatas for a roomdata using a grid of data loaded from a file. 
+		"""
+		effects = []
+		for y in xrange (len(formatted_data)):
+			effects.append([])
+			for x in xrange(len(formatted_data[y])):
+				effects[y].append(None)
+		for y in xrange(len(formatted_data)):
+			for x in xrange(len(formatted_data[y])):
+				next_data = None
+				next_effect = formatted_data[y][x]
+				if next_effect != None: effects[y][x] = RoomData.deformatted_effect(formatted_data[y][x], filepath)
+		return effects
 
 	@staticmethod
 	def addTiles(tiles, formatted_data, x_pos, y_pos, filepath = "./"):
@@ -166,6 +227,10 @@ class RoomData(object):
 		else:
 			tile_data = TileData(formatted_data[0], formatted_data[1], filepath)
 		return tile_data
+
+	@staticmethod
+	def deformatted_effect(formatted_data, filepath = "./"):
+		return LevelEffectData(formatted_data[0], formatted_data[1], filepath)
 
 	@staticmethod
 	def deformatted_sign(formatted_data, filepath):	# this will need to change as this class's constructor does.
@@ -230,6 +295,15 @@ class RoomData(object):
 			for x in xrange(width):
 				tiles[y].append(None)
 		return tiles
+
+	@staticmethod
+	def empty_effect_set(width,height):
+		effects = []
+		for y in xrange(height):
+			effects.append([])
+			for x in xrange(width):
+				effects[y].append(None)
+		return effects
 
 TILE_INIT_MAP = {
 	DEFAULT_SIGN:RoomData.deformatted_sign,

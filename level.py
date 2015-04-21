@@ -22,6 +22,7 @@ from nonplayercharacter import NonPlayerCharacter
 from lantern import Lantern
 from chest import Chest
 from exitblock import ExitBlock
+from leveleffect import LevelEffect
 
 from camera import WIN_WIDTH, WIN_HEIGHT
 from roomdata import ROOM_WIDTH, ROOM_HEIGHT
@@ -770,10 +771,9 @@ class Level(object):
 		if (player.invincibility_frames % 2) == 0: self.screen.blit(player.image, self.level_camera.apply(player))
 		self.display_passable_blocks()
 		self.display_player_subentities(player)
-		if not self.current_event:
-			self.update_player_hud(player) 
-		if(self.has_effects): 
-			self.update_effects()
+		self.draw_level_effects()
+		if not self.current_event: self.update_player_hud(player) 
+		if(self.has_effects): self.update_effects()
 
 	def display_dark(self, tiles, player):
 		""" l.display_dark( [ [ Tile ] ], Player ) -> None
@@ -786,10 +786,9 @@ class Level(object):
 		self.display_passable_blocks()
 		self.display_player_subentities(player)
 		if light_map: self.update_light(light_map)	
-		if not self.current_event:
-			self.update_player_hud(player) 
-		if(self.has_effects): 
-			self.update_effects()
+		self.draw_level_effects()
+		if not self.current_event: self.update_player_hud(player) 
+		if(self.has_effects): self.update_effects()
 		
 	def display_full_dark(self, tiles, player):
 		""" l.display_full_dark( [ [ Tile ] ], Player ) -> None
@@ -799,6 +798,7 @@ class Level(object):
 		"""
 		if (player.invincibility_frames % 2) == 0: self.screen.blit(player.image, self.level_camera.apply(player))
 		self.display_player_subentities(player)
+		self.draw_level_effects()
 		if not self.current_event:
 			self.update_player_hud(player) 
 		if(self.has_effects): 
@@ -910,6 +910,13 @@ class Level(object):
 				e.update()
 				self.screen.blit(e.image, self.level_camera.apply(e))		
 		"""
+
+	def draw_level_effects(self):
+		level_effects = self.getLevelEffects()
+		for le in level_effects:
+			le.update()
+			self.screen.blit(le.image, self.level_camera.apply(le))
+
 	def update_light(self, light_map):
 		""" l.update_light( [ [ double ] ] ) -> None 
 
@@ -1276,6 +1283,13 @@ class Level(object):
 		Returns all chests in the level.
 		"""
 		return self.level_objects.get_entities(Chest)
+
+	def getLevelEffects(self):
+		""" l.getLevelEffects( ) -> [ LevelEffect ]
+
+		Returns all level effects in the level.
+		"""
+		return self.level_objects.level_effects
 
 	def get_exit_blocks(self):
 		""" l.get_exit_blocks( ) -> [ ExitBlock ]

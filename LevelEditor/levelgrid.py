@@ -91,8 +91,9 @@ class LevelGrid(ImageLabel):	# maybe this should be a table instead? not sure
 		for y in xrange (ROOM_HEIGHT):
 			for x in xrange(ROOM_WIDTH):
 				tile_data = room_data.tile_at(x, y)
-				if tile_data == None: continue
-				self.add_tile_cell(tile_data, x, y)
+				effect_data = room_data.effect_at(x, y)
+				if tile_data != None: self.add_tile_cell(tile_data, x, y)
+				if effect_data != None: self.add_effect_cell(effect_data, x, y)
 
 	def select_room(self, x, y):
 		self.room_x, self.room_y = x, y
@@ -102,6 +103,9 @@ class LevelGrid(ImageLabel):	# maybe this should be a table instead? not sure
 	def add_tile_cell(self, tile_data, x, y):
 		if(tile_data == None or isinstance(tile_data, BlockedTileData)): return
 		self.updateTileImage(tile_data.get_image(), x, y)
+
+	def add_effect_cell(self, effect_data, x, y):
+		self.updateTileImage(effect_data.get_image(), x, y)
 
 	def updateTileImage(self, tile_image, x, y):
 		pygame.draw.line(tile_image, BLACK, (0, 0), (0, TILE_HEIGHT))
@@ -147,13 +151,14 @@ class LevelGrid(ImageLabel):	# maybe this should be a table instead? not sure
 		self.deselect()
 		tile = self.level_editor.entity_select_container.current_entity 
 		existing_tile = self.tile_at(global_row, global_col)
-		if isinstance(existing_tile, LevelEffectData):
+		existing_effect = self.effect_at(global_row, global_col)
+		if existing_effect:
 			self.level_effect_click(row, col)
 			return
 		if isinstance(tile, LevelEffectData): 
 			self.level_effect_click(row, col)
 			return
-		if existing_tile != None: 
+		if existing_tile: 
 			if isinstance(existing_tile, BlockedTileData):
 				row, col = existing_tile.origin_y%self.rows, existing_tile.origin_x%self.cols
 				existing_tile = existing_tile.origin_tile
@@ -196,12 +201,17 @@ class LevelGrid(ImageLabel):	# maybe this should be a table instead? not sure
 		self.set_picture(self.grid_image)
 
 	def deselect(self):
-		#TODO: get tile, row and col from somewhere (should probably be data members of this class)
-		tile, row, col = self.selected_tile, self.selected_row, self.selected_col
-		if tile == None: return
-		image = tile.get_image() 		# this part only needs to be done once.
+		row, col = self.selected_row, self.selected_col
 		self.drawGridlines()
-		self.updateTileImage(image, col, row)
+		tile_image = LevelGrid.empty_tile_image()
+		bg = self.bg_grid[self.room_y][self.room_x]
+		if bg: tile_image.blit( bg.subsurface( Rect((col%self.cols)*32, (row%self.rows)*32, 32, 32) ), (0, 0) ) 		
+		tile = self.tile_at(row, col)
+		effect = self.effect_at(row, col)
+		if tile: tile_image.blit(tile.get_image(), (0, 0))
+		if effect:tile_image.blit(effect.get_image(), (0, 0))
+
+		self.updateTileImage(tile_image, col, row)
 		self.selected_tile, self.selected_row, self.selected_col = None, 0, 0
 		self.level_editor.deselect_tile() 
 
@@ -276,7 +286,7 @@ class LevelGrid(ImageLabel):	# maybe this should be a table instead? not sure
 		global_row, global_col = row + self.room_y*self.rows, col + self.room_x*self.cols
 		effect = self.effect_at(global_row, global_col)		
 		if effect == self.selected_tile: self.deselect()
-		self.level_cell().add_effect(None, global_row, global_col)
+		self.level_cell().add_effect(None, global_col, global_row)
 		tile = self.tile_at(global_row, global_col)
 		tile_image = LevelGrid.empty_tile_image()
 		bg = self.bg_grid[self.room_y][self.room_x]

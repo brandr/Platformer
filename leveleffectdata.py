@@ -27,3 +27,11 @@ class LevelEffectData(TileData):
 		Format this leveleffectdata into primitive types so that it can be saved to a file.
 		"""
 		return (self.entity_key, self.image_filepath, self.width, self.height) #TODO: add additional information
+
+	def get_image(self, filepath_start = "./"):	#TODO: consider allowing filepath beginning here.
+		filename = "./images/" + self.image_filepath.split("/")[-1]
+		return TileData.load_image(filename)
+		#filepath = filepath_start + self.image_filepath
+		#image = TileData.load_image(filepath)
+		#image.set_colorkey(DEFAULT_COLORKEY)
+		#return image
