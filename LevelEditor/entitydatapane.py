@@ -12,7 +12,7 @@ from pygame.draw import polygon
 from cutscenescripts import MASTER_CUTSCENE_MAP
 from chestcontents import MASTER_CHEST_CONTENTS_MAP
 from platformdata import MASTER_CATALYST_MAP
-from tiledata import DEFAULT_CUTSCENE_TRIGGER, DESTRUCTIBLE_PLATFORM, DEFAULT_SIGN, DEFAULT_NPC, DEFAULT_DOOR, DEFAULT_CHEST
+from tiledata import DEFAULT_CUTSCENE_TRIGGER, DESTRUCTIBLE_PLATFORM, DEFAULT_SIGN, DEFAULT_NPC, DEFAULT_DOOR, DEFAULT_CHEST, DEFAULT_LEVEL_EFFECT
 
 WHITE = Color("#FFFFFF")
 BLACK = Color("#000000")
@@ -315,6 +315,21 @@ class EntityDataPane(Box): #TODO: figure what class this should extend
 		self.cutscene_label.set_text("Linked cutscene: " + self.current_cutscene_key)
 		self.current_selection.cutscene_key = self.current_cutscene_key
 
+	# LEVEL EFFECT
+	def update_level_effect(self):
+		level_effect_data = self.current_selection
+		self.level_effect_transparency_label = Label("Transparency level: ")
+		self.level_effect_entry = Entry(str(self.current_selection.transparency).ljust(3))
+		self.level_effect_entry.topleft = self.level_effect_transparency_label.rect.right + 8, self.level_effect_transparency_label.rect.top
+		self.set_children([self.level_effect_transparency_label, self.level_effect_entry])
+
+	def save_level_effect_data(self):
+		text = self.level_effect_entry.text
+		if not text.isdigit(): return
+		transparency = (int)(text)
+		if transparency < 0 or transparency > 255: return
+		self.current_selection.transparency = transparency
+
 	# GENERAL METHODS
 	def set_sensitivity(self, component, sensitive):
 		state = Constants.STATE_INSENSITIVE
@@ -348,5 +363,10 @@ ENTITY_DATA_MAP = {
 		DEFAULT_CUTSCENE_TRIGGER:
 		{
 			UPDATE: EntityDataPane.update_cutscene_trigger
+		},
+		DEFAULT_LEVEL_EFFECT:
+		{
+			UPDATE: EntityDataPane.update_level_effect,
+			SAVE: EntityDataPane.save_level_effect_data
 		}
 }

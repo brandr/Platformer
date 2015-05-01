@@ -10,4 +10,7 @@ class LevelEffectFactory:
 
 		Create a LevelEffect using the correct data.
 		"""
-		return LevelEffect(animation_set, x, y) #TEMP. use effect_data if necessary.
+		for direction in animation_set.animations:
+			for key in animation_set.animations[direction]: animation_set.animations[direction][key].set_all_alphas(effect_data.transparency)
+		effect = LevelEffect(animation_set, x, y)
+		return effect

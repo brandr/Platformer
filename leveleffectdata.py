@@ -14,11 +14,11 @@ class LevelEffectData(TileData):
 
 	def __init__(self, key, filepath, filepath_start = "./"):
 		TileData.__init__(self, key, filepath, filepath_start)
-		#TODO: additional information goes here
+		self.transparency = 255
 
 	def create_copy(self):
 		copy_effect = LevelEffectData(self.entity_key, self.image_filepath)
-		#TODO: additional information goes here
+		copy_effect.transparency = self.transparency
 		return copy_effect
 
 	def formatted_data(self):
@@ -26,12 +26,8 @@ class LevelEffectData(TileData):
 
 		Format this leveleffectdata into primitive types so that it can be saved to a file.
 		"""
-		return (self.entity_key, self.image_filepath, self.width, self.height) #TODO: add additional information
+		return (self.entity_key, self.image_filepath, self.width, self.height, self.transparency) #TODO: add additional information
 
-	def get_image(self, filepath_start = "./"):	#TODO: consider allowing filepath beginning here.
+	def get_image(self, filepath_start = "./"):	# note that this needs to be different from the LevelEditor version of the same method.
 		filename = "./images/" + self.image_filepath.split("/")[-1]
 		return TileData.load_image(filename)
-		#filepath = filepath_start + self.image_filepath
-		#image = TileData.load_image(filepath)
-		#image.set_colorkey(DEFAULT_COLORKEY)
-		#return image

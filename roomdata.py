@@ -6,7 +6,7 @@ from npcdata import NPCData
 from cutscenetriggerdata import CutsceneTriggerData
 from chestdata import ChestData
 from platformdata import PlatformData, DestructiblePlatformData
-from tiledata import TileData, BlockedTileData, DEFAULT_SIGN, DEFAULT_NPC, DEFAULT_CHEST, DEFAULT_CUTSCENE_TRIGGER, DESTRUCTIBLE_PLATFORM
+from tiledata import TileData, BlockedTileData, DEFAULT_SIGN, DEFAULT_NPC, DEFAULT_CHEST, DEFAULT_CUTSCENE_TRIGGER, DESTRUCTIBLE_PLATFORM, DEFAULT_LEVEL_EFFECT
 from leveleffectdata import LevelEffectData
 
 ROOM_WIDTH = 28
@@ -230,7 +230,9 @@ class RoomData(object):
 
 	@staticmethod
 	def deformatted_effect(formatted_data, filepath = "./"):
-		return LevelEffectData(formatted_data[0], formatted_data[1], filepath)
+		effect_data = LevelEffectData(formatted_data[0], formatted_data[1], filepath)
+		effect_data.transparency = formatted_data[4]
+		return effect_data
 
 	@staticmethod
 	def deformatted_sign(formatted_data, filepath):	# this will need to change as this class's constructor does.
@@ -310,5 +312,6 @@ TILE_INIT_MAP = {
 	DEFAULT_NPC:RoomData.deformatted_npc,
 	DEFAULT_CHEST:RoomData.deformatted_chest,
 	DEFAULT_CUTSCENE_TRIGGER:RoomData.deformatted_cutscene_trigger,
-	DESTRUCTIBLE_PLATFORM:RoomData.deformatted_destructible_platform
+	DESTRUCTIBLE_PLATFORM:RoomData.deformatted_destructible_platform,
+	DEFAULT_LEVEL_EFFECT:RoomData.deformatted_effect
 }

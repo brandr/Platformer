@@ -24,5 +24,5 @@ class LevelEditorScreen(object):
 	def close_editor_button(self,x,y):
 		button = Button("Close Editor")
 		button.topleft = x,y
-		button.connect_signal(SIG_CLICKED,self.closeLevelEditor)
+		button.connect_signal(SIG_CLICKED, self.closeLevelEditor)
 		return button
