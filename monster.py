@@ -137,6 +137,7 @@ class Monster(Being):
         Being.updatePosition(self)
         if self.armor_set: 
             for a in self.armor_set: a.activate(True)
+        print self.ai_counter
 
     def set_active(self, active):
         """ m.set_active( bool ) -> None

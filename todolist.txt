@@ -149,6 +149,10 @@ OVERARCHING MAIN GOAL: Build a demo showing off combat, exploration, dialogs, cu
 
 IMMEDIATE STUFF: most immediate (defined mainly as finishing incomplete systems or creating new ones that are interesting or that other TODOs depend on.)
 
+# fix the bug "python.exe has stopped working"
+    - test on linux and other windows computers to see if I can reproduce it
+    - it seem to only occur on levels that contain monsters, but not if "print ai_counter" is called in a monster's update method.
+# fix the way the miner takes hits and falls-- the pick is counted as part of the miner when it should not be
 # figure out how monster spawining should be handled: i.e., when monsters defeated earlier should reappear.
     - do this by making save points and using them to save/reload the game.
         * For now, don't bother with a title screen, but just save the saved versions of the game as separate dungeons.

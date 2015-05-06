@@ -13,6 +13,8 @@ from level import DUNGEON_NAME_MAP
 from os import listdir
 from os.path import isfile, join
 
+FRAMES = 80
+
 class GameManager:
 	"""GameManager () -> GameManager
 
@@ -70,8 +72,7 @@ class GameManager:
 		#TEMP
 
 		while 1:
-			timer.tick(120) # make this value lower to make the game run slowly for testing. (use about 40-50 I think)
-
+			timer.tick(FRAMES) # make this value lower to make the game run slowly for testing. (use about 40-50 I think)
  			for e in pygame.event.get():
 				screen_manager.process_event(e)
 			screen_manager.update_current_screen()
