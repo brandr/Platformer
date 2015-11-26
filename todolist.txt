@@ -149,10 +149,6 @@ OVERARCHING MAIN GOAL: Build a demo showing off combat, exploration, dialogs, cu
 
 IMMEDIATE STUFF: most immediate (defined mainly as finishing incomplete systems or creating new ones that are interesting or that other TODOs depend on.)
 
-# fix the bug "python.exe has stopped working"
-    - test on linux and other windows computers to see if I can reproduce it
-    - it seem to only occur on levels that contain monsters, but not if "print ai_counter" is called in a monster's update method.
-# fix the way the miner takes hits and falls-- the pick is counted as part of the miner when it should not be
 # figure out how monster spawining should be handled: i.e., when monsters defeated earlier should reappear.
     - do this by making save points and using them to save/reload the game.
         * For now, don't bother with a title screen, but just save the saved versions of the game as separate dungeons.
@@ -160,8 +156,14 @@ IMMEDIATE STUFF: most immediate (defined mainly as finishing incomplete systems 
     - also consider what will happen to things like destructible blocks
     - IDEA: when levels are created, give them a 2D grid of TileData that will store everything that should respawn when the level is reloaded.
         * to permanently remove something from the level, just remove its associated data object.
+    - also decide if living monsters should move back to their original positions when the player leaves and re-enters a level
 # change the way the player looks in complete darkness.
 # make the miner more reactive by making his charge bring him to the player, then stop, and creating a more animated swing animation for when he is in front of the player.
+# make the player swing his sword properly
+    - consider adding a delay between swings
+# fix the bug "python.exe has stopped working"
+    - test on linux and other windows computers to see if I can reproduce it
+    - it seem to only occur on levels that contain monsters, but not if "print ai_counter" is called in a monster's update method.
 
 --------------------------------------------------------------------------------
 
@@ -346,6 +348,21 @@ IMMEDIATE STUFF: cutscenes
 # consider platforms that  the player can jump up through and/or fall through  by tapping down
 # consider platforms that hurt the player when touched
 # consider moving platforms (might not fit into the existing tile -> block system, and therefore might not inherit from Platform)
+
+    # MORALITY STUFF
+
+# The player gets red, green, and blue points through various natural in-game actions (like collecting items, fighting enemies, etc.)
+    - Try to set it up so players will NOT game the system by saying things like this:
+        * "I will kill/farm X number of monsters to get the red ending"
+        * "I will find every hidden area and collect every item to get the blue ending"
+        * "I will sneak around every enemy so I won't get the red ending"
+        * "I will sequence break so I can get the green ending"
+    - Instead, the player should be unaware of the exact mechanics, but be able to consistently get the endings they want with the correct "attitiudes":
+        * "I will be aggressive and take risks against enemies so I can get the red ending"
+        * "I will move through areas methodically so I can get the blue ending"
+        * "I will look for out-of-the-box ways of getting past obstacles so I can get the green ending"
+    - Some possible ways of achieving this:
+        * Get red points by attacking enemies quickly once they come into view. A timer starts when an enemy gets in a certain range of the player, and the number of attacks the player delivers before that timer runs out determines how many red points the player gains (potentially zero)
 
     # MISC STUFF
 

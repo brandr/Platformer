@@ -9,6 +9,7 @@ from chest import Chest
 from platform import Platform, DestructiblePlatform, PassablePlatform
 from monster import Monster
 from sign import Sign
+from savepoint import SavePoint
 from cutscenetrigger import CutsceneTrigger
 from block import Block
 from door import Door
@@ -35,6 +36,8 @@ ENTITY_CONSTRUCTOR_MAP = { #TODO: try to figure out why signs aren't in here
 	MINER:NonPlayerCharacter,
 
 	DEFAULT_NPC:NonPlayerCharacter,
+
+	DEFAULT_SAVE_POINT:SavePoint,
 
 	DEFAULT_CUTSCENE_TRIGGER:CutsceneTrigger,	#this might not be necessary, but I'm not sure.
 	#TEMP

@@ -137,7 +137,6 @@ class Monster(Being):
         Being.updatePosition(self)
         if self.armor_set: 
             for a in self.armor_set: a.activate(True)
-        print self.ai_counter
 
     def set_active(self, active):
         """ m.set_active( bool ) -> None
@@ -165,6 +164,10 @@ class Monster(Being):
         update_method = MONSTER_AI_MAP[(self.name, self.ai_state)]
         update_method(self, player)
 
+    def can_update(self):
+        if self.bounce_count > 0: return False
+        return True
+
     def default_update_idle(self, player, gravity = True):
         """ m.default_update_idle( Player, bool ) -> None
 
@@ -174,7 +177,7 @@ class Monster(Being):
         if gravity: self.gravityUpdate()
         if self.bounce_count > 0:   
             self.bounce()
-        if self.onGround:
+        elif self.onGround:
             self.changeAnimation('idle', self.direction_id)
             self.xvel = 0   
 
@@ -196,6 +199,7 @@ class Monster(Being):
         In-progress method handling a giant frog's behavior.
         """
         self.default_update_idle(player)
+        if not self.can_update(): return
         #if self.onGround: 
         # TODO: make the frog try to land on the player.
         # figure out the frog's distance from the player, and calculate the necessary xvel.
@@ -215,6 +219,7 @@ class Monster(Being):
         The miner does nothing. Gravity is applied here.
         """
         self.default_update_idle(player)
+        self.weapon.animation.synch_animation_frame(self.animation)
         if self.ai_counter <= 0:
             self.faceTowards(player)
             next_actions = [Monster.miner_begin_charging, Monster.miner_begin_jumping] #TODO: make a more general way to select a "next action" from a set of possibilities
@@ -239,6 +244,7 @@ class Monster(Being):
         blocked = self.check_blocked(DIRECTION_MAP[self.direction_id])
         if blocked or self.ai_counter <= 0: # NOTE: consider dealing with blockage differently to stop the miner from glitching out all over blocks.
             self.weapon.deactivate()
+            self.weapon.set_idle(0, 0, self.direction_id)
             self.ai_state = AI_IDLE
             self.changeAnimation('idle', self.direction_id)
             self.ai_counter = 100
@@ -250,13 +256,17 @@ class Monster(Being):
 
         The miner begins jumping towards the player.
         """
+
         if self.onGround:
             self.faceTowards(player)
             self.ai_state = AI_JUMPING
             self.ai_counter = 50
             self.jump(self.direction_val*self.max_speed/2, self.max_speed)
             self.changeAnimation('idle', self.direction_id) #TODO: use a jumping animation rather than an idle animation
+            self.weapon.update()
+            self.weapon.animation.synch_animation_frame(self.animation)
             return
+        
         #TODO: other case?
 
     def miner_update_jumping(self, player):
@@ -268,13 +278,16 @@ class Monster(Being):
         blocked = self.check_blocked(DIRECTION_MAP[self.direction_id])
         if blocked: self.xvel = 0
         self.gravityUpdate()
+        self.weapon.animation.synch_animation_frame(self.animation)
         if self.onGround:
             self.ai_state = AI_IDLE
             self.ai_counter = 100
+            
+
     
     def miner_swing(self):
         self.changeAnimation('swinging', self.direction_id) # this part might not belong here if there are different animations that involve swinging the pick.
-        if not self.weapon.active:
+        if not self.weapon.active or self.weapon.permanent:
             self.weapon.activate(31, -13, self.direction_id)
         self.weapon.animation.synch_animation_frame(self.animation)
 
@@ -337,13 +350,13 @@ class Monster(Being):
         self.bounceAgainst(source)
         source.bounceAgainst(self)
 
-    def bounceAgainst(self, other): # this is used for a monster colliding with the player, and may be useful in other cases.
+    def bounceAgainst(self, other, bounce_duration = 40): # this is used for a monster colliding with the player, and may be useful in other cases.
         """ m.bounceAgainst ( Being ) -> None
 
         Bounce against another being, starting the bounce counter so that this monster cannot
         take other actions until the counter runs out.
         """
-        if self.can_bounce: Being.bounceAgainst(self, other)
+        if self.can_bounce: Being.bounceAgainst(self, other, bounce_duration)
         # TODO: separate bouncing frames from invincibility frames, and think of some structure that can hold both.
 
     def wait(self):

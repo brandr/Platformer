@@ -127,6 +127,9 @@ class Player(Being):
         player_jumping_left = GameImage.load_animation(filepath, 'player_1_idle_left.bmp', player_rect, -1) # TODO: GameImage.load_animation(filepath, 'player_1_jumping_left.bmp', player_rect, -1, True, 12)
         player_jumping_right = GameImage.load_animation(filepath, 'player_1_idle_right.bmp', player_rect, -1) # TODO: GameImage.load_animation(filepath, 'player_1_jumping_right.bmp', player_rect, -1, True, 12)
 
+        player_swinging_left = GameImage.load_animation(filepath, 'player_1_swinging_left.bmp', player_rect, -1, True, 10)
+        player_swinging_right = GameImage.load_animation(filepath, 'player_1_swinging_right.bmp', player_rect, -1, True, 10)
+
         animation_set = AnimationSet(player_idle_right)
         animation_set.insertAnimation(player_idle_left,'left', 'idle')
         animation_set.insertAnimation(player_idle_right,'right', 'idle')
@@ -139,6 +142,9 @@ class Player(Being):
 
         animation_set.insertAnimation(player_jumping_left,'left', 'jumping')
         animation_set.insertAnimation(player_jumping_right,'right', 'jumping')
+
+        animation_set.insertAnimation(player_swinging_left,'left', 'swinging')
+        animation_set.insertAnimation(player_swinging_right,'right', 'swinging')
 
         #TODO: jumping, falling, and (maybe) terminal velocity
         #TODO: attacking, other sprite animations
@@ -166,6 +172,9 @@ class Player(Being):
         player_jumping_left = GameImage.load_animation(filepath, 'player_1_idle_left_silhouette.bmp', player_rect, -1) # TODO: GameImage.load_animation(filepath, 'player_1_jumping_left.bmp', player_rect, -1, True, 12)
         player_jumping_right = GameImage.load_animation(filepath, 'player_1_idle_right_silhouette.bmp', player_rect, -1) # TODO: GameImage.load_animation(filepath, 'player_1_jumping_right.bmp', player_rect, -1, True, 12)
 
+        player_swinging_left = GameImage.load_animation(filepath, 'player_1_idle_left_silhouette.bmp', player_rect, -1) # TODO: GameImage.load_animation(filepath, 'player_1_swinging_left_silhouette.bmp', player_rect, -1, False, ?)
+        player_swinging_right = GameImage.load_animation(filepath, 'player_1_idle_right_silhouette.bmp', player_rect, -1) # TODO: GameImage.load_animation(filepath, 'player_1_swinging_silhouette.bmp', player_rect, -1, False, ?)
+
         animation_set = AnimationSet(player_idle_right)
         animation_set.insertAnimation(player_idle_left,'left', 'idle')
         animation_set.insertAnimation(player_idle_right,'right', 'idle')
@@ -178,6 +187,9 @@ class Player(Being):
 
         animation_set.insertAnimation(player_jumping_left,'left', 'jumping')
         animation_set.insertAnimation(player_jumping_right,'right', 'jumping')
+
+        animation_set.insertAnimation(player_swinging_left,'left', 'swinging')
+        animation_set.insertAnimation(player_swinging_right,'right', 'swinging')
 
         #TODO: jumping, falling, and (maybe) terminal velocity
         #TODO: attacking, other sprite animations
@@ -227,6 +239,7 @@ class Player(Being):
         This is a little complicated, so I can go more in-depth if necessary.
         """
         up, down, left, right, space, running, x = self.button_press_map[UP], self.button_press_map[DOWN], self.button_press_map[LEFT], self.button_press_map[RIGHT], self.button_press_map[SPACE], self.button_press_map[CONTROL], self.button_press_map[X]
+        swinging = self.get_sword().active
         self.xvel = 0
         if x:
             if self.x_action_check(): return
@@ -237,15 +250,15 @@ class Player(Being):
             pass
         if left and not right:
             self.xvel = -3
-            self.direction_id = 'left'
+            if not swinging: self.direction_id = 'left'
 
         if right and not left:
             self.xvel = 3
-            self.direction_id = 'right'
+            if not swinging: self.direction_id = 'right'
 
         if space and self.onGround:
                 self.yvel -= 8.0
-                self.changeAnimation('jumping', self.direction_id)
+                if not swinging: self.changeAnimation('jumping', self.direction_id)
                 self.animation.iter()
                 self.onGround = False
                 self.can_jump = True
@@ -258,19 +271,18 @@ class Player(Being):
                 self.yvel = max(self.yvel, 0)
                 self.can_jump = False
             #TODO: consider a separate falling animation at terminal velocity.
-        #else:
-        #    self.running = running
+        
         if(running):#self.running):
             self.xvel *= 1.6
             if(self.onGround):
-                self.changeAnimation('running', self.direction_id)
+                if not swinging: self.changeAnimation('running', self.direction_id)
         else:
             if(self.onGround):
                 if(left != right):
-                    self.changeAnimation('walking', self.direction_id)
+                    if not swinging: self.changeAnimation('walking', self.direction_id)
                 else:
                     self.xvel = 0
-                    self.changeAnimation('idle', self.direction_id)
+                    if not swinging: self.changeAnimation('idle', self.direction_id)
             else: 
                 if(left == right):
                     self.xvel = 0
@@ -333,7 +345,9 @@ class Player(Being):
     def temp_z_method(self):    
         #TEMP (no docstring)
         #TODO: find some way to pass this directional check into the sword itself.
-        self.get_sword().activate(32, 0, self.direction_id) 
+        if self.get_sword().active: return
+        self.get_sword().activate(16, 0, self.direction_id) 
+        self.changeAnimation('swinging', self.direction_id)
         #TODO: make a sword-swinging animation for the player, and set it so that the player cannot face the other way if moving left while swinging right (i.e., he just walks backwards)
         #TEMP
 
@@ -590,7 +604,7 @@ class Player(Being):
                 if isinstance(p, DestructiblePlatform):
                     destructible_platforms.append(p)
                 if p.is_sloped:
-                    slopes.append(p)
+                    slopes.append(p) 
                 else:
                     default_platforms.append(p)
         for s in slopes:

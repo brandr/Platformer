@@ -259,7 +259,7 @@ class Being(Entity):
                 if self.onGround: return
                 self.rect.top += 1
 
-    def bounceAgainst(self, other): # this is used for a monster colliding with the player, and may be useful in other cases.
+    def bounceAgainst(self, other, bounce_duration = 40): # this is used for a monster colliding with the player, and may be useful in other cases.
         """ b.bounceAgainst ( Being ) -> None
 
         Bounce against another being, starting the bounce counter so that this being cannot
@@ -277,7 +277,7 @@ class Being(Entity):
         self.xvel = new_xvel
         self.yvel = new_yvel 
         self.collide(self.xvel, self.yvel)
-        self.bounce_count = 40
+        self.bounce_count = bounce_duration
 
     def bounce(self):
         """ b.bounce () -> None

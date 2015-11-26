@@ -94,3 +94,8 @@ class SubEntity(Being): #NOTE: should lanterns be a subentity?
 		if self.active:
 			coords = self.superentity.rect_coords()
 			self.moveRect(self.follow_offset[0] + coords[0], self.follow_offset[1] + coords[1], True)
+
+	def direction_update(self):
+		if self.active and self.direction_id != self.superentity.direction_id:
+			self.direction_id = self.superentity.direction_id
+			self.follow_offset = (-1*(self.follow_offset[0]), self.follow_offset[1])

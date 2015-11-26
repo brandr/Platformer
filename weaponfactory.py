@@ -38,6 +38,7 @@ def build_weapon(weapon_key, superentity):
 LEFT = "left"
 RIGHT = "right"
 
+IDLE = "idle"
 SWINGING = "swinging"
 
 SWORD = "sword"
@@ -46,10 +47,10 @@ PICK = "pick"
 WEAPON_ANIMATION_DATA_MAP = {
 	SWORD:
 		(
-			Rect(0, 0, 32, 32),
+			Rect(0, 0, 64, 64),
 			[
-				("test_sword_swinging_left.bmp", LEFT, SWINGING),
-				("test_sword_swinging_right.bmp", RIGHT, SWINGING)
+				("test_sword_1_swinging_left.bmp", LEFT, SWINGING),
+				("test_sword_1_swinging_right.bmp", RIGHT, SWINGING)
 			]	
 		),
 	PICK:
@@ -57,7 +58,9 @@ WEAPON_ANIMATION_DATA_MAP = {
 			Rect(0, 0, 128, 128),
 			[
 				("pick_swinging_left.bmp", LEFT, SWINGING),
-				("pick_swinging_right.bmp", RIGHT, SWINGING)
+				("pick_swinging_right.bmp", RIGHT, SWINGING),
+				("pick_idle_left.bmp", LEFT, IDLE),
+				("pick_idle_right.bmp", RIGHT, IDLE)
 			]
 		)
 }

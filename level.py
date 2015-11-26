@@ -21,6 +21,7 @@ from monster import Monster
 from nonplayercharacter import NonPlayerCharacter
 from lantern import Lantern
 from chest import Chest
+from savepoint import SavePoint
 from exitblock import ExitBlock
 from leveleffect import LevelEffect
 
@@ -871,6 +872,8 @@ class Level(object):
 			self.screen.blit(c.image, self.level_camera.apply(c))
 		for d in self.getDoors():
 			self.screen.blit(d.image, self.level_camera.apply(d))
+		for s in self.getSavePoints():
+			self.screen.blit(s.image, self.level_camera.apply(s))
 
 		# non-stationary update
 		for l in self.getLanterns():
@@ -1283,6 +1286,13 @@ class Level(object):
 		Returns all chests in the level.
 		"""
 		return self.level_objects.get_entities(Chest)
+
+	def getSavePoints(self):
+		""" l.getSavePoints( ) -> [ SavePoint ]
+
+		Returns all save points in the level.
+		"""
+		return self.level_objects.get_entities(SavePoint)
 
 	def getLevelEffects(self):
 		""" l.getLevelEffects( ) -> [ LevelEffect ]
