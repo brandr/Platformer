@@ -94,7 +94,9 @@ class Monster(Being):
 
         Set this monster's weapon to the given weapon.
         """
-        if weapon: self.weapon = weapon(self)
+        if weapon: 
+            self.weapon = weapon(self)
+            #self.weapon.activate() #TEMP
 
     def init_armor_set(self, armor_set):
         """ m.init_armor_set( [ method ] ) -> None

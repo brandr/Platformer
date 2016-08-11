@@ -45,7 +45,7 @@ class DestructiblePlatform(Platform):
 	"""
 	def __init__(self, animations, x, y):
 		Platform.__init__(self, animations, x, y)
-		self.destroy_list = []	#consider adding more ways to destroy these blocks, such as stepping on them.
+		self.destroy_list = []	
 		self.destroying = False
 		self.destroyed = False
 		self.destroy_animation = self.build_destroy_animation()

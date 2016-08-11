@@ -27,8 +27,8 @@ class DialogChoice(Dialog):
 		self.choice_data_list = choice_data_list
 		self.source = source
 		for d in self.choice_data_list:
-			choice_text = d[0]
-			text += "\n" + choice_text
+			#choice_text = d[0]
+			text += "\n" + d[0]
 		self.choosing = False
 		self.select_index = 0
 		Dialog.__init__(self, source_type, text, portrait_filename, dimensions, scrolling, font_color)
@@ -160,9 +160,22 @@ class DialogChoice(Dialog):
 		if(next_action_data):
 			action_key = next_action_data[0]
 			build_method = BUILD_METHOD_MAP[action_key]
-			dialog_branch = build_method(self, dialog_branch, next_action_data)
-		event.add_action(dialog_branch[0])
-		dialog_branch[0].execute(level)
+			if dialog_branch: dialog_branch = build_method(self, dialog_branch, next_action_data)
+			else: 				
+				action_set = []
+				for a in next_action_data[1]:
+					action = GameAction(a[0], a[1], self.get_source(), a[2])
+					action_set.append(action)
+				for i in range(0, len(next_action_data[1]) - 1):
+					action_set[i].add_next_action(action_set[i + 1])
+				event.add_action(action_set[0])
+				action_set[0].execute(level)
+				return True
+		if dialog_branch:
+			event.add_action(dialog_branch[0])
+			dialog_branch[0].execute(level)
+		else:
+			pass #TODO
 		return True
 
 	def build_dialog_branch(self, dialog_data):

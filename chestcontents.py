@@ -2,6 +2,7 @@
 """
 
 from lantern import Lantern
+from meleeweapon import MeleeWeapon
 
 # item constants
 ITEM_CLASS = "item_class"
@@ -24,6 +25,22 @@ LANTERN_MAP = {
 	]
 }
 
+SWORD_MAP = {
+	ITEM_CLASS:MeleeWeapon, 
+	ITEM_KEY:"sword",
+	DISPLAY_NAME: "Sword",
+	RECEIVE_DIALOG_DATA:
+	[
+		[
+			"You got a sword! Swing it with Z!",
+			"Be careful! You could poke an eye out!"
+		]
+	]
+}
+
+SUBENTITY_LIST = ["sword"]
+
 MASTER_CHEST_CONTENTS_MAP = {
-	"lantern":LANTERN_MAP
+	"lantern":LANTERN_MAP,
+	"sword":SWORD_MAP
 }

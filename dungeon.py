@@ -22,12 +22,15 @@ class Dungeon(object):
 
 	dungeon_name: A string representing the name of the dungeon. Note that this is not the name that will display on the map.
 	"""
-	def __init__(self, level_data_set, room_data_set, dungeon_name): #Dungeon builds the dungeon from a single map along with some other data about the level.
+	def __init__(self, dungeon_data, room_data_set, level_data_set, dungeon_name, filename = "", start_data = None): #Dungeon builds the dungeon from a single map along with some other data about the level.
 		factory = LevelFactory()
 		print "Building dungeon rooms..."
 		rooms = factory.dungeon_rooms(self, room_data_set, level_data_set) 
 		self.dungeon_levels = factory.dungeon_levels(self, rooms, level_data_set)
 		self.dungeon_name = dungeon_name
+		self.dungeon_build_data = dungeon_data
+		self.filename = filename
+		self.start_data = start_data
 		
 	def start_level(self):
 		""" d.start_level( ) -> Level 
@@ -35,9 +38,17 @@ class Dungeon(object):
 		The level where the player starts the game. Might want to change this system if the player can
 		travel between dungeons, save the game, etc.
 		"""
+		if not self.start_data:
+			for L in self.dungeon_levels:
+				if(L.start_coords != None): return L
+			return None
+		level_key = self.start_data.start_level_key
 		for L in self.dungeon_levels:
-			if(L.start_coords != None): return L
+			if(L.level_ID == level_key):
+				L.start_coords = (self.start_data.start_x, self.start_data.start_y)
+				return L
 		return None
+		#TODO: get the starting level from player start data, and set its start coords.
 
 		#TODO: error case where next_level is None.
 	def move_player(self, screen_manager, screen, player, next_level, global_coords, local_coords, pixel_remainder):
@@ -56,6 +67,7 @@ class Dungeon(object):
 
 		Adds the player to this dungeon at the given level using arguments to determine the correct position.
 		"""
+		
 		room_coords = (local_coords[0], local_coords[1])
 		next_coords = next_level.flipped_coords( (0, 0), room_coords) #TODO: will have to change this
 		next_level.screen_manager = screen_manager

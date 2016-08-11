@@ -10,6 +10,8 @@ from platformdata import DESTROY_STEP_ON
 from animationset import AnimationSet
 from lightflash import LightFlash
 from projectile import Projectile
+from subentity import SubEntity
+from playerdata import PlayerData
 
 from weaponfactory import build_weapon, SWORD
 from inventory import Inventory, LANTERN
@@ -92,7 +94,7 @@ class Player(Being):
         self.hud_map = self.load_hud_map()
         self.light_flash_animations = self.load_light_flash_animations()
         self.light_flash = None
-        #self.light_flash_circles = self.load_light_flash_circles()
+        
         #TODO: come up with a more general system for swords/weapons
         self.viewed_cutscene_keys = []
         #TEMP
@@ -212,6 +214,27 @@ class Player(Being):
         Makes the player active, such as after a cutscene is over.
         """
         self.active = True
+
+    def player_data(self):
+        """ p.player_data( ) -> PlayerData
+
+        Returns data about the player to be used when saving or loading the game.
+        """
+        data = PlayerData(self.inventory) 
+        data.load_meter_data(self)
+        return data
+
+    def init_start_data(self, start_data):
+        """ p.init_start_data( StartData ) -> None
+
+        Set up the player's initial data, such as starting inventory.
+        """
+        self.inventory = start_data.load_inventory()
+        for i in self.inventory.get_all_items():
+            if isinstance(i, SubEntity): i.superentity = self
+        meter_amounts = start_data.player_data.meter_amounts
+        if "lantern" in meter_amounts and self.get_lantern():
+            self.get_lantern().oil_meter = meter_amounts["lantern"]
 
     def update(self, tiles, light_map):
         """ p.update( [ [ Tile ] ], [ [ double ] ]) -> None

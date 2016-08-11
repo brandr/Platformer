@@ -129,7 +129,7 @@ LONG-TERM GOALS: (short summaries, does not include all TODOs)
         * see begin_cutscene in cutsenetrigger.py.
 # world and world data (implementing this might be a priority, but it'll be a big project)
     - flesh out dungeon <-> world relationship
-    - saving/loading game (probably a concern for late in development)
+    - saving/loading game
     - world data:
         * will be something stored as an instance when the player saves, but also update as the player goes through the game.
         * includes relatively temporary things like which enemies have been killed and which blocks have been broken, 
@@ -149,6 +149,31 @@ OVERARCHING MAIN GOAL: Build a demo showing off combat, exploration, dialogs, cu
 
 IMMEDIATE STUFF: most immediate (defined mainly as finishing incomplete systems or creating new ones that are interesting or that other TODOs depend on.)
 
+# make it so the world editor can save worlds properly.
+    - Finish the WorldFileManagerContainer class so it can save properly.
+    - Make another container for setting start data (start location, starting inventory, etc.)
+# make it so save data for a file is separate from the dungeon save.
+    - This means the dungeon's filename is no longer used to load the save, but instead some filename is used to load the entire world, including all the dungeons.
+    - Alternately, keep the dungeons as separate files, but make a small save file which indicates which dungeon the player saved in, along with some other data.
+    - Either way, all dungeon changes still need to be saved upon saving the game. This makes the first option more appealing.
+    - IDEA: always load all the dungeons from a single WorldData object loaded from file.
+        * set up the worlddata using a dungeon list containing only a single dungeon. Need to save the formatted data first (maybe using hardcoded world data)
+        * next, make it possible to load the worlddata, and make sure the save uses the worlddata associated with the world.
+        * hardcode the game to save another dungeon in the same worlddata save, then test the world's ability to save across multiple dungeons.
+            # finally, change the dungeoneditor (or make a new editor) that packages a set of dungeons into a single world and sets the player's starting location.
+            # keep in mind I will need to change the "developer directory" now that I'm on a new computer.
+# make it so the player's visited room data carried over.
+# IDEA: track "change events" using the player, and have these apply in the save method in savepoint.py.
+    -change events will include anything that the game should "remember" upon reloading, such as:
+        * Bosses defeated
+        * changes in monster spawning
+        * chests opened
+        * certain shortcuts opened
+        * cutscenes viewed
+# include info about the player (such as morality and inventory) separately from change data, since it will always be saved.
+# after the game saves, have a dialog pop up saying "game saved".
+# fix the sword swinging animation so it actually looks good and doesn't blink on and off.
+    - Also consider adding a delay between swings
 # figure out how monster spawining should be handled: i.e., when monsters defeated earlier should reappear.
     - do this by making save points and using them to save/reload the game.
         * For now, don't bother with a title screen, but just save the saved versions of the game as separate dungeons.
@@ -159,8 +184,7 @@ IMMEDIATE STUFF: most immediate (defined mainly as finishing incomplete systems 
     - also decide if living monsters should move back to their original positions when the player leaves and re-enters a level
 # change the way the player looks in complete darkness.
 # make the miner more reactive by making his charge bring him to the player, then stop, and creating a more animated swing animation for when he is in front of the player.
-# make the player swing his sword properly
-    - consider adding a delay between swings
+    
 # fix the bug "python.exe has stopped working"
     - test on linux and other windows computers to see if I can reproduce it
     - it seem to only occur on levels that contain monsters, but not if "print ai_counter" is called in a monster's update method.
@@ -185,7 +209,7 @@ SECOND MOST IMMEDIATE STUFF
 # make the "hit spark" better (and possibly more well-adapted to the shape of the thing hit)
     - consider other ways to show that something is being damaged-- flashing red?
 # IDEA: Make the dungeon editor (not the level editor) more intuitive by allowing level selection via the grid and not just the scroll list.
-# figure out a combat system 
+# figure out a better combat system 
     - IDEA for hp/other stats: have a double dict of { MONSTER_NAME: { MONSTER DICT }, DEFAULT: { DEFAULT DICT } }
         * implemented this for HP only
     - may have to tweak some of the being/monster bounce system 
@@ -270,7 +294,7 @@ IMMEDIATE STUFF: dialog
             which make them appear.
 # make portraits prettier (look at cave story, consult people, consider resizing, etc.)
 # fix the SIGN arg that I use to determine the image for the dialog pane, or just make it so all dialog panes are the same (which I would prefer not to do)
-    - this will change the NPC class, the dialog class (I think), and probaly the dialogchoice one (and maybe some others)
+    - this will change the NPC class, the dialog class (I think), and probaly the dialogchoice one (and maybe some others like SavePoint)
 # figure out how to give the existing dialog boxes borders, maybe even make them loaded images instead.
     - could make a nice little "sign" image with a wooden grain
     - figure out what panes should be like for NPCs
@@ -301,9 +325,7 @@ IMMEDIATE STUFF: cutscenes
 # implement collectable items of some kind and an inventory screen
     - will require a lot of planning as far as actual game design
 # consider making it so the player does not jump repeatedly if the jump button is held down.
-# Make a windowed launcher that makes it possible to select which dungeon to load from the saved list.
-# consider removing level_ID, but first try to think of possible uses for it.
-    - it is likely to come in handy when "world data" is implemented.
+# Make a title screen
 # flesh out projectiles
     - might need a more general way to create projectiles
     - make variables that determine how projectiles move, whether they harm their owner, whether they penetrate armor, whether they penetrate blocks, etc.
@@ -344,7 +366,6 @@ IMMEDIATE STUFF: cutscenes
 
     # PLATFORM STUFF
 
-# consider letting destructible platforms have multiple destroy criteria. This would be accomplished by changing the entitydatapane and the formatting style of destructible platforms.
 # consider platforms that  the player can jump up through and/or fall through  by tapping down
 # consider platforms that hurt the player when touched
 # consider moving platforms (might not fit into the existing tile -> block system, and therefore might not inherit from Platform)
@@ -376,10 +397,9 @@ IMMEDIATE STUFF: cutscenes
 # to make running out of lantern oil more threatening, make some unkillable monster (explained in the story) who comes to kill you if you're in complete darkness.
     - maybe you kill this monster during one of the possible endings?
 # figure out the long-term artstyle and change sprites to match
-# since being in the dark with no light could make it extremely tedious to get out, make a "suicide" option and ensure that death
+# since being in the dark with no light could make it extremely tedious to get out, could make a "suicide" option and ensure that death
     has siginficant pentalties and sends the player back to a save point where they are guaranteed to have access to light
         - want to structure the game partly around this system
-# make it possible for the player to save the game
 # think up lots of cool easter eggs 
 # when actually implementing the game, make sure that at some point the player is forced to go through dark areas with no lantern/empty lantern
     so that they know what it's like.   

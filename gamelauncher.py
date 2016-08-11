@@ -1,6 +1,5 @@
 """This is currently the only class with a main method, so you can run the game from it.
-currently the data for building the dungeon is read in from here, though that is likely to change as
-the data gets more complicated."""
+currently the data for building the dungeon is dealt with by GameManager."""
 
 from gamemanager import *
 
@@ -8,11 +7,9 @@ def runGame():
     """
     runGame () -> None
 
-    Run the game with the dungeon saved in file 'dungeon0'. 
-    Later, we might run the game with arguments to choose
-    a particular dungeon.
-
+    Run the game using whatever default starting conditions are set in GameManager.
     """
+    print("HERE")
     pygame.init()
     manager = GameManager()
     manager.run_game()

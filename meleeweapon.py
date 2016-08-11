@@ -22,6 +22,7 @@ class MeleeWeapon(SubEntity):
 		self.default_image = self.animation.images[0]
 		self.damage = 1 #TEMP
 		self.cancelled = False
+		self.enemies_hit = []
 
 	# TEMP, COPIED FROM SWORD vvv
 

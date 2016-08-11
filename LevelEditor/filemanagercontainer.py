@@ -45,6 +45,7 @@ class FileManagerContainer(Box):
 		self.add_child(self.current_file_label)
 		
 		self.updateFileSelection()
+		self.setSensitivity(self.save_dungeon_button, True) #TEMP
 
 	#methods for making GUI components
 
@@ -104,7 +105,8 @@ class FileManagerContainer(Box):
 		json.dump(save_data, dungeon_file)
 		self.file_select_window.set_directory('./dungeon_map_files')
 		#TODO: update the save pane here.
-		dev_filepath = "/home/robert/Documents/python_stuff/Platformer/dungeon_map_files"
+		#dev_filepath = "/home/robert/Documents/python_stuff/Platformer/saves"
+		dev_filepath = "C:\Users\Robert\Documents\python_stuff\Platformer\saves"
 		if(path.exists(dev_filepath)):
 			dev_filename = dev_filepath + "/" + current_filename
 			print "Saving dungeon for the developers..."

@@ -26,7 +26,6 @@ class Lantern(SubEntity):	#lantern which can help the player see
     """
     def __init__(self, animations, x, y, player = None):
         SubEntity.__init__(self, player, animations, x, y)
-        #self.load_animation_set()
         self.rect.centerx += x
         self.rect.centery += y
         self.animated = True

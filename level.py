@@ -548,7 +548,7 @@ class Level(object):
 		dungeon_display_name = dungeon_name
 		if dungeon_name in DUNGEON_NAME_MAP:
 			dungeon_display_name = DUNGEON_NAME_MAP[dungeon_name]
-		adjacent_dungeon = build_dungeon(dungeon_directory + dungeon_name, dungeon_display_name)
+		adjacent_dungeon = build_dungeon(dungeon_directory + dungeon_name, dungeon_name, dungeon_display_name)
 		adjacent_dungeon.connect_to_level(self, self.dungeon)
 		self.adjacent_dungeon = adjacent_dungeon
 

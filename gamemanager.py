@@ -48,8 +48,9 @@ class GameManager:
 
 		player = Player(player_animations, start_level)
 		start_level.addPlayer(player)
+		player.init_start_data(start_dungeon.start_data)
 
-		game_controls = MainGameControls(player) # TODO: consider how controls may parse buttons differently for different screens.
+		game_controls = MainGameControls(player) 
 		control_manager = ControlManager(game_controls)
 		main_screen = MainGameScreen(control_manager, player) 
 		screen_manager = ScreenManager(master_screen, main_screen, player)
@@ -61,14 +62,14 @@ class GameManager:
 		player_right_action = GameAction(player_right_method, 60, None, player)
 		actions = [player_right_action] 		# TODO: action for player moving right
 		test_cutscene = Cutscene(actions)
-		player.current_level.begin_cutscene(test_cutscene)
+		#player.current_level.begin_cutscene(test_cutscene)
 
 		#TEMP
-		pygame.mixer.init()
-		pygame.mixer.music.load('./music/test_song.mp3')
-		pygame.mixer.music.play(-1)
-
-		pygame.mixer.music.set_volume(0) # comment out this line to enable music.
+		#NOTE: the music may be causing python to crash.
+		#pygame.mixer.init()
+		#pygame.mixer.music.load('./music/test_song.mp3')	# this is copyrighted so I will need to compose my own music at some point.
+		#pygame.mixer.music.play(-1)
+		#pygame.mixer.music.set_volume(0) # comment out this line to enable music.
 		#TEMP
 
 		while 1:
@@ -81,9 +82,9 @@ class GameManager:
 
 	def build_dungeon_and_screen(self):
 		#use this block for developers only vvvvv
-		dungeon_path = "./dungeon_map_files/"
 		print "Select a starting dungeon by number: "
-		dungeon_path = "./dungeon_map_files/"
+		#dungeon_path = "./dungeon_map_files/"
+		dungeon_path = "./saves/"
 		dungeon_files = [ f for f in listdir(dungeon_path) if isfile(join(dungeon_path, f)) ]
 		i = 0
 		for f in dungeon_files:
@@ -106,7 +107,7 @@ class GameManager:
 		if dungeon_name in DUNGEON_NAME_MAP:
 			dungeon_display_name = DUNGEON_NAME_MAP[dungeon_name]
 		master_screen = pygame.display.set_mode(DISPLAY, FLAGS, DEPTH)
-		dungeon = build_dungeon(dungeon_path + dungeon_name, dungeon_display_name)
+		dungeon = build_dungeon(dungeon_path + dungeon_name, dungeon_name, dungeon_display_name)
 		print "Dungeon built."
 		return dungeon, dungeon_display_name, master_screen
 

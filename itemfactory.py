@@ -5,7 +5,8 @@ from pygame import image, Rect
 
 from gameimage import GameImage
 from animationset import AnimationSet
-
+from chestcontents import SUBENTITY_LIST
+from weaponfactory import SWINGING
 
 def item_animation_set( animation_data ):
 	""" item_animation_set( ( Rect, [ ( str, str, str ) ] ) ) -> AnimationSet
@@ -33,7 +34,9 @@ def build_item( constructor, key, x, y ):
 	"""
 	animation_data = ITEM_ANIMATION_DATA_MAP[key]
 	animation_set = item_animation_set(animation_data)
-	item = constructor( animation_set, x, y )
+	item = None
+	if key in SUBENTITY_LIST: item = constructor(None, animation_set) #TMP
+	else: item = constructor( animation_set, x, y )
 	# TODO: additional init  methods go here. (may need to take more args)
 	return item
 
@@ -43,6 +46,7 @@ LEFT = "left"
 RIGHT = "right"
 
 LANTERN = "lantern"
+SWORD = "sword"
 
 ITEM_ANIMATION_DATA_MAP = {
 	LANTERN:
@@ -53,5 +57,14 @@ ITEM_ANIMATION_DATA_MAP = {
 				( "lantern_idle_left.bmp", LEFT, IDLE ),
 				( "lantern_idle_right.bmp", RIGHT, IDLE ),
 			]	
+		),
+	SWORD:
+		(
+			Rect(0, 0, 32, 32),
+			[
+				("test_sword_1_swinging_left.bmp", DEFAULT, DEFAULT),
+				("test_sword_1_swinging_left.bmp", LEFT, SWINGING),
+				("test_sword_1_swinging_right.bmp", RIGHT, SWINGING)
+			]
 		)
 }
