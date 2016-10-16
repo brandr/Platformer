@@ -3,6 +3,7 @@ from ocempgui.widgets.Constants import *
 import os
 
 DUNGEON_NAME_SPACING = 26
+LEFT_MOUSE_BUTTON = 1
 
 class DungeonSelectContainer(Box):
 	def __init__(self, position, dimensions): #TODO: add arg for connected component if necessary.

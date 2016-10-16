@@ -1,8 +1,8 @@
 from worldfilemanagercontainer import *
-from dungeonselectcontainer import DungeonSelectContainer
+from dungeonselectcontainer import DungeonSelectContainer, LEFT_MOUSE_BUTTON
 from startdataeditorcontainer import StartDataEditorContainer
 
-LEFT_MOUSE_BUTTON = 1
+#LEFT_MOUSE_BUTTON = 1
 WORLD_WIN_WIDTH = 860	  
 WORLD_WIN_HEIGHT = 540
 

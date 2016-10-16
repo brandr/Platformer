@@ -143,7 +143,7 @@ class BuildExe:
  
         #List all data files to add
         #dungeon_data_files = ["C:\Users\Robert\Documents\python_stuff\Platformer\LevelEditor\dungeon_map_files\dungeon0"]
-        extra_directory_names = ["animations", "backgrounds", "concentric_circles", "dungeon_map_files", "fonts", "hud", "images", "light_flash_circles", "light_rings", "portraits"]
+        extra_directory_names = ["animations", "backgrounds", "concentric_circles", "dungeon_map_files", "fonts", "hud", "images", "inventory_images", "light_flash_circles", "light_rings", "music", "portraits", "saves"]
         extra_datas = []
         for name in extra_directory_names:
             dir_path = ".\\" + name + "\\"

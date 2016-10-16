@@ -62,6 +62,7 @@ class SavePoint(Entity):
 		# - opened chests (this falls under "change data" or whatever I was planning to call it)
 		# - some (but not all) destroyed blocks (need the blocks' original locations)
 		# these things can go in "start data".
+		# TODO: make sure the entire world is saved, not just the dungeon.
 		level = self.current_level
 		dungeon = level.dungeon
 		player = level.getPlayer()

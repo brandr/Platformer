@@ -37,6 +37,7 @@ class GameManager:
 		"""
 
 		#factory = DungeonFactory() #might need args like filename, filepath, etc later
+		#TODO: load the whole world, not just one dungeon
 		start_dungeon, dungeon_name, master_screen = self.build_dungeon_and_screen() 
 		world = World(start_dungeon) # TODO: implement world (contains all dungeons, along with other global data-- how to do this?)
 		pygame.display.set_caption(dungeon_name)

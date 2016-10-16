@@ -153,7 +153,7 @@ IMMEDIATE STUFF: most immediate (defined mainly as finishing incomplete systems 
     - Finish the WorldFileManagerContainer class so it can save properly.
     - Make another container for setting start data (start location, starting inventory, etc.)
 # make it so save data for a file is separate from the dungeon save.
-    - This means the dungeon's filename is no longer used to load the save, but instead some filename is used to load the entire world, including all the dungeons.
+    - This means the dungeon's filename is no longer used to load the save, but instead some filename is used to save/load the entire world, including all the dungeons.
     - Alternately, keep the dungeons as separate files, but make a small save file which indicates which dungeon the player saved in, along with some other data.
     - Either way, all dungeon changes still need to be saved upon saving the game. This makes the first option more appealing.
     - IDEA: always load all the dungeons from a single WorldData object loaded from file.

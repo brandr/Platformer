@@ -29,7 +29,7 @@ class WorldFileManagerContainer(Box):
 	def new_world_button(self, x, y):
 		button = Button("New World")
 		button.topleft = x, y
-		#TODO
+		#TODO: create a new world with the given name if possible. May need to reset the editor.
 		#button.connect_signal(SIG_CLICKED, self.level_select_container.editor_screen.resetEditor) 
 		return button
 
@@ -88,5 +88,5 @@ class WorldFileManagerContainer(Box):
 	def updateFileSelection(self):
 		current_filename = self.current_filename()
 		valid_filename = current_filename != None and len(current_filename) > 0	and current_filename != ".." #TODO: consider checking for spaces and stuff too
-		self.setSensitivity(self.save_world_button, valid_filename)
+		#self.setSensitivity(self.save_world_button, valid_filename)
 		self.setSensitivity(self.load_world_button, valid_filename)

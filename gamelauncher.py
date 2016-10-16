@@ -9,7 +9,6 @@ def runGame():
 
     Run the game using whatever default starting conditions are set in GameManager.
     """
-    print("HERE")
     pygame.init()
     manager = GameManager()
     manager.run_game()

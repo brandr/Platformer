@@ -100,13 +100,13 @@ class DungeonGridCell(ImageButton):
 	@staticmethod
 	def selected_empty_tile():
 		tile = Surface((DUNGEON_CELL_WIDTH, DUNGEON_CELL_HEIGHT))
-		tile.fill(Color("#880000"))
+		tile.fill(Color("#660000"))
 		return tile
 
 	@staticmethod
 	def deselected_tile():
 		tile = Surface((DUNGEON_CELL_WIDTH, DUNGEON_CELL_HEIGHT))
-		tile.fill(Color("#FF0066"))
+		tile.fill(Color("#DD00AA"))
 		return tile
 
 	@staticmethod
